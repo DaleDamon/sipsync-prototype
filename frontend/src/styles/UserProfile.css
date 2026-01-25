@@ -1,0 +1,201 @@
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #8b0000 0%, #a10000 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 12px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.profile-header h2 {
+  margin: 0 0 20px 0;
+  font-size: 36px;
+}
+
+.user-info {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.user-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.user-stats {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.error-message {
+  background-color: #ffe0e0;
+  color: #8b0000;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #8b0000;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  font-size: 16px;
+}
+
+.profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.section h3 {
+  color: #8b0000;
+  margin: 0 0 20px 0;
+  font-size: 22px;
+  border-bottom: 2px solid #ffe0e0;
+  padding-bottom: 10px;
+}
+
+.pairings-list,
+.restaurants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.pairing-card,
+.restaurant-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.pairing-card:hover,
+.restaurant-card:hover {
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #8b0000;
+}
+
+.pairing-header,
+.restaurant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.pairing-info,
+.restaurant-info {
+  flex: 1;
+}
+
+.pairing-info h4,
+.restaurant-info h4 {
+  color: #8b0000;
+  margin: 0 0 5px 0;
+  font-size: 16px;
+}
+
+.restaurant-name,
+.restaurant-city {
+  color: #666;
+  margin: 0;
+  font-size: 13px;
+}
+
+.match-score,
+.pairing-count {
+  background-color: #d4af37;
+  color: #8b0000;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.saved-date,
+.last-visit {
+  color: #999;
+  font-size: 12px;
+  margin: 0;
+  font-style: italic;
+}
+
+.pairing-notes {
+  color: #666;
+  font-size: 12px;
+  margin: 8px 0 0 0;
+  padding: 8px;
+  background-color: #fafafa;
+  border-left: 2px solid #ffe0e0;
+  border-radius: 2px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: 30px 20px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px 10px;
+  }
+
+  .profile-header {
+    padding: 30px 20px;
+  }
+
+  .profile-header h2 {
+    font-size: 28px;
+  }
+
+  .section {
+    padding: 20px;
+  }
+
+  .pairing-header,
+  .restaurant-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .match-score,
+  .pairing-count {
+    margin-left: 0;
+  }
+}

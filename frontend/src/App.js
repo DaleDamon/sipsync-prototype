@@ -5,6 +5,7 @@ import PairingDiscovery from './components/PairingDiscovery';
 import Analytics from './components/Analytics';
 import RestaurantMap from './components/RestaurantMap';
 import QRScanner from './components/QRScanner';
+import UserProfile from './components/UserProfile';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -92,6 +93,12 @@ function App() {
               Trending
             </button>
             <button
+              className={`nav-btn ${currentScreen === 'profile' ? 'active' : ''}`}
+              onClick={() => setCurrentScreen('profile')}
+            >
+              Profile
+            </button>
+            <button
               className={`nav-btn ${showQRScanner ? 'active' : ''}`}
               onClick={() => setShowQRScanner(true)}
             >
@@ -113,6 +120,8 @@ function App() {
           <RestaurantMap onRestaurantSelect={handleMapRestaurantSelect} />
         ) : currentScreen === 'analytics' ? (
           <Analytics user={user} />
+        ) : currentScreen === 'profile' ? (
+          <UserProfile user={user} />
         ) : null}
       </main>
 

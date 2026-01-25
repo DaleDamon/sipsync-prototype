@@ -185,6 +185,37 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
     }
   };
 
+  const savePairing = async (wine) => {
+    if (!user || !user.userId) {
+      setError('Must be logged in to save pairings');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/pairings/save-pairing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.userId,
+          restaurantId: selectedRestaurant,
+          wineId: wine.wineId,
+          matchScore: wine.matchScore,
+          wineName: wine.name,
+          restaurantName: restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || ''
+        }),
+      });
+
+      if (response.ok) {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus(''), 2000);
+      } else {
+        setError('Failed to save pairing');
+      }
+    } catch (err) {
+      setError('Network error saving pairing: ' + err.message);
+    }
+  };
+
   const wineTypes = ['red', 'white', 'rosé', 'sparkling'];
   const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral'];
 
@@ -395,6 +426,12 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
                     ))}
                   </div>
                 )}
+                <button
+                  className="save-pairing-btn"
+                  onClick={() => savePairing(wine)}
+                >
+                  ♥ Save Pairing
+                </button>
               </div>
             ))}
           </div>

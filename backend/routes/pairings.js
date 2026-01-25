@@ -229,4 +229,42 @@ router.get('/restaurant/:restaurantId/wine/:wineId', async (req, res) => {
   }
 });
 
+// POST /api/pairings/save-pairing
+// Save a pairing to user's history
+router.post('/save-pairing', async (req, res) => {
+  try {
+    const { userId, restaurantId, wineId, foodItemId, matchScore, wineName, restaurantName } = req.body;
+
+    if (!userId || !restaurantId || !wineId) {
+      return res.status(400).json({ error: 'userId, restaurantId, and wineId are required' });
+    }
+
+    // Create pairing history entry in user's subcollection
+    const pairingHistoryRef = await db
+      .collection('users')
+      .doc(userId)
+      .collection('pairing_history')
+      .add({
+        restaurantId,
+        restaurantName: restaurantName || '',
+        wineId,
+        wineName: wineName || '',
+        foodItemId: foodItemId || null,
+        foodName: '',
+        matchScore: matchScore || 0,
+        saved_at: new Date(),
+        notes: ''
+      });
+
+    res.json({
+      message: 'Pairing saved successfully',
+      pairingHistoryId: pairingHistoryRef.id,
+      saved_at: new Date()
+    });
+  } catch (error) {
+    console.error('Error saving pairing:', error);
+    res.status(500).json({ error: 'Failed to save pairing' });
+  }
+});
+
 module.exports = router;

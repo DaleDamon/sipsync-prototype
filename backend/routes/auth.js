@@ -182,4 +182,109 @@ router.put('/user/:userId', async (req, res) => {
   }
 });
 
+// GET /api/auth/user/:userId/pairing-history
+// Get user's pairing history
+router.get('/user/:userId/pairing-history', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const pairingHistorySnapshot = await db
+      .collection('users')
+      .doc(userId)
+      .collection('pairing_history')
+      .orderBy('saved_at', 'desc')
+      .limit(limit)
+      .get();
+
+    const pairingHistory = [];
+    pairingHistorySnapshot.forEach((doc) => {
+      pairingHistory.push({
+        historyId: doc.id,
+        ...doc.data(),
+        saved_at: doc.data().saved_at?.toDate?.() || new Date(doc.data().saved_at)
+      });
+    });
+
+    res.json({
+      userId,
+      pairingHistory,
+      count: pairingHistory.length
+    });
+  } catch (error) {
+    console.error('Error getting pairing history:', error);
+    res.status(500).json({ error: 'Failed to get pairing history' });
+  }
+});
+
+// GET /api/auth/user/:userId/visited-restaurants
+// Get unique restaurants user has saved pairings from
+router.get('/user/:userId/visited-restaurants', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const pairingHistorySnapshot = await db
+      .collection('users')
+      .doc(userId)
+      .collection('pairing_history')
+      .orderBy('saved_at', 'desc')
+      .get();
+
+    // Group by restaurantId and keep most recent entry
+    const restaurantMap = new Map();
+    pairingHistorySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.restaurantId && !restaurantMap.has(data.restaurantId)) {
+        restaurantMap.set(data.restaurantId, {
+          restaurantId: data.restaurantId,
+          restaurantName: data.restaurantName,
+          lastVisit: data.saved_at?.toDate?.() || new Date(data.saved_at),
+          pairingCount: 0
+        });
+      }
+    });
+
+    // Count pairings per restaurant
+    pairingHistorySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (restaurantMap.has(data.restaurantId)) {
+        const restaurant = restaurantMap.get(data.restaurantId);
+        restaurant.pairingCount++;
+      }
+    });
+
+    // Convert to array and sort by lastVisit descending
+    const visitedRestaurants = Array.from(restaurantMap.values())
+      .sort((a, b) => b.lastVisit - a.lastVisit);
+
+    // Fetch restaurant details from restaurants collection
+    const enrichedRestaurants = await Promise.all(
+      visitedRestaurants.map(async (rest) => {
+        try {
+          const restaurantDoc = await db.collection('restaurants').doc(rest.restaurantId).get();
+          if (restaurantDoc.exists) {
+            return {
+              ...rest,
+              city: restaurantDoc.data().city || '',
+              wineCount: restaurantDoc.data().wineCount || 0
+            };
+          }
+          return rest;
+        } catch (err) {
+          return rest;
+        }
+      })
+    );
+
+    res.json({
+      userId,
+      visitedRestaurants: enrichedRestaurants,
+      count: enrichedRestaurants.length
+    });
+  } catch (error) {
+    console.error('Error getting visited restaurants:', error);
+    res.status(500).json({ error: 'Failed to get visited restaurants' });
+  }
+});
+
 module.exports = router;
