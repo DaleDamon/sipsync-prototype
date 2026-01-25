@@ -2,6 +2,46 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
 
+// Helper function to generate default food pairings based on wine type
+function getDefaultFoodPairings(wineType) {
+  const pairingsByType = {
+    red: [
+      { name: 'Grilled Steak', description: 'Medium to full-bodied red wine pairs perfectly with a juicy grilled steak', pairing: 'Classic pairing that highlights both the wine and meat' },
+      { name: 'Roasted Lamb', description: 'Red wine complements the rich, savory flavors of roasted lamb', pairing: 'Traditional French bistro pairing' },
+      { name: 'Beef Burger', description: 'A quality red wine elevates a gourmet burger experience', pairing: 'Great for casual dining' },
+    ],
+    white: [
+      { name: 'Grilled Fish', description: 'White wine\'s acidity complements fresh grilled fish beautifully', pairing: 'Coastal Mediterranean tradition' },
+      { name: 'Pasta Alfredo', description: 'Creamy pasta sauces pair wonderfully with white wine', pairing: 'Italian classic combination' },
+      { name: 'Shrimp Scampi', description: 'Light white wine enhances garlic and butter flavors in shrimp', pairing: 'Sophisticated seafood pairing' },
+    ],
+    rosé: [
+      { name: 'Salad with Goat Cheese', description: 'Rosé\'s light fruitiness pairs with fresh salads and tangy cheese', pairing: 'Perfect summer lunch' },
+      { name: 'Grilled Chicken', description: 'Rosé is versatile enough for grilled chicken dishes', pairing: 'Balanced flavor combination' },
+      { name: 'Fruit Dessert', description: 'Rosé\'s sweetness complements fruit-based desserts', pairing: 'Delicate and refreshing' },
+    ],
+    sparkling: [
+      { name: 'Oysters', description: 'Sparkling wine\'s bubbles and acidity are perfect with fresh oysters', pairing: 'Classic French coastal pairing' },
+      { name: 'Caviar & Canapés', description: 'Champagne and caviar is the ultimate celebration pairing', pairing: 'Luxurious and elegant' },
+      { name: 'Appetizer Platter', description: 'Sparkling wine works with a variety of appetizers', pairing: 'Great for parties and celebrations' },
+    ],
+  };
+
+  // Normalize wine type (handle special characters and case variations)
+  const normalizedType = wineType.toLowerCase()
+    .replace(/\u00e9/g, 'e')  // é to e
+    .replace(/\u00f4/g, 'o')  // ô to o
+    .replace(/[^\w]/g, '')    // Remove other special characters
+    .trim();
+
+  // Check for rosé variations
+  if (normalizedType.includes('rose') || normalizedType.includes('ros')) {
+    return pairingsByType.rosé;
+  }
+
+  return pairingsByType[normalizedType] || pairingsByType.red;
+}
+
 // Helper function to calculate match score between user preferences and wine
 function calculateMatchScore(userPreferences, wine) {
   let totalScore = 0;
@@ -115,7 +155,7 @@ router.post('/find', async (req, res) => {
           .sort((a, b) => (b.data().pairingScore || 0) - (a.data().pairingScore || 0))
           .slice(0, 3);
 
-        const foodPairings = [];
+        let foodPairings = [];
         for (const doc of pairingsDocs) {
           const pairing = doc.data();
           // Fetch food item details
@@ -137,6 +177,22 @@ router.post('/find', async (req, res) => {
               },
             });
           }
+        }
+
+        // If no food pairings found, generate default pairings for this wine type
+        if (foodPairings.length === 0) {
+          const defaultPairings = getDefaultFoodPairings(wine.type);
+          foodPairings = defaultPairings.map((pairing, index) => ({
+            pairingId: `default-${wine.wineId}-${index}`,
+            pairingScore: 8,
+            pairingReason: pairing.pairing,
+            foodItem: {
+              foodItemId: `default-${wine.wineId}-${index}`,
+              name: pairing.name,
+              description: pairing.description,
+            },
+            isDefault: true,
+          }));
         }
 
         return {
