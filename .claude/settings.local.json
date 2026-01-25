@@ -6,7 +6,13 @@
       "Bash(npm start)",
       "Bash(pkill:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd restaurant map feature with wine glass icons and pairing discovery pre-selection\n\n- Implement interactive restaurant map using Leaflet and OpenStreetMap\n- Add custom wine glass shaped markers in wine red color\n- Display restaurant popups with wine count and \"Pair Now\" button\n- Fix pre-selection flow so clicking map restaurant pre-fills pairing tool dropdown\n- Add restaurants sidebar with clickable list items\n- Sync preSelectedRestaurant prop to PairingDiscovery component state\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd restaurant map feature with wine glass icons and pairing discovery pre-selection\n\n- Implement interactive restaurant map using Leaflet and OpenStreetMap\n- Add custom wine glass shaped markers in wine red color\n- Display restaurant popups with wine count and \"Pair Now\" button\n- Fix pre-selection flow so clicking map restaurant pre-fills pairing tool dropdown\n- Add restaurants sidebar with clickable list items\n- Sync preSelectedRestaurant prop to PairingDiscovery component state\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npm --version:*)",
+      "Bash(npm install:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate project settings\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
