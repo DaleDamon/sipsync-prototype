@@ -21,6 +21,8 @@ router.get('/', async (req, res) => {
         .get();
 
       const rest = doc.data();
+      rest.id = doc.id;
+      rest.restaurantId = doc.id;
       rest.wineCount = winesSnapshot.size;
       console.log(`[RESTAURANTS GET /] ${rest.name}: ${winesSnapshot.size} wines`);
       restaurants.push(rest);
