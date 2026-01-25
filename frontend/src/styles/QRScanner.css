@@ -1,0 +1,89 @@
+.qr-scanner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.qr-scanner-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.qr-scanner-card h2 {
+  color: #8b0000;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.qr-instructions {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #ffe0e0;
+  color: #8b0000;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border-left: 4px solid #8b0000;
+}
+
+.qr-reader {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#qr-reader {
+  width: 100%;
+}
+
+#qr-reader video {
+  max-width: 100%;
+}
+
+.scan-success {
+  padding: 30px;
+  background-color: #e8f5e9;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.scan-success p {
+  color: #2e7d32;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.close-btn {
+  padding: 12px 30px;
+  background-color: #999;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.close-btn:hover {
+  background-color: #777;
+}

@@ -1,0 +1,217 @@
+.map-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.map-container h2 {
+  color: #8b0000;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+.map-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.error-message {
+  background-color: #ffe0e0;
+  color: #8b0000;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border-left: 4px solid #8b0000;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 40px;
+}
+
+.no-restaurants {
+  text-align: center;
+  color: #999;
+  padding: 60px 20px;
+  font-style: italic;
+}
+
+.map-wrapper {
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.15);
+  margin-bottom: 40px;
+}
+
+.leaflet-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Leaflet overrides */
+.leaflet-map .leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.restaurant-popup {
+  padding: 0;
+}
+
+.restaurant-popup h4 {
+  color: #8b0000;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.restaurant-popup .location {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.restaurant-popup .wine-count {
+  color: #333;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.popup-button {
+  background-color: #8b0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.popup-button:hover {
+  background-color: #a00000;
+}
+
+/* Restaurants List Sidebar */
+.restaurants-list-sidebar {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.restaurants-list-sidebar h3 {
+  color: #8b0000;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 22px;
+}
+
+.restaurants-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.restaurant-list-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.restaurant-list-item:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #8b0000;
+  background: white;
+}
+
+.restaurant-info {
+  flex: 1;
+}
+
+.restaurant-info h4 {
+  color: #8b0000;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.restaurant-info .city {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.restaurant-info .wine-count {
+  color: #999;
+  font-size: 13px;
+  margin: 0;
+}
+
+.view-btn {
+  background-color: #8b0000;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  margin-left: 15px;
+  flex-shrink: 0;
+}
+
+.view-btn:hover {
+  background-color: #a00000;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .restaurants-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .map-container h2 {
+    font-size: 24px;
+  }
+
+  .map-wrapper {
+    height: 400px;
+    margin-bottom: 30px;
+  }
+
+  .restaurants-list {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .view-btn {
+    align-self: flex-end;
+    margin-left: 0;
+    margin-top: 12px;
+  }
+}
