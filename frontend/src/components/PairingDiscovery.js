@@ -75,12 +75,21 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
   };
 
   const sliderValues = { 1: 'low', 2: 'medium', 3: 'high' };
+  const sweetnessValues = { 1: 'dry', 2: 'medium', 3: 'sweet' };
   const reverseSlider = { low: 1, medium: 2, high: 3 };
+  const reverseSweetness = { dry: 1, medium: 2, sweet: 3 };
 
   const handleSliderChange = (key, value) => {
     setPreferences((prev) => ({
       ...prev,
       [key]: sliderValues[value],
+    }));
+  };
+
+  const handleSweetnessChange = (value) => {
+    setPreferences((prev) => ({
+      ...prev,
+      sweetness: sweetnessValues[value],
     }));
   };
 
@@ -294,6 +303,23 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
               <span className="slider-label">Full</span>
             </div>
             <p className="slider-value">{preferences.bodyWeight}</p>
+          </div>
+
+          <div className="pref-item slider-item">
+            <label>Sweetness</label>
+            <div className="slider-container">
+              <span className="slider-label">Dry</span>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                value={reverseSweetness[preferences.sweetness]}
+                onChange={(e) => handleSweetnessChange(e.target.value)}
+                className="slider"
+              />
+              <span className="slider-label">Sweet</span>
+            </div>
+            <p className="slider-value">{preferences.sweetness}</p>
           </div>
         </div>
 
