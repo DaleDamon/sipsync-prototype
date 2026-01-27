@@ -238,6 +238,23 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       <div className="preferences-section">
         <div className="pref-row">
           <div className="pref-item">
+            <label>Select Restaurant</label>
+            <select
+              value={selectedRestaurant || ''}
+              onChange={(e) => setSelectedRestaurant(e.target.value)}
+            >
+              <option value="">Choose a restaurant...</option>
+              {restaurants.map((rest) => (
+                <option key={rest.restaurantId} value={rest.restaurantId}>
+                  {rest.name} ({rest.city})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="pref-row">
+          <div className="pref-item">
             <label>Wine Type</label>
             <div className="wine-type-buttons">
               {wineTypes.map((type) => (
@@ -378,21 +395,6 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
         </div>
 
         <div className="pref-row">
-          <div className="pref-item">
-            <label>Select Restaurant</label>
-            <select
-              value={selectedRestaurant || ''}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-            >
-              <option value="">Choose a restaurant...</option>
-              {restaurants.map((rest) => (
-                <option key={rest.restaurantId} value={rest.restaurantId}>
-                  {rest.name} ({rest.city})
-                </option>
-              ))}
-            </select>
-          </div>
-
           <button className="reset-btn" onClick={handleReset}>
             Reset All
           </button>
