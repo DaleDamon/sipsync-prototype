@@ -85,8 +85,8 @@
 
 /* Slider Styles */
 .slider-item {
-  flex: 0 1 calc(33.333% - 20px);
-  min-width: 180px;
+  flex: 0 1 calc(50% - 15px);
+  min-width: 200px;
 }
 
 .slider-container {
@@ -477,6 +477,11 @@
 
   .slider-label {
     text-align: left;
+  }
+
+  .slider-item {
+    flex: 0 1 100%;
+    min-width: auto;
   }
 }
 
