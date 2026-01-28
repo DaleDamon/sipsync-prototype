@@ -12,7 +12,18 @@
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate project settings\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nUpdate project settings\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(lsof:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(killall:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "Bash(tasklist:*)",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\")",
+      "Bash(wmic process where processid=21444 delete)",
+      "Bash(git commit:*)",
+      "Bash(wmic:*)"
     ]
   }
 }
