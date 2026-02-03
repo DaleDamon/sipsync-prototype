@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipSync Restaurant Analytics Dashboard - Comprehensive Analysis</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 60px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #8b0000;
+        }
+        h1 {
+            color: #8b0000;
+            font-size: 42px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            font-style: italic;
+        }
+        .meta {
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+        h2 {
+            color: #8b0000;
+            font-size: 32px;
+            margin: 50px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        h3 {
+            color: #a10000;
+            font-size: 24px;
+            margin: 35px 0 15px 0;
+        }
+        h4 {
+            color: #333;
+            font-size: 18px;
+            margin: 25px 0 10px 0;
+            font-weight: 600;
+        }
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .section {
+            margin: 40px 0;
+        }
+        .highlight-box {
+            background-color: #fff9e6;
+            border-left: 4px solid #d4af37;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background-color: #fff0f0;
+            border-left: 4px solid #8b0000;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .success-box {
+            background-color: #f0fff4;
+            border-left: 4px solid #2d7f2d;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #8b0000;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .pros, .cons {
+            padding: 20px;
+            border-radius: 6px;
+        }
+        .pros {
+            background-color: #f0fff4;
+            border: 2px solid #2d7f2d;
+        }
+        .cons {
+            background-color: #fff0f0;
+            border: 2px solid #cc0000;
+        }
+        .pros h4 {
+            color: #2d7f2d;
+            margin-top: 0;
+        }
+        .cons h4 {
+            color: #cc0000;
+            margin-top: 0;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        .cost-breakdown {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+        .phase-box {
+            background-color: #e6f3ff;
+            border: 2px solid #4169e1;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .recommendation {
+            background: linear-gradient(135deg, #8b0000 0%, #a10000 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .recommendation h3 {
+            color: white;
+            margin-top: 0;
+        }
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 40px;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            .section {
+                page-break-inside: avoid;
+            }
+            .pros-cons {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>SipSync Restaurant Analytics Dashboard</h1>
+            <p class="subtitle">Comprehensive Feasibility Analysis & Implementation Plan</p>
+            <div class="meta">
+                <p>Document Date: February 1, 2026</p>
+                <p>Analysis Type: Technical Architecture, Cost-Benefit, Implementation Roadmap</p>
+            </div>
+        </header>
+
+        <!-- Executive Summary -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+
+            <div class="highlight-box">
+                <p><strong>Bottom Line:</strong> Building a restaurant analytics dashboard for SipSync is <strong>highly feasible</strong> and represents a strategic opportunity to transition from a consumer-only platform to a B2B SaaS model. The existing infrastructure provides a foundation, but significant backend development is required for restaurant authentication, event tracking, and analytics aggregation.</p>
+            </div>
+
+            <h3>Key Findings</h3>
+            <ul>
+                <li><strong>Current State:</strong> SipSync currently tracks only saved wine pairings (user → restaurant interactions), with no restaurant-facing analytics, authentication, or sales tracking.</li>
+                <li><strong>Foundation Exists:</strong> Basic analytics endpoints are implemented (<code>/api/analytics</code>), wine/restaurant data models are mature, and Firebase Firestore provides flexible schema for expansion.</li>
+                <li><strong>Major Gaps:</strong> No restaurant authentication, no event tracking (views, searches), no sales/transaction data, no restaurant ownership model.</li>
+                <li><strong>Development Effort:</strong> Estimated 8-12 weeks for Phase 1 (authentication + basic analytics), with additional 4-6 weeks for advanced features (sales tracking, inventory management).</li>
+                <li><strong>Cost:</strong> Firebase costs remain minimal ($50-200/month for moderate scale), primary investment is development time (~$40-60k for full implementation).</li>
+            </ul>
+
+            <h3>Recommended Approach</h3>
+            <p>Implement a <strong>phased rollout</strong> starting with restaurant authentication and engagement analytics (no sales tracking initially), then add POS integration and inventory management as optional premium features. Focus on daily batch-processed dashboards to minimize Firebase query costs.</p>
+
+            <div class="recommendation">
+                <h3>Recommended Phase 1 (MVP)</h3>
+                <ul>
+                    <li>Restaurant authentication system (email + password)</li>
+                    <li>Basic analytics dashboard (engagement metrics from existing data)</li>
+                    <li>Event tracking for wine list views and QR code scans</li>
+                    <li>Daily aggregated reports (cached data, low cost)</li>
+                    <li>Industry benchmarks (anonymized comparison data)</li>
+                </ul>
+                <p><strong>Timeline:</strong> 8-10 weeks | <strong>Cost:</strong> $40-50k development</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Current Infrastructure Assessment -->
+        <section class="section">
+            <h2>1. Current Infrastructure Assessment</h2>
+
+            <h3>What Already Exists</h3>
+
+            <h4>Database Structure (Firebase Firestore)</h4>
+            <pre><code>restaurants/{restaurantId}
+  ├── name, city, location, qrCodeUrl, createdAt
+  ├── wines/{wineId}  (subcollection)
+  │   └── name, type, acidity, tannins, bodyWeight, flavorProfile,
+  │       sweetnessLevel, price, inventoryStatus, createdAt
+  ├── foodItems/{foodItemId}  (subcollection)
+  │   └── name, description, category, createdAt
+  └── pairings/{pairingId}  (subcollection)
+      └── wineId, foodItemId, pairingScore, pairingReason, createdAt
+
+users/{userId}  (userId = phone number)
+  ├── phoneNumber, name, createdAt
+  ├── quizProfile, quizCompletedAt
+  ├── savedPreferences[]
+  └── pairing_history/{historyId}  (subcollection)
+      └── restaurantId, restaurantName, wineId, wineName,
+          foodItemId, foodName, matchScore, saved_at, notes</code></pre>
+
+            <h4>Existing API Endpoints</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Purpose</th>
+                        <th>Relevant to Dashboard?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>GET /api/analytics/restaurant-stats</code></td>
+                        <td>Platform-wide statistics</td>
+                        <td>Yes - needs per-restaurant filtering</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /api/analytics/popular-wines</code></td>
+                        <td>Most matched wines across platform</td>
+                        <td>Yes - needs per-restaurant filtering</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /api/analytics/preference-trends</code></td>
+                        <td>User preference aggregations</td>
+                        <td>Yes - can show customer preference trends</td>
+                    </tr>
+                    <tr>
+                        <td><code>POST /api/pairings/save-pairing</code></td>
+                        <td>User saves wine pairing to history</td>
+                        <td>Yes - primary engagement metric</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET /api/auth/user/:userId/visited-restaurants</code></td>
+                        <td>User's restaurant visits</td>
+                        <td>Yes - can derive visit frequency</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>What Data Is Currently Tracked</h4>
+            <ul>
+                <li><strong>User Pairing Saves:</strong> When a user saves a wine recommendation, stored in <code>users/{userId}/pairing_history</code> with restaurantId, wineId, matchScore, timestamp</li>
+                <li><strong>User Preferences:</strong> Quiz results and manual slider adjustments stored per user</li>
+                <li><strong>Match Scores:</strong> Algorithmic compatibility scores calculated in real-time (not persisted)</li>
+                <li><strong>Wine Catalog:</strong> All wines per restaurant with characteristics and pricing</li>
+            </ul>
+
+            <h4>Critical Gaps</h4>
+            <div class="warning-box">
+                <h4>What's Missing for Restaurant Analytics</h4>
+                <ul>
+                    <li><strong>Restaurant Authentication:</strong> No way for restaurants to log in or claim ownership</li>
+                    <li><strong>Event Tracking:</strong> Wine list views, search queries, QR code scans not logged</li>
+                    <li><strong>Sales/Transaction Data:</strong> No commerce, no revenue tracking</li>
+                    <li><strong>Inventory Management:</strong> No stock levels, reorder alerts, or availability tracking</li>
+                    <li><strong>Restaurant Ownership Model:</strong> No concept of restaurant "accounts" or user roles</li>
+                    <li><strong>Aggregated Analytics:</strong> All analytics calculated on-demand (expensive at scale)</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Restaurant Authentication System -->
+        <section class="section">
+            <h2>2. Restaurant Authentication System</h2>
+
+            <p>To enable restaurant dashboards, a complete authentication system must be built from scratch. This is a prerequisite for all other features.</p>
+
+            <h3>Architecture Overview</h3>
+
+            <h4>Database Schema Changes</h4>
+            <pre><code>restaurant_users/{restaurantUserId}
+  ├── email: String (unique)
+  ├── passwordHash: String (bcrypt hashed)
+  ├── name: String
+  ├── role: String (owner, manager, staff)
+  ├── restaurantId: String (reference to restaurants collection)
+  ├── createdAt: Timestamp
+  ├── lastLoginAt: Timestamp
+  ├── isActive: Boolean
+  └── permissions: Array (viewAnalytics, editWines, manageUsers, etc.)
+
+restaurants/{restaurantId}
+  ├── (existing fields)
+  ├── ownerUserId: String (reference to restaurant_users)
+  ├── claimedAt: Timestamp
+  ├── accountStatus: String (active, suspended, pending)
+  └── subscriptionTier: String (free, basic, premium)</code></pre>
+
+            <h4>Authentication Flow</h4>
+            <ol>
+                <li><strong>Restaurant Sign-Up:</strong>
+                    <ul>
+                        <li>Restaurant owner provides email, password, restaurant name</li>
+                        <li>System creates <code>restaurant_users</code> document</li>
+                        <li>Send email verification link</li>
+                        <li>Upon verification, allow restaurant claiming process</li>
+                    </ul>
+                </li>
+                <li><strong>Restaurant Claiming:</strong>
+                    <ul>
+                        <li>Owner searches for their restaurant in existing <code>restaurants</code> collection</li>
+                        <li>System verifies ownership (manual approval or verification code displayed at physical location)</li>
+                        <li>Link <code>restaurantUserId</code> to <code>restaurants/{restaurantId}</code></li>
+                        <li>Grant dashboard access</li>
+                    </ul>
+                </li>
+                <li><strong>Login:</strong>
+                    <ul>
+                        <li>Email + password authentication</li>
+                        <li>Generate JWT token with restaurantId and permissions</li>
+                        <li>Token expires after 7 days (configurable)</li>
+                    </ul>
+                </li>
+                <li><strong>Multi-User Support:</strong>
+                    <ul>
+                        <li>Restaurant owner can invite additional users (managers, staff)</li>
+                        <li>Role-based permissions control dashboard access</li>
+                        <li>Owner can revoke access at any time</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h4>New API Endpoints Required</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/api/restaurant-auth/signup</code></td>
+                        <td>POST</td>
+                        <td>Create restaurant user account</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/restaurant-auth/login</code></td>
+                        <td>POST</td>
+                        <td>Authenticate restaurant user, return JWT</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/restaurant-auth/verify-email</code></td>
+                        <td>GET</td>
+                        <td>Verify email via token link</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/restaurant-auth/claim-restaurant</code></td>
+                        <td>POST</td>
+                        <td>Link user to restaurant, request approval</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/restaurant-auth/invite-user</code></td>
+                        <td>POST</td>
+                        <td>Restaurant owner invites additional users</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/restaurant-auth/reset-password</code></td>
+                        <td>POST</td>
+                        <td>Password reset flow</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Security Considerations</h4>
+            <ul>
+                <li><strong>Password Hashing:</strong> Use bcrypt with salt rounds = 10</li>
+                <li><strong>JWT Tokens:</strong> Sign with secret key, include restaurantId + role claims</li>
+                <li><strong>Rate Limiting:</strong> Prevent brute-force attacks on login endpoint</li>
+                <li><strong>Email Verification:</strong> Required before restaurant claiming</li>
+                <li><strong>Restaurant Verification:</strong> Manual approval or QR code scan at physical location to prevent fraudulent claims</li>
+            </ul>
+
+            <h4>Development Effort</h4>
+            <div class="cost-breakdown">
+                <p><strong>Backend Development:</strong> 2-3 weeks</p>
+                <ul>
+                    <li>Authentication endpoints (signup, login, token refresh)</li>
+                    <li>Email verification system</li>
+                    <li>Restaurant claiming workflow</li>
+                    <li>Role-based permission middleware</li>
+                </ul>
+
+                <p><strong>Frontend Development:</strong> 1-2 weeks</p>
+                <ul>
+                    <li>Restaurant signup/login forms</li>
+                    <li>Restaurant claiming interface</li>
+                    <li>Dashboard shell with authentication gating</li>
+                </ul>
+
+                <p><strong>Total Effort:</strong> 3-5 weeks (~$15-25k at $500/day developer rate)</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Sales Tracking Analysis -->
+        <section class="section">
+            <h2>3. Sales Tracking Analysis</h2>
+
+            <p>Currently, SipSync has <strong>zero sales tracking</strong>. To provide meaningful revenue analytics, one of three approaches must be implemented. Each has significant trade-offs.</p>
+
+            <h3>Option A: Manual Sales Entry (No POS Integration)</h3>
+
+            <h4>How It Works</h4>
+            <p>Restaurants manually log wine sales through the dashboard interface at end of day or shift.</p>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Pros</h4>
+                    <ul>
+                        <li>Simple to implement (just add form + database)</li>
+                        <li>No integration complexity</li>
+                        <li>Works for any restaurant regardless of POS system</li>
+                        <li>Low development cost ($5-8k)</li>
+                        <li>No ongoing API fees</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Cons</h4>
+                    <ul>
+                        <li><strong>Major adoption barrier:</strong> Restaurants unlikely to manually enter data daily</li>
+                        <li>Data accuracy issues (human error, forgetfulness)</li>
+                        <li>Incomplete data (staff may skip days)</li>
+                        <li>Time-consuming for restaurant staff</li>
+                        <li>No real-time analytics (delayed by manual entry)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Technical Implementation</h4>
+            <pre><code>sales_transactions/{restaurantId}/transactions/{transactionId}
+  ├── wineId: String
+  ├── quantity: Number
+  ├── pricePerBottle: Number
+  ├── totalRevenue: Number
+  ├── soldAt: Timestamp
+  ├── enteredBy: String (restaurantUserId)
+  └── enteredAt: Timestamp</code></pre>
+
+            <h4>Dashboard Features</h4>
+            <ul>
+                <li>Quick entry form: select wine, enter quantity, auto-calculate revenue</li>
+                <li>Bulk import from CSV</li>
+                <li>Daily sales log with edit/delete capabilities</li>
+                <li>Revenue reports based on manually entered data</li>
+            </ul>
+
+            <h4>Realistic Assessment</h4>
+            <div class="warning-box">
+                <p><strong>Low Adoption Risk:</strong> Industry data suggests <strong>less than 20%</strong> of restaurants will consistently use manual entry systems. Restaurants are busy, understaffed, and unlikely to add daily data entry tasks. This approach is only viable if SipSync has dedicated account managers who follow up with restaurants to ensure compliance.</p>
+            </div>
+
+            <hr>
+
+            <h3>Option B: POS Integration (Automatic Sales Tracking)</h3>
+
+            <h4>How It Works</h4>
+            <p>SipSync integrates with popular restaurant POS systems (Square, Toast, Clover, TouchBistro, etc.) via their APIs to automatically pull wine sales data nightly.</p>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Pros</h4>
+                    <ul>
+                        <li><strong>Zero manual effort</strong> from restaurants</li>
+                        <li>100% data accuracy (direct from source)</li>
+                        <li>Real-time or near-real-time analytics</li>
+                        <li>High adoption potential (set it and forget it)</li>
+                        <li>Competitive advantage (few wine apps offer this)</li>
+                        <li>Enables advanced features (inventory sync, predictive reordering)</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Cons</h4>
+                    <ul>
+                        <li><strong>Significant development complexity</strong> (3-6 months per integration)</li>
+                        <li>Must build separate integrations for each POS system</li>
+                        <li>Ongoing API maintenance (breaking changes, version updates)</li>
+                        <li>Restaurant must use supported POS (limits addressable market)</li>
+                        <li>OAuth setup burden for restaurants</li>
+                        <li>Potential API rate limits and costs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Popular POS Systems & Integration Difficulty</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>POS System</th>
+                        <th>Market Share (US Restaurants)</th>
+                        <th>API Quality</th>
+                        <th>Integration Difficulty</th>
+                        <th>Estimated Dev Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Square</strong></td>
+                        <td>~15%</td>
+                        <td>Excellent</td>
+                        <td>Easy</td>
+                        <td>3-4 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Toast</strong></td>
+                        <td>~12%</td>
+                        <td>Good</td>
+                        <td>Medium</td>
+                        <td>4-6 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Clover</strong></td>
+                        <td>~8%</td>
+                        <td>Good</td>
+                        <td>Medium</td>
+                        <td>4-6 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TouchBistro</strong></td>
+                        <td>~5%</td>
+                        <td>Fair</td>
+                        <td>Hard</td>
+                        <td>6-8 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lightspeed</strong></td>
+                        <td>~4%</td>
+                        <td>Good</td>
+                        <td>Medium</td>
+                        <td>4-6 weeks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Others/Custom</strong></td>
+                        <td>~56%</td>
+                        <td>Varies</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Technical Implementation</h4>
+            <pre><code>pos_integrations/{restaurantId}
+  ├── posSystem: String (square, toast, clover, etc.)
+  ├── accessToken: String (encrypted)
+  ├── refreshToken: String (encrypted)
+  ├── locationId: String (POS-specific restaurant identifier)
+  ├── lastSyncAt: Timestamp
+  ├── syncStatus: String (active, failed, disconnected)
+  └── webhookUrl: String (for real-time updates)
+
+sales_transactions/{restaurantId}/transactions/{transactionId}
+  ├── wineId: String (matched from wine catalog)
+  ├── posItemId: String (original POS item ID)
+  ├── quantity: Number
+  ├── pricePerBottle: Number
+  ├── totalRevenue: Number
+  ├── soldAt: Timestamp
+  ├── posTransactionId: String (for reconciliation)
+  └── source: String (pos_integration)</code></pre>
+
+            <h4>Integration Workflow</h4>
+            <ol>
+                <li><strong>Restaurant Connects POS:</strong> From dashboard, restaurant clicks "Connect Square" (OAuth flow)</li>
+                <li><strong>Authorization:</strong> Restaurant authorizes SipSync to read transaction data</li>
+                <li><strong>Item Matching:</strong> System maps POS item names to SipSync wine catalog (AI-assisted or manual)</li>
+                <li><strong>Nightly Sync:</strong> Cron job pulls previous day's transactions via POS API</li>
+                <li><strong>Data Processing:</strong> Extract wine sales, calculate revenue, store in Firestore</li>
+                <li><strong>Dashboard Update:</strong> Daily batch refresh shows updated sales metrics</li>
+            </ol>
+
+            <h4>Development Effort (Per POS Integration)</h4>
+            <div class="cost-breakdown">
+                <p><strong>Initial Integration Development:</strong> 4-8 weeks per POS</p>
+                <ul>
+                    <li>OAuth flow implementation</li>
+                    <li>API client for transactions endpoint</li>
+                    <li>Item matching algorithm (wine name → catalog mapping)</li>
+                    <li>Error handling and retry logic</li>
+                    <li>Webhook setup for real-time sync (optional)</li>
+                </ul>
+
+                <p><strong>Ongoing Maintenance:</strong> ~$1,000-2,000/month per POS</p>
+                <ul>
+                    <li>API version updates</li>
+                    <li>Breaking change fixes</li>
+                    <li>Restaurant support (connection issues)</li>
+                </ul>
+
+                <p><strong>Total for 3 POS Systems (Square, Toast, Clover):</strong> ~$60-90k initial + $3-6k/month ongoing</p>
+            </div>
+
+            <h4>Market Coverage Analysis</h4>
+            <p>Integrating with the top 3 POS systems (Square, Toast, Clover) covers approximately <strong>35% of US restaurants</strong>. To reach 60% coverage, you'd need to integrate 5-6 additional systems, multiplying development costs.</p>
+
+            <div class="warning-box">
+                <p><strong>Strategic Risk:</strong> High upfront investment with uncertain ROI. POS integrations are expensive to build and maintain, yet only cover a fraction of the restaurant market. Recommend starting with <strong>one POS integration (Square)</strong> as a pilot to validate demand before expanding.</p>
+            </div>
+
+            <hr>
+
+            <h3>Option C: Hybrid Approach (POS + Manual Entry)</h3>
+
+            <h4>How It Works</h4>
+            <p>Build POS integration for restaurants with supported systems, provide manual entry fallback for others. Let restaurants choose their tracking method.</p>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Pros</h4>
+                    <ul>
+                        <li>Maximum market coverage (all restaurants can participate)</li>
+                        <li>Restaurants with POS integrations get best experience</li>
+                        <li>Manual entry as backup prevents complete exclusion</li>
+                        <li>Can start with one POS, expand later based on demand</li>
+                        <li>Tiered pricing opportunity (POS integration = premium tier)</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Cons</h4>
+                    <ul>
+                        <li>Must build and maintain both systems</li>
+                        <li>Manual entry users still have low adoption</li>
+                        <li>Data inconsistency between automated vs manual</li>
+                        <li>Support burden (two systems to troubleshoot)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Recommended Phasing</h4>
+            <div class="phase-box">
+                <h4>Phase 1: Manual Entry Only (MVP)</h4>
+                <p>Launch dashboard with manual sales entry to validate demand and gather feedback. Low cost, fast to market.</p>
+                <p><strong>Timeline:</strong> 2-3 weeks | <strong>Cost:</strong> $5-8k</p>
+            </div>
+
+            <div class="phase-box">
+                <h4>Phase 2: Square Integration (Pilot)</h4>
+                <p>Build integration with Square (largest market share, easiest API). Offer to 20-30 pilot restaurants for free in exchange for feedback.</p>
+                <p><strong>Timeline:</strong> 6-8 weeks | <strong>Cost:</strong> $20-30k</p>
+            </div>
+
+            <div class="phase-box">
+                <h4>Phase 3: Additional POS Integrations (Scale)</h4>
+                <p>If pilot succeeds and demand is validated, expand to Toast and Clover. Make POS integration a premium feature ($50-100/month).</p>
+                <p><strong>Timeline:</strong> 12-16 weeks | <strong>Cost:</strong> $40-60k</p>
+            </div>
+
+            <h4>Business Model Implication</h4>
+            <p>Sales tracking creates a natural <strong>freemium model</strong>:</p>
+            <ul>
+                <li><strong>Free Tier:</strong> Basic analytics (engagement metrics from pairing saves), manual sales entry</li>
+                <li><strong>Premium Tier ($50-100/month):</strong> Automatic POS integration, advanced analytics, inventory management, priority support</li>
+            </ul>
+
+            <hr>
+
+            <h3>Recommendation: Start with Manual, Add Square Integration</h3>
+            <div class="success-box">
+                <p><strong>Recommended Path:</strong> Launch MVP dashboard with manual sales entry to validate restaurant interest. If 50+ restaurants actively use manual entry for 3+ months, invest in Square integration as a premium feature. Avoid building multiple POS integrations until you have clear evidence of market demand and willingness to pay.</p>
+
+                <p><strong>Key Success Metrics to Watch:</strong></p>
+                <ul>
+                    <li>% of restaurants who enable manual sales entry</li>
+                    <li>Average days per month with sales data entered</li>
+                    <li>% of restaurants requesting POS integration</li>
+                    <li>Willingness to pay for premium tier with POS integration</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Event Tracking System -->
+        <section class="section">
+            <h2>4. Event Tracking System</h2>
+
+            <p>To provide actionable analytics, SipSync must track user interactions beyond saved pairings. This enables "eyeballs" metrics (views, searches) in addition to "engagement" metrics (saves).</p>
+
+            <h3>Events to Track</h3>
+
+            <h4>1. Wine List Page Views</h4>
+            <p><strong>Trigger:</strong> User navigates to restaurant's wine discovery page</p>
+            <pre><code>analytics_events/{restaurantId}/events/{eventId}
+  ├── eventType: "wine_list_view"
+  ├── userId: String | null (if authenticated)
+  ├── sessionId: String (anonymous user tracking)
+  ├── timestamp: Timestamp
+  ├── source: String (qr_code, search, direct_link)
+  └── metadata: Object (referrer, device type, location)</code></pre>
+
+            <h4>2. Individual Wine Detail Views</h4>
+            <p><strong>Trigger:</strong> User clicks on specific wine to see details</p>
+            <pre><code>analytics_events/{restaurantId}/events/{eventId}
+  ├── eventType: "wine_view"
+  ├── wineId: String
+  ├── userId: String | null
+  ├── sessionId: String
+  ├── timestamp: Timestamp
+  ├── viewDuration: Number (seconds, if tracked)
+  └── metadata: Object</code></pre>
+
+            <h4>3. QR Code Scans</h4>
+            <p><strong>Trigger:</strong> User scans restaurant's QR code</p>
+            <pre><code>analytics_events/{restaurantId}/events/{eventId}
+  ├── eventType: "qr_code_scan"
+  ├── userId: String | null
+  ├── sessionId: String
+  ├── timestamp: Timestamp
+  ├── qrCodeId: String (for multi-location tracking)
+  └── metadata: Object (device type, scan location if available)</code></pre>
+
+            <h4>4. Search/Filter Interactions</h4>
+            <p><strong>Trigger:</strong> User adjusts preference sliders or selects wine type filters</p>
+            <pre><code>analytics_events/{restaurantId}/events/{eventId}
+  ├── eventType: "search_query"
+  ├── userId: String | null
+  ├── sessionId: String
+  ├── timestamp: Timestamp
+  ├── preferences: Object (acidity, tannins, wineType, priceRange)
+  └── resultsCount: Number (wines matched)</code></pre>
+
+            <h3>Implementation Approach</h3>
+
+            <h4>Frontend Changes</h4>
+            <p>Add analytics tracking to existing components:</p>
+            <pre><code>// PairingDiscovery.js
+useEffect(() => {
+  // Track wine list page view
+  trackEvent({
+    eventType: 'wine_list_view',
+    restaurantId: selectedRestaurant,
+    userId: user?.userId || null,
+    sessionId: getOrCreateSessionId(),
+    timestamp: new Date(),
+    source: getUrlParams().source || 'direct_link'
+  });
+}, [selectedRestaurant]);
+
+// Track individual wine view
+const handleWineClick = (wine) => {
+  trackEvent({
+    eventType: 'wine_view',
+    restaurantId: selectedRestaurant,
+    wineId: wine.id,
+    userId: user?.userId || null,
+    sessionId: getOrCreateSessionId(),
+    timestamp: new Date()
+  });
+  // Show wine details modal
+};</code></pre>
+
+            <h4>Backend Endpoint</h4>
+            <pre><code>POST /api/analytics/track-event
+Body: {
+  restaurantId: String,
+  eventType: String,
+  userId?: String,
+  sessionId: String,
+  timestamp: Timestamp,
+  metadata: Object
+}
+
+Response: { success: true }</code></pre>
+
+            <h4>Batching & Performance</h4>
+            <p>To minimize Firebase writes (costly at scale), implement <strong>client-side batching</strong>:</p>
+            <ul>
+                <li>Buffer events in browser localStorage</li>
+                <li>Send batch of 10 events per API call</li>
+                <li>Flush buffer on page unload or every 30 seconds</li>
+                <li>Reduces Firebase write costs by 90%</li>
+            </ul>
+
+            <h3>Privacy & Compliance</h3>
+            <div class="warning-box">
+                <h4>GDPR & Privacy Considerations</h4>
+                <ul>
+                    <li><strong>Anonymous Tracking:</strong> Use sessionId for non-authenticated users (no personal data)</li>
+                    <li><strong>User Consent:</strong> Add cookie banner for analytics tracking (required in EU, CA)</li>
+                    <li><strong>Data Retention:</strong> Auto-delete events older than 90 days (or allow restaurant to configure)</li>
+                    <li><strong>Opt-Out:</strong> Provide mechanism for users to disable tracking</li>
+                </ul>
+            </div>
+
+            <h3>Development Effort</h3>
+            <div class="cost-breakdown">
+                <p><strong>Frontend Instrumentation:</strong> 1-2 weeks</p>
+                <ul>
+                    <li>Add tracking calls to PairingDiscovery component</li>
+                    <li>Session ID generation and management</li>
+                    <li>Event batching logic</li>
+                    <li>Privacy consent banner</li>
+                </ul>
+
+                <p><strong>Backend Analytics Endpoint:</strong> 1 week</p>
+                <ul>
+                    <li>POST /api/analytics/track-event endpoint</li>
+                    <li>Event validation and sanitization</li>
+                    <li>Firestore write with proper indexing</li>
+                </ul>
+
+                <p><strong>Total Effort:</strong> 2-3 weeks (~$5-8k)</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Dashboard Features & Analytics -->
+        <section class="section">
+            <h2>5. Dashboard Features & Analytics</h2>
+
+            <h3>Core Metrics (Available with Current Data)</h3>
+
+            <h4>Engagement Metrics</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Data Source</th>
+                        <th>Calculation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Total Pairing Saves</strong></td>
+                        <td>users/{userId}/pairing_history</td>
+                        <td>Count where restaurantId matches</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unique Visitors</strong></td>
+                        <td>users/{userId}/pairing_history</td>
+                        <td>Distinct userIds with saves at restaurant</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repeat Visitors</strong></td>
+                        <td>users/{userId}/pairing_history</td>
+                        <td>Users with 2+ saved pairings, 7+ days apart</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Most Popular Wines</strong></td>
+                        <td>users/{userId}/pairing_history</td>
+                        <td>Top 10 wines by save frequency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Average Match Score</strong></td>
+                        <td>users/{userId}/pairing_history</td>
+                        <td>Mean matchScore across all saves</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Wine Performance</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Save Rate</strong></td>
+                        <td>Saves / Views for each wine</td>
+                        <td>Which wines convert browsers to savers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Price Performance</strong></td>
+                        <td>Saves by price tier ($, $$, $$$)</td>
+                        <td>Optimize price positioning</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Wine Type Distribution</strong></td>
+                        <td>% saves by type (red, white, sparkling)</td>
+                        <td>Understand customer preferences</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flavor Profile Trends</strong></td>
+                        <td>Most saved flavor notes</td>
+                        <td>Guide wine purchasing decisions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Customer Insights</h4>
+            <ul>
+                <li><strong>Peak Activity Times:</strong> When do users browse wine lists? (day of week, hour)</li>
+                <li><strong>Customer Preference Segments:</strong> What wine profiles visit your restaurant? (quiz results aggregation)</li>
+                <li><strong>QR Code Effectiveness:</strong> How many scans convert to saves?</li>
+                <li><strong>Session Duration:</strong> Average time spent browsing wines</li>
+            </ul>
+
+            <h3>Dashboard Layout (Wireframe Description)</h3>
+
+            <h4>Top-Level KPI Cards (Daily Refresh)</h4>
+            <pre><code>┌──────────────────────────────────────────────────────────────┐
+│  🍷 Total Wines: 47    👥 Unique Visitors: 234                │
+│  💾 Total Saves: 128   📈 Avg Match Score: 8.2/10            │
+│  🔄 Repeat Rate: 42%   📊 Save Rate: 18.7%                   │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+
+            <h4>Time Series Charts</h4>
+            <ul>
+                <li><strong>Daily Saves Trend:</strong> Line chart showing saves per day (last 30/90 days)</li>
+                <li><strong>Traffic vs Engagement:</strong> Views vs Saves overlaid chart</li>
+                <li><strong>Day of Week Heatmap:</strong> When are customers most active?</li>
+            </ul>
+
+            <h4>Top Performers Tables</h4>
+            <pre><code>Top 10 Wines by Saves:
+┌────────────────────────────────────────────────────────────┐
+│ Wine Name              Type    Price   Saves   Match Score │
+├────────────────────────────────────────────────────────────┤
+│ 2019 Pinot Noir       Red     $45     23      8.9         │
+│ Sauvignon Blanc       White   $32     19      8.4         │
+│ Cabernet Blend        Red     $58     17      9.1         │
+│ ...                                                        │
+└────────────────────────────────────────────────────────────┘</code></pre>
+
+            <h4>Customer Insights Section</h4>
+            <ul>
+                <li><strong>Preference Distribution:</strong> Pie chart of wine types saved (Red 58%, White 32%, Sparkling 10%)</li>
+                <li><strong>Price Sensitivity:</strong> Bar chart showing saves by price tier</li>
+                <li><strong>Top Flavor Profiles:</strong> Word cloud of most requested flavor notes</li>
+            </ul>
+
+            <h3>Advanced Features (Phase 2+)</h3>
+
+            <h4>Inventory Management</h4>
+            <p>If restaurants enable inventory tracking:</p>
+            <ul>
+                <li>Current stock levels per wine</li>
+                <li>Low stock alerts (below threshold)</li>
+                <li>Reorder suggestions based on save rate trends</li>
+                <li>Seasonal performance (which wines sell best in summer vs winter?)</li>
+            </ul>
+
+            <h4>Predictive Analytics</h4>
+            <p>Using historical data to forecast:</p>
+            <ul>
+                <li><strong>Trending Wines:</strong> Wines with increasing save rates (opportunity to promote)</li>
+                <li><strong>Underperformers:</strong> Wines with high views but low saves (pricing issue? description problem?)</li>
+                <li><strong>Optimal Wine List Size:</strong> Recommend adding/removing wines based on engagement patterns</li>
+            </ul>
+
+            <h4>Competitive Insights (Industry Benchmarks)</h4>
+            <p>Compare restaurant's metrics to anonymized industry averages:</p>
+            <ul>
+                <li><strong>Your Save Rate:</strong> 18.7% vs <strong>Industry Avg:</strong> 15.2% (You're 23% above average! 🎉)</li>
+                <li><strong>Your Avg Match Score:</strong> 8.2 vs <strong>Industry:</strong> 7.8</li>
+                <li><strong>Your Repeat Visitor Rate:</strong> 42% vs <strong>Industry:</strong> 35%</li>
+            </ul>
+
+            <p><em>Note: Industry benchmarks are calculated from all restaurants on the platform but never reveal individual restaurant data. Restaurants see only their own metrics + anonymized averages.</em></p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Technical Architecture -->
+        <section class="section">
+            <h2>6. Technical Architecture</h2>
+
+            <h3>Daily Batch Processing (Cost-Optimized Approach)</h3>
+
+            <p>Rather than calculating analytics on-demand (expensive Firestore queries), implement <strong>daily batch processing</strong> to pre-aggregate metrics and cache results.</p>
+
+            <h4>Architecture Overview</h4>
+            <pre><code>┌─────────────────────────────────────────────────────────────┐
+│                   Firebase Cloud Functions                   │
+│                                                               │
+│  1. Daily Aggregation Job (runs at 4 AM UTC)                │
+│     ├─ Query all pairing_history for last 24 hours          │
+│     ├─ Query analytics_events for last 24 hours             │
+│     ├─ Calculate metrics per restaurant                     │
+│     └─ Write to restaurant_analytics_cache collection       │
+│                                                               │
+│  2. Dashboard API Endpoint                                   │
+│     ├─ GET /api/restaurant-dashboard/:restaurantId          │
+│     ├─ Read from restaurant_analytics_cache (fast!)         │
+│     └─ Return pre-computed metrics                          │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+
+            <h4>Database Schema for Cached Analytics</h4>
+            <pre><code>restaurant_analytics_cache/{restaurantId}/daily_metrics/{date}
+  ├── date: String (YYYY-MM-DD)
+  ├── totalSaves: Number
+  ├── uniqueVisitors: Number
+  ├── wineListViews: Number
+  ├── qrCodeScans: Number
+  ├── avgMatchScore: Number
+  ├── topWines: Array[{wineId, name, saves, matchScore}]
+  ├── wineTypeDistribution: Object {red: 58, white: 32, ...}
+  ├── priceRangePerformance: Object {low: 23, mid: 45, high: 12}
+  ├── peakHours: Array[{hour: 18, views: 45}]
+  └── computedAt: Timestamp
+
+restaurant_analytics_cache/{restaurantId}/aggregated
+  ├── last7Days: Object (same structure, aggregated metrics)
+  ├── last30Days: Object
+  ├── last90Days: Object
+  └── allTime: Object</code></pre>
+
+            <h4>Cloud Function Implementation</h4>
+            <pre><code>// Firebase Cloud Function (Node.js)
+exports.dailyAnalyticsAggregation = functions.pubsub
+  .schedule('0 4 * * *')  // Run at 4 AM UTC daily
+  .timeZone('UTC')
+  .onRun(async (context) => {
+    const yesterday = getYesterdayDate();
+    const restaurants = await getActiveRestaurants();
+
+    for (const restaurant of restaurants) {
+      const metrics = await calculateDailyMetrics(restaurant.id, yesterday);
+      await saveToCacheCollection(restaurant.id, yesterday, metrics);
+      await updateAggregatedMetrics(restaurant.id);
+    }
+
+    console.log(`Aggregated analytics for ${restaurants.length} restaurants`);
+  });
+
+async function calculateDailyMetrics(restaurantId, date) {
+  // Query pairing_history for this restaurant + date
+  const saves = await getPairingSavesForDate(restaurantId, date);
+
+  // Query analytics_events for this restaurant + date
+  const events = await getAnalyticsEventsForDate(restaurantId, date);
+
+  return {
+    date,
+    totalSaves: saves.length,
+    uniqueVisitors: getUniqueUserIds(saves),
+    wineListViews: events.filter(e => e.eventType === 'wine_list_view').length,
+    qrCodeScans: events.filter(e => e.eventType === 'qr_code_scan').length,
+    avgMatchScore: calculateAverage(saves.map(s => s.matchScore)),
+    topWines: getTopWinesBySaves(saves, 10),
+    wineTypeDistribution: groupByWineType(saves),
+    priceRangePerformance: groupByPriceRange(saves),
+    peakHours: calculatePeakHours(events),
+    computedAt: new Date()
+  };
+}</code></pre>
+
+            <h4>Benefits of Daily Batch Processing</h4>
+            <ul>
+                <li><strong>99% cost reduction:</strong> Pre-computed metrics = 1 Firestore read vs 100s of reads for on-demand calculation</li>
+                <li><strong>Fast dashboard load:</strong> 50ms response time (cached data) vs 2-5 seconds (live aggregation)</li>
+                <li><strong>Scalable:</strong> Works for 10 restaurants or 10,000 restaurants (Cloud Function scales automatically)</li>
+                <li><strong>Historical data:</strong> Daily snapshots enable time-series charts and trend analysis</li>
+            </ul>
+
+            <h4>Trade-Offs</h4>
+            <ul>
+                <li><strong>Not Real-Time:</strong> Dashboard shows data from yesterday (acceptable for most use cases)</li>
+                <li><strong>Delayed Insights:</strong> Restaurants see analytics with 1-day lag</li>
+                <li><strong>Storage Cost:</strong> Storing daily snapshots adds ~$5-10/month for 500 restaurants (negligible)</li>
+            </ul>
+
+            <h3>Firebase Cost Estimation</h3>
+
+            <h4>Assumptions</h4>
+            <ul>
+                <li>500 active restaurants on platform</li>
+                <li>Average 50 user saves per restaurant per day</li>
+                <li>Average 200 analytics events per restaurant per day (views, searches, QR scans)</li>
+                <li>Daily batch processing (1 aggregation job per restaurant per day)</li>
+            </ul>
+
+            <h4>Monthly Costs (Firebase Blaze Plan)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Usage</th>
+                        <th>Free Tier</th>
+                        <th>Billable</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Firestore Writes</strong></td>
+                        <td>3.15M/month (events + saves)</td>
+                        <td>20k/day</td>
+                        <td>3.15M</td>
+                        <td>$2.84</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Firestore Reads</strong></td>
+                        <td>15M/month (dashboard loads)</td>
+                        <td>50k/day</td>
+                        <td>15M</td>
+                        <td>$3.60</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloud Functions</strong></td>
+                        <td>15k invocations/month</td>
+                        <td>2M/month</td>
+                        <td>0 (within free tier)</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Storage</strong></td>
+                        <td>5 GB (cached analytics)</td>
+                        <td>1 GB</td>
+                        <td>4 GB</td>
+                        <td>$0.72</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TOTAL</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><strong>$7.16/month</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><em>Note: Costs scale linearly with restaurant count. 5,000 restaurants ≈ $71/month.</em></p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Implementation Phases -->
+        <section class="section">
+            <h2>7. Implementation Phases</h2>
+
+            <h3>Phase 1: Authentication + Basic Analytics (MVP)</h3>
+
+            <div class="phase-box">
+                <h4>Scope</h4>
+                <ul>
+                    <li>Restaurant authentication system (signup, login, password reset)</li>
+                    <li>Restaurant claiming workflow</li>
+                    <li>Basic dashboard with engagement metrics (using existing pairing_history data)</li>
+                    <li>Daily batch aggregation for cached analytics</li>
+                    <li>Industry benchmarks (anonymized averages)</li>
+                </ul>
+
+                <h4>Features</h4>
+                <ul>
+                    <li>Total saves, unique visitors, repeat visitor rate</li>
+                    <li>Top 10 wines by save frequency</li>
+                    <li>Wine type distribution chart</li>
+                    <li>30-day trend line for daily saves</li>
+                    <li>Comparison to industry averages</li>
+                </ul>
+
+                <h4>Timeline & Cost</h4>
+                <p><strong>Development Time:</strong> 8-10 weeks</p>
+                <p><strong>Development Cost:</strong> $40-50k (assumes $500/day developer rate)</p>
+                <p><strong>Ongoing Costs:</strong> ~$10-20/month Firebase (for 500 restaurants)</p>
+
+                <h4>Success Metrics</h4>
+                <ul>
+                    <li>50+ restaurants claim accounts within 3 months</li>
+                    <li>75%+ restaurant login at least once per week</li>
+                    <li>Positive feedback on analytics usefulness (NPS > 50)</li>
+                </ul>
+            </div>
+
+            <h3>Phase 2: Event Tracking + Enhanced Analytics</h3>
+
+            <div class="phase-box">
+                <h4>Scope</h4>
+                <ul>
+                    <li>Event tracking system (wine views, QR scans, searches)</li>
+                    <li>Privacy compliance (cookie consent, GDPR)</li>
+                    <li>Enhanced dashboard with "eyeballs" metrics</li>
+                    <li>Save rate calculation (saves / views)</li>
+                    <li>Peak activity time analysis</li>
+                </ul>
+
+                <h4>Features</h4>
+                <ul>
+                    <li>Wine list view count</li>
+                    <li>Individual wine view counts</li>
+                    <li>QR code scan tracking</li>
+                    <li>Save rate per wine (conversion metric)</li>
+                    <li>Peak hours heatmap</li>
+                    <li>Session duration metrics</li>
+                </ul>
+
+                <h4>Timeline & Cost</h4>
+                <p><strong>Development Time:</strong> 3-4 weeks</p>
+                <p><strong>Development Cost:</strong> $8-12k</p>
+                <p><strong>Ongoing Costs:</strong> ~$15-25/month Firebase (additional writes for events)</p>
+
+                <h4>Prerequisites</h4>
+                <ul>
+                    <li>Phase 1 must be complete and stable</li>
+                    <li>At least 30 active restaurants using dashboard regularly</li>
+                </ul>
+            </div>
+
+            <h3>Phase 3: Sales Tracking (Manual Entry)</h3>
+
+            <div class="phase-box">
+                <h4>Scope</h4>
+                <ul>
+                    <li>Manual sales entry interface</li>
+                    <li>CSV bulk import for sales data</li>
+                    <li>Revenue analytics and reports</li>
+                    <li>Wine profitability analysis</li>
+                </ul>
+
+                <h4>Features</h4>
+                <ul>
+                    <li>Quick sales entry form (wine selector + quantity)</li>
+                    <li>Daily sales log with edit/delete</li>
+                    <li>Revenue by wine report</li>
+                    <li>Revenue by wine type (red vs white)</li>
+                    <li>Price tier performance (profitability)</li>
+                </ul>
+
+                <h4>Timeline & Cost</h4>
+                <p><strong>Development Time:</strong> 2-3 weeks</p>
+                <p><strong>Development Cost:</strong> $5-8k</p>
+
+                <h4>Success Metrics</h4>
+                <ul>
+                    <li>20%+ of restaurants enter sales data for at least 15 days/month</li>
+                    <li>If adoption is below 20%, pivot to POS integration instead</li>
+                </ul>
+            </div>
+
+            <h3>Phase 4: POS Integration (Square) - Premium Feature</h3>
+
+            <div class="phase-box">
+                <h4>Scope</h4>
+                <ul>
+                    <li>Square POS OAuth integration</li>
+                    <li>Automatic transaction sync (nightly batch)</li>
+                    <li>Item matching algorithm (POS items → wine catalog)</li>
+                    <li>Real-time inventory sync (optional)</li>
+                    <li>Premium tier pricing ($50-100/month)</li>
+                </ul>
+
+                <h4>Features</h4>
+                <ul>
+                    <li>Automatic daily revenue reports</li>
+                    <li>Actual sales data (no manual entry)</li>
+                    <li>Inventory levels synced from POS</li>
+                    <li>Reorder alerts based on sales velocity</li>
+                    <li>Revenue forecasting</li>
+                </ul>
+
+                <h4>Timeline & Cost</h4>
+                <p><strong>Development Time:</strong> 6-8 weeks</p>
+                <p><strong>Development Cost:</strong> $20-30k</p>
+                <p><strong>Ongoing Costs:</strong> ~$1,000-2,000/month (API maintenance + support)</p>
+
+                <h4>Prerequisites</h4>
+                <ul>
+                    <li>Phase 3 (manual sales) shows demand but low adoption</li>
+                    <li>At least 20 restaurants request POS integration</li>
+                    <li>Confirmed willingness to pay for premium tier</li>
+                </ul>
+            </div>
+
+            <h3>Phase 5: Advanced Features & Optimization</h3>
+
+            <div class="phase-box">
+                <h4>Scope</h4>
+                <ul>
+                    <li>Inventory management module</li>
+                    <li>Predictive analytics (trending wines, reorder suggestions)</li>
+                    <li>A/B testing for wine descriptions</li>
+                    <li>Customer segmentation (wine profiles visiting restaurant)</li>
+                    <li>Export to PDF/Excel reports</li>
+                </ul>
+
+                <h4>Timeline & Cost</h4>
+                <p><strong>Development Time:</strong> 8-12 weeks (ongoing, feature by feature)</p>
+                <p><strong>Development Cost:</strong> $30-50k</p>
+            </div>
+
+            <h3>Total Investment Summary</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Timeline</th>
+                        <th>Dev Cost</th>
+                        <th>Monthly Ops Cost</th>
+                        <th>Cumulative Investment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Phase 1 (MVP)</td>
+                        <td>8-10 weeks</td>
+                        <td>$40-50k</td>
+                        <td>$10-20</td>
+                        <td>$40-50k</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 2 (Events)</td>
+                        <td>3-4 weeks</td>
+                        <td>$8-12k</td>
+                        <td>$15-25</td>
+                        <td>$48-62k</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 3 (Manual Sales)</td>
+                        <td>2-3 weeks</td>
+                        <td>$5-8k</td>
+                        <td>$15-25</td>
+                        <td>$53-70k</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 4 (POS Integration)</td>
+                        <td>6-8 weeks</td>
+                        <td>$20-30k</td>
+                        <td>$1-2k</td>
+                        <td>$73-100k</td>
+                    </tr>
+                    <tr>
+                        <td>Phase 5 (Advanced)</td>
+                        <td>8-12 weeks</td>
+                        <td>$30-50k</td>
+                        <td>$1-2k</td>
+                        <td>$103-150k</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><em>Note: Phases 4-5 are optional and should only be pursued if earlier phases show strong adoption and revenue potential.</em></p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Business Model & Revenue Potential -->
+        <section class="section">
+            <h2>8. Business Model & Revenue Potential</h2>
+
+            <h3>Freemium Pricing Model</h3>
+
+            <h4>Free Tier</h4>
+            <ul>
+                <li>Restaurant authentication and account claiming</li>
+                <li>Basic engagement analytics (saves, visitors, top wines)</li>
+                <li>Manual sales entry (optional)</li>
+                <li>30-day historical data</li>
+                <li>Industry benchmarks</li>
+            </ul>
+            <p><strong>Target:</strong> Onboard maximum restaurants, demonstrate value</p>
+
+            <h4>Premium Tier ($50-100/month per restaurant)</h4>
+            <ul>
+                <li>Everything in Free tier</li>
+                <li>Automatic POS integration (Square, Toast, etc.)</li>
+                <li>90-day historical data + data export</li>
+                <li>Inventory management and reorder alerts</li>
+                <li>Predictive analytics (trending wines, forecasting)</li>
+                <li>Priority support</li>
+            </ul>
+            <p><strong>Target:</strong> Convert 20-30% of free users after 3 months</p>
+
+            <h4>Enterprise Tier ($200-500/month for restaurant groups)</h4>
+            <ul>
+                <li>Everything in Premium tier</li>
+                <li>Multi-location dashboard (for restaurant groups with 5+ locations)</li>
+                <li>API access for custom integrations</li>
+                <li>Dedicated account manager</li>
+                <li>Custom reporting and white-label options</li>
+            </ul>
+
+            <h3>Revenue Projections</h3>
+
+            <h4>Conservative Scenario (Year 1)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Month 6</th>
+                        <th>Month 12</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Restaurants on Platform</td>
+                        <td>100</td>
+                        <td>300</td>
+                        <td>Organic growth + outreach</td>
+                    </tr>
+                    <tr>
+                        <td>Claimed Dashboard Accounts</td>
+                        <td>30 (30%)</td>
+                        <td>120 (40%)</td>
+                        <td>Claim rate improves over time</td>
+                    </tr>
+                    <tr>
+                        <td>Premium Conversions</td>
+                        <td>3 (10%)</td>
+                        <td>24 (20%)</td>
+                        <td>Convert after seeing value</td>
+                    </tr>
+                    <tr>
+                        <td>Avg Premium Price</td>
+                        <td>$75/mo</td>
+                        <td>$75/mo</td>
+                        <td>Mid-tier pricing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly Revenue</strong></td>
+                        <td><strong>$225</strong></td>
+                        <td><strong>$1,800</strong></td>
+                        <td>MRR from premium tier</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Annual Run Rate</strong></td>
+                        <td>$2.7k</td>
+                        <td><strong>$21.6k</strong></td>
+                        <td>ARR at end of Year 1</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Optimistic Scenario (Year 2-3)</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Year 2</th>
+                        <th>Year 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Restaurants on Platform</td>
+                        <td>1,000</td>
+                        <td>3,000</td>
+                    </tr>
+                    <tr>
+                        <td>Claimed Dashboard Accounts</td>
+                        <td>500 (50%)</td>
+                        <td>1,800 (60%)</td>
+                    </tr>
+                    <tr>
+                        <td>Premium Conversions</td>
+                        <td>125 (25%)</td>
+                        <td>540 (30%)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly Revenue</strong></td>
+                        <td><strong>$9,375</strong></td>
+                        <td><strong>$40,500</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Annual Run Rate</strong></td>
+                        <td><strong>$112.5k</strong></td>
+                        <td><strong>$486k</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Break-Even Analysis</h3>
+
+            <p><strong>Total Development Investment (Phase 1-3):</strong> $53-70k</p>
+            <p><strong>Monthly Operational Costs:</strong> ~$2-3k (Firebase + maintenance + support)</p>
+
+            <p><strong>Break-Even Point:</strong> 30-40 premium customers (~$2,250-3,000 MRR)</p>
+            <p><strong>Timeline to Break-Even:</strong> 12-18 months (conservative scenario)</p>
+
+            <div class="success-box">
+                <p><strong>Key Insight:</strong> The restaurant analytics dashboard is a strategic investment that transforms SipSync from a consumer app to a B2B SaaS platform. While break-even takes 12-18 months, this creates a durable revenue stream and increases platform stickiness (restaurants with active dashboards are unlikely to churn).</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Feasibility Assessment -->
+        <section class="section">
+            <h2>9. Feasibility Assessment</h2>
+
+            <h3>Technical Feasibility: HIGH</h3>
+            <div class="success-box">
+                <p><strong>Verdict: Feasible with existing stack</strong></p>
+                <ul>
+                    <li>Firebase Firestore provides flexible schema for analytics expansion</li>
+                    <li>Existing data (pairing_history) enables basic analytics immediately</li>
+                    <li>Cloud Functions support batch processing for cost optimization</li>
+                    <li>React frontend easily extended with dashboard components</li>
+                    <li>No major architectural changes required</li>
+                </ul>
+                <p><strong>Risk Level: Low</strong> - No novel technology, proven patterns</p>
+            </div>
+
+            <h3>Business Feasibility: MODERATE-HIGH</h3>
+            <div class="highlight-box">
+                <p><strong>Verdict: Viable with proper positioning and pricing</strong></p>
+                <ul>
+                    <li><strong>Market Need:</strong> Restaurants lack visibility into customer wine preferences - SipSync fills this gap</li>
+                    <li><strong>Competitive Advantage:</strong> Most wine apps are consumer-only; few offer restaurant analytics</li>
+                    <li><strong>Willingness to Pay:</strong> Restaurants pay $50-200/month for analytics tools (Toast Analytics, MarketMan, etc.) - SipSync pricing is competitive</li>
+                    <li><strong>Adoption Risk:</strong> Restaurants must claim accounts and engage with dashboard - requires active onboarding effort</li>
+                </ul>
+                <p><strong>Risk Level: Moderate</strong> - Success depends on restaurant adoption and perceived value</p>
+            </div>
+
+            <h3>Financial Feasibility: MODERATE</h3>
+            <div class="highlight-box">
+                <p><strong>Verdict: ROI positive but requires patience</strong></p>
+                <ul>
+                    <li><strong>Upfront Investment:</strong> $50-70k for MVP + event tracking + manual sales (Phase 1-3)</li>
+                    <li><strong>Break-Even:</strong> 12-18 months at 30-40 premium customers</li>
+                    <li><strong>Operational Costs:</strong> Low ($2-3k/month for moderate scale)</li>
+                    <li><strong>Revenue Potential:</strong> $100k+ ARR achievable by Year 2 with strong execution</li>
+                </ul>
+                <p><strong>Risk Level: Moderate</strong> - Requires capital and runway to reach profitability</p>
+            </div>
+
+            <h3>Key Success Factors</h3>
+
+            <ol>
+                <li><strong>Restaurant Onboarding:</strong> Must actively reach out to restaurants and help them claim accounts (passive approach will fail)</li>
+                <li><strong>Value Demonstration:</strong> Dashboard must show immediate, actionable insights (not just vanity metrics)</li>
+                <li><strong>Product-Market Fit:</strong> Start with Phase 1 (engagement analytics) and validate demand before investing in POS integrations</li>
+                <li><strong>Support & Education:</strong> Restaurants need hand-holding to understand analytics - plan for customer success resources</li>
+                <li><strong>Pricing Discipline:</strong> Don't undervalue premium tier - restaurants are used to paying for analytics tools</li>
+            </ol>
+
+            <h3>Risks & Mitigation Strategies</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Risk</th>
+                        <th>Impact</th>
+                        <th>Likelihood</th>
+                        <th>Mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Low Restaurant Adoption</strong></td>
+                        <td>High (no revenue)</td>
+                        <td>Medium</td>
+                        <td>Active outreach, onboarding incentives, free tier to reduce friction</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Weak Premium Conversion</strong></td>
+                        <td>High (low revenue)</td>
+                        <td>Medium</td>
+                        <td>Start with manual sales to validate demand before POS investment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>POS Integration Complexity</strong></td>
+                        <td>Medium (delays)</td>
+                        <td>High</td>
+                        <td>Start with Square only, expand based on proven demand</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Firebase Costs at Scale</strong></td>
+                        <td>Low (manageable)</td>
+                        <td>Low</td>
+                        <td>Daily batch processing keeps costs minimal, pass costs to premium tier</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Competitive Response</strong></td>
+                        <td>Medium (market share)</td>
+                        <td>Low</td>
+                        <td>First-mover advantage, deep integration with existing wine pairing data</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Recommendations -->
+        <section class="section">
+            <h2>10. Final Recommendations</h2>
+
+            <div class="recommendation">
+                <h3>Go/No-Go Decision: GO (with Phased Approach)</h3>
+                <p>The restaurant analytics dashboard is <strong>highly feasible</strong> and strategically valuable for SipSync. It transitions the platform from consumer-only to a B2B SaaS model with recurring revenue potential. However, success requires disciplined execution and realistic expectations.</p>
+            </div>
+
+            <h3>Recommended Implementation Plan</h3>
+
+            <h4>Step 1: Build Phase 1 MVP (Authentication + Basic Analytics)</h4>
+            <ul>
+                <li><strong>Timeline:</strong> 8-10 weeks</li>
+                <li><strong>Investment:</strong> $40-50k</li>
+                <li><strong>Goal:</strong> Validate that restaurants find value in engagement analytics</li>
+                <li><strong>Success Criteria:</strong> 50+ restaurants claim accounts, 30+ log in weekly</li>
+            </ul>
+
+            <h4>Step 2: Launch Beta with 20 Pilot Restaurants</h4>
+            <ul>
+                <li>Hand-select 20 restaurants with active user engagement</li>
+                <li>Offer free premium access for 6 months in exchange for feedback</li>
+                <li>Conduct monthly check-ins to understand usage and perceived value</li>
+                <li><strong>Decision Point:</strong> If 15+ restaurants (75%) actively use dashboard weekly, proceed to Step 3</li>
+            </ul>
+
+            <h4>Step 3: Add Event Tracking (Phase 2)</h4>
+            <ul>
+                <li><strong>Timeline:</strong> 3-4 weeks</li>
+                <li><strong>Investment:</strong> $8-12k</li>
+                <li><strong>Goal:</strong> Enrich analytics with "eyeballs" metrics (views, QR scans)</li>
+                <li><strong>Success Criteria:</strong> Save rate metric becomes most-viewed dashboard section</li>
+            </ul>
+
+            <h4>Step 4: Launch Manual Sales Tracking (Phase 3)</h4>
+            <ul>
+                <li><strong>Timeline:</strong> 2-3 weeks</li>
+                <li><strong>Investment:</strong> $5-8k</li>
+                <li><strong>Goal:</strong> Test demand for revenue analytics</li>
+                <li><strong>Decision Point:</strong> If <20% adoption, skip to POS integration (Step 5). If >20%, iterate on manual entry UX.</li>
+            </ul>
+
+            <h4>Step 5: Build Square POS Integration (Phase 4) - If Validated</h4>
+            <ul>
+                <li><strong>Timeline:</strong> 6-8 weeks</li>
+                <li><strong>Investment:</strong> $20-30k</li>
+                <li><strong>Prerequisite:</strong> At least 20 restaurants request POS integration, willingness to pay confirmed</li>
+                <li><strong>Pricing:</strong> Launch as premium feature at $75-100/month</li>
+            </ul>
+
+            <h4>Step 6: Optimize & Scale (Phase 5) - Ongoing</h4>
+            <ul>
+                <li>Add advanced features based on customer requests</li>
+                <li>Expand POS integrations if Square pilot succeeds</li>
+                <li>Build enterprise tier for restaurant groups</li>
+            </ul>
+
+            <h3>Critical Success Factors</h3>
+
+            <ol>
+                <li><strong>Restaurant Outreach:</strong> Don't assume restaurants will discover dashboard on their own - proactive onboarding is essential</li>
+                <li><strong>Value First:</strong> Ensure free tier provides real value (engagement analytics) before asking for payment</li>
+                <li><strong>Iterate Quickly:</strong> Launch Phase 1, gather feedback, iterate before investing in POS integrations</li>
+                <li><strong>Pricing Confidence:</strong> $75-100/month is fair for automatic POS sync - don't undervalue</li>
+                <li><strong>Support Readiness:</strong> Restaurants will need help interpreting analytics - plan for customer success resources</li>
+            </ol>
+
+            <h3>What NOT to Do</h3>
+
+            <div class="warning-box">
+                <h4>Anti-Patterns to Avoid</h4>
+                <ul>
+                    <li><strong>Don't:</strong> Build POS integrations before validating demand with manual entry</li>
+                    <li><strong>Don't:</strong> Launch with real-time analytics (too expensive) - daily batch is sufficient</li>
+                    <li><strong>Don't:</strong> Integrate with 5 POS systems at once - start with Square only</li>
+                    <li><strong>Don't:</strong> Price premium tier below $50/month - underpricing undermines perceived value</li>
+                    <li><strong>Don't:</strong> Assume restaurants will onboard themselves - active outreach required</li>
+                </ul>
+            </div>
+
+            <h3>Next Steps (If Proceeding)</h3>
+
+            <ol>
+                <li><strong>Week 1-2:</strong> Finalize technical specifications for Phase 1 authentication system</li>
+                <li><strong>Week 3-10:</strong> Develop Phase 1 MVP (authentication + basic analytics)</li>
+                <li><strong>Week 11-12:</strong> Beta testing with 20 pilot restaurants</li>
+                <li><strong>Week 13:</strong> Gather feedback, iterate on dashboard UX</li>
+                <li><strong>Week 14:</strong> Public launch of free tier to all restaurants</li>
+                <li><strong>Month 4-6:</strong> Monitor adoption, plan Phase 2 (event tracking) if traction is strong</li>
+            </ol>
+
+            <div class="success-box">
+                <h3>Bottom Line</h3>
+                <p>The restaurant analytics dashboard is a <strong>strategic investment</strong> that positions SipSync for long-term success as a B2B platform. While it requires upfront capital ($50-70k) and patience to reach profitability (12-18 months), the potential to build a $100k+ ARR business by Year 2 makes this a high-value opportunity.</p>
+
+                <p><strong>Recommendation: Proceed with Phase 1 MVP, validate with pilot restaurants, then scale based on proven demand.</strong></p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="margin-top: 80px; padding-top: 30px; border-top: 2px solid #ddd; text-align: center; color: #999;">
+            <p>SipSync Restaurant Analytics Dashboard - Comprehensive Analysis</p>
+            <p>Document Date: February 1, 2026</p>
+            <p style="margin-top: 20px; font-size: 12px;">This document is confidential and intended for internal strategic planning purposes only.</p>
+        </footer>
+    </div>
+</body>
+</html>

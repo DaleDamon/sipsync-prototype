@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipSync Complete Cost Analysis - Financial Modeling</title>
+    <style>
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 60px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 3px solid #8b0000;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #8b0000;
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+        h2 {
+            color: #8b0000;
+            font-size: 1.8em;
+            margin-top: 40px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #555;
+            font-size: 1.4em;
+            margin-top: 30px;
+        }
+        h4 {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #8b0000;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .highlight-row {
+            background-color: #fff9e6 !important;
+            font-weight: 600;
+        }
+        .total-row {
+            background-color: #ffe6e6 !important;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        .cost-box {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .warning-box {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .success-box {
+            background-color: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        .formula {
+            background-color: #f5f5f5;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+                padding: 40px;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            .section {
+                page-break-inside: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>💰 SipSync Complete Cost Analysis</h1>
+            <p class="subtitle">Comprehensive Infrastructure & Operational Cost Breakdown</p>
+            <p style="color: #999; font-size: 0.9em;">Financial Modeling Report | January 2026</p>
+        </header>
+
+        <!-- Executive Summary -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+
+            <p>
+                This document provides a complete cost analysis for the SipSync wine recommendation platform, including all infrastructure, AI processing, development, and operational costs. Costs are projected across three business stages: Early (50 restaurants), Growth (500 restaurants), and Scale (5,000 restaurants).
+            </p>
+
+            <div class="cost-box">
+                <h3 style="margin-top: 0;">📊 Total Monthly Operating Costs (Steady State)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Business Stage</th>
+                            <th>Restaurants</th>
+                            <th>Monthly Cost</th>
+                            <th>Per-Restaurant Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Early Stage</strong></td>
+                            <td>50</td>
+                            <td><strong>$83/month</strong></td>
+                            <td>$1.66/restaurant</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Growth Stage</strong></td>
+                            <td>500</td>
+                            <td><strong>$538/month</strong></td>
+                            <td>$1.08/restaurant</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>Scale</strong></td>
+                            <td>5,000</td>
+                            <td><strong>$4,293/month</strong></td>
+                            <td>$0.86/restaurant</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; font-size: 0.95em;"><strong>Note:</strong> Includes Firebase, AI processing, hosting, and all infrastructure. Does not include development, support staff, or marketing costs.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 Key Insights</h4>
+                <ul>
+                    <li><strong>Firebase is the largest cost driver</strong> at scale (~73% of monthly costs)</li>
+                    <li><strong>Per-restaurant costs decrease</strong> as you scale due to fixed costs spreading</li>
+                    <li><strong>Daily wine list updates</strong> add ~$18/month at 5,000 restaurants (negligible)</li>
+                    <li><strong>One-time setup costs:</strong> $288-1,620 (AI processing of initial wine lists)</li>
+                    <li><strong>Development costs:</strong> $15-23k one-time for MVP + optimizations</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Current System Usage Analysis -->
+        <section class="section">
+            <h2>1. Current System Architecture & Usage Patterns</h2>
+
+            <h3>Database Operations Per User Journey</h3>
+            <p>Understanding Firestore costs requires analyzing typical user behavior:</p>
+
+            <h4>Scenario 1: New User Signs Up & Takes Quiz</h4>
+            <ol>
+                <li><strong>Create user account:</strong> 1 write</li>
+                <li><strong>Submit quiz:</strong> 1 write (save preferences)</li>
+                <li><strong>View quiz results:</strong> 1 read (user data)</li>
+                <li><strong>Navigate to pairing discovery:</strong> 0 operations (uses cached data)</li>
+                <li><strong>Find wine pairings:</strong>
+                    <ul>
+                        <li>1 read (restaurant data)</li>
+                        <li>50 reads (wine subcollection - avg 50 wines per restaurant)</li>
+                        <li>20 reads (food items subcollection)</li>
+                        <li>50 reads (pairings subcollection)</li>
+                    </ul>
+                </li>
+                <li><strong>Save favorite pairing:</strong> 1 write</li>
+            </ol>
+            <p><strong>Total per new user:</strong> ~123 reads, 3 writes</p>
+
+            <h4>Scenario 2: Returning User Browses Wines</h4>
+            <ol>
+                <li><strong>Load profile page:</strong> 1 read (user), 50 reads (pairing history), 5 reads (visited restaurants)</li>
+                <li><strong>Browse wines at restaurant:</strong> 1 read (restaurant), 50 reads (wines), 20 reads (foods), 50 reads (pairings)</li>
+                <li><strong>Save new pairing:</strong> 1 write</li>
+            </ol>
+            <p><strong>Total per returning session:</strong> ~177 reads, 1 write</p>
+
+            <h4>Scenario 3: Restaurant Uploads Wine List (CSV)</h4>
+            <ol>
+                <li><strong>Upload 50-wine CSV:</strong> 0 reads, 50 writes (batch import)</li>
+                <li><strong>Daily update (10% churn):</strong> 0 reads, 5 writes</li>
+            </ol>
+            <p><strong>Total per restaurant onboarding:</strong> 50 writes</p>
+            <p><strong>Total per daily update:</strong> 5 writes (avg)</p>
+
+            <h3>Monthly Activity Assumptions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Early (50 rest.)</th>
+                        <th>Growth (500 rest.)</th>
+                        <th>Scale (5,000 rest.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Active users per month</td>
+                        <td>500</td>
+                        <td>5,000</td>
+                        <td>50,000</td>
+                    </tr>
+                    <tr>
+                        <td>New users/month</td>
+                        <td>100</td>
+                        <td>1,000</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>Returning user sessions/month</td>
+                        <td>1,200 (3 per user)</td>
+                        <td>12,000</td>
+                        <td>120,000</td>
+                    </tr>
+                    <tr>
+                        <td>Restaurants with daily updates</td>
+                        <td>10 (20%)</td>
+                        <td>100 (20%)</td>
+                        <td>1,000 (20%)</td>
+                    </tr>
+                    <tr>
+                        <td>Total wines in database</td>
+                        <td>2,500</td>
+                        <td>25,000</td>
+                        <td>250,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Firebase Firestore Costs -->
+        <section class="section">
+            <h2>2. Firebase Firestore Costs (Primary Infrastructure)</h2>
+
+            <h3>Firestore Pricing (2026 Rates)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Free Tier</th>
+                        <th>Cost Beyond Free Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Document Reads</td>
+                        <td>50,000/day</td>
+                        <td>$0.06 per 100,000 reads</td>
+                    </tr>
+                    <tr>
+                        <td>Document Writes</td>
+                        <td>20,000/day</td>
+                        <td>$0.18 per 100,000 writes</td>
+                    </tr>
+                    <tr>
+                        <td>Document Deletes</td>
+                        <td>20,000/day</td>
+                        <td>$0.02 per 100,000 deletes</td>
+                    </tr>
+                    <tr>
+                        <td>Stored Data</td>
+                        <td>1 GB</td>
+                        <td>$0.18 per GB/month</td>
+                    </tr>
+                    <tr>
+                        <td>Network Egress</td>
+                        <td>10 GB/month</td>
+                        <td>$0.12 per GB</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Monthly Firestore Usage Calculations</h3>
+
+            <h4>Early Stage (50 Restaurants, 500 Active Users)</h4>
+
+            <div class="formula">
+<strong>READS:</strong>
+New users (100/month): 100 × 123 reads = 12,300 reads
+Returning sessions (1,200/month): 1,200 × 177 reads = 212,400 reads
+<strong>Total reads/month: 224,700 reads</strong>
+
+Billable reads: 224,700 - 1,500,000 (free tier) = 0
+<strong>Read cost: $0/month (within free tier)</strong>
+
+<strong>WRITES:</strong>
+New users (100/month): 100 × 3 writes = 300 writes
+Returning sessions (1,200/month): 1,200 × 1 write = 1,200 writes
+Restaurant onboarding (5 new/month): 5 × 50 writes = 250 writes
+Daily updates (10 restaurants × 30 days): 10 × 5 × 30 = 1,500 writes
+<strong>Total writes/month: 3,250 writes</strong>
+
+Billable writes: 3,250 - 600,000 (free tier) = 0
+<strong>Write cost: $0/month (within free tier)</strong>
+
+<strong>STORAGE:</strong>
+Wine documents: 2,500 wines × 2 KB = 5 MB
+User documents: 500 users × 5 KB = 2.5 MB
+Restaurant documents: 50 × 3 KB = 150 KB
+Food items: 1,000 × 1 KB = 1 MB
+Pairings: 5,000 × 1 KB = 5 MB
+<strong>Total storage: ~14 MB</strong>
+
+Billable storage: 0.014 GB - 1 GB (free) = 0
+<strong>Storage cost: $0/month (within free tier)</strong>
+
+<strong>NETWORK EGRESS:</strong>
+Avg response size: 50 KB per request
+Monthly requests: 224,700 reads × 50 KB = 11.2 GB
+Billable egress: 11.2 GB - 10 GB (free) = 1.2 GB
+<strong>Egress cost: 1.2 × $0.12 = $0.14/month</strong>
+
+<strong>TOTAL FIRESTORE COST (Early): $0.14/month</strong>
+            </div>
+
+            <h4>Growth Stage (500 Restaurants, 5,000 Active Users)</h4>
+
+            <div class="formula">
+<strong>READS:</strong>
+New users (1,000/month): 1,000 × 123 = 123,000 reads
+Returning sessions (12,000/month): 12,000 × 177 = 2,124,000 reads
+<strong>Total reads/month: 2,247,000 reads</strong>
+
+Billable reads: 2,247,000 - 1,500,000 = 747,000 reads
+<strong>Read cost: (747,000 / 100,000) × $0.06 = $0.45/month</strong>
+
+<strong>WRITES:</strong>
+New users: 1,000 × 3 = 3,000 writes
+Returning sessions: 12,000 × 1 = 12,000 writes
+Restaurant onboarding: 50/month × 50 = 2,500 writes
+Daily updates: 100 restaurants × 5 × 30 = 15,000 writes
+<strong>Total writes/month: 32,500 writes</strong>
+
+Billable writes: 32,500 - 600,000 = 0
+<strong>Write cost: $0/month (within free tier)</strong>
+
+<strong>STORAGE:</strong>
+Wines: 25,000 × 2 KB = 50 MB
+Users: 5,000 × 5 KB = 25 MB
+Restaurants: 500 × 3 KB = 1.5 MB
+Food items: 10,000 × 1 KB = 10 MB
+Pairings: 50,000 × 1 KB = 50 MB
+<strong>Total storage: 136.5 MB (~0.14 GB)</strong>
+
+Billable storage: 0
+<strong>Storage cost: $0/month (within free tier)</strong>
+
+<strong>NETWORK EGRESS:</strong>
+Monthly data transfer: 2,247,000 × 50 KB = 112.3 GB
+Billable egress: 112.3 - 10 = 102.3 GB
+<strong>Egress cost: 102.3 × $0.12 = $12.28/month</strong>
+
+<strong>TOTAL FIRESTORE COST (Growth): $12.73/month</strong>
+            </div>
+
+            <h4>Scale (5,000 Restaurants, 50,000 Active Users)</h4>
+
+            <div class="formula">
+<strong>READS:</strong>
+New users (10,000/month): 10,000 × 123 = 1,230,000 reads
+Returning sessions (120,000/month): 120,000 × 177 = 21,240,000 reads
+<strong>Total reads/month: 22,470,000 reads</strong>
+
+Billable reads: 22,470,000 - 1,500,000 = 20,970,000 reads
+<strong>Read cost: (20,970,000 / 100,000) × $0.06 = $12.58/month</strong>
+
+<strong>WRITES:</strong>
+New users: 10,000 × 3 = 30,000 writes
+Returning sessions: 120,000 × 1 = 120,000 writes
+Restaurant onboarding: 500/month × 50 = 25,000 writes
+Daily updates: 1,000 restaurants × 5 × 30 = 150,000 writes
+<strong>Total writes/month: 325,000 writes</strong>
+
+Billable writes: 325,000 - 600,000 = 0
+<strong>Write cost: $0/month (still within free tier!)</strong>
+
+<strong>STORAGE:</strong>
+Wines: 250,000 × 2 KB = 500 MB
+Users: 50,000 × 5 KB = 250 MB
+Restaurants: 5,000 × 3 KB = 15 MB
+Food items: 100,000 × 1 KB = 100 MB
+Pairings: 500,000 × 1 KB = 500 MB
+<strong>Total storage: 1,365 MB (~1.33 GB)</strong>
+
+Billable storage: 1.33 - 1 = 0.33 GB
+<strong>Storage cost: 0.33 × $0.18 = $0.06/month</strong>
+
+<strong>NETWORK EGRESS:</strong>
+Monthly data transfer: 22,470,000 × 50 KB = 1,123.5 GB
+Billable egress: 1,123.5 - 10 = 1,113.5 GB
+<strong>Egress cost: 1,113.5 × $0.12 = $133.62/month</strong>
+
+<strong>TOTAL FIRESTORE COST (Scale): $146.26/month</strong>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ Critical Optimization Opportunity: Caching</h4>
+                <p>The largest cost driver is <strong>network egress</strong> from repeated wine list queries. Implementing a CDN or Redis cache layer can reduce this by 70-80%:</p>
+                <ul>
+                    <li><strong>Without caching:</strong> $134/month egress at 5,000 restaurants</li>
+                    <li><strong>With CloudFlare CDN (free tier):</strong> ~$30/month egress (75% reduction)</li>
+                    <li><strong>With Redis cache:</strong> $15/month Redis + $30/month egress = $45/month total</li>
+                </ul>
+                <p><strong>Recommended:</strong> Add caching layer at Growth stage to cap Firestore costs.</p>
+            </div>
+
+            <h3>Firestore Cost Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Without Caching</th>
+                        <th>With Caching (75% egress reduction)</th>
+                        <th>Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early (50 rest.)</td>
+                        <td>$0.14/month</td>
+                        <td>$0.14/month</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Growth (500 rest.)</td>
+                        <td>$12.73/month</td>
+                        <td>$3.52/month</td>
+                        <td><strong>$9.21/month</strong></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Scale (5,000 rest.)</td>
+                        <td>$146.26/month</td>
+                        <td>$46.49/month</td>
+                        <td><strong>$99.77/month</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Firebase Authentication Costs -->
+        <section class="section">
+            <h2>3. Firebase Authentication Costs</h2>
+
+            <p>Firebase Authentication is used for phone number login (SMS-based).</p>
+
+            <h3>Firebase Auth Pricing</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Free Tier</th>
+                        <th>Paid Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Phone Auth (SMS)</td>
+                        <td>None</td>
+                        <td>$0.01 - $0.06 per SMS (varies by country)</td>
+                    </tr>
+                    <tr>
+                        <td>Email/Password Auth</td>
+                        <td>Unlimited (free)</td>
+                        <td>Free</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>💡 Current Implementation: Phone Number Auth</h4>
+                <p>Your system uses Firebase phone authentication. Costs depend on SMS volume:</p>
+                <ul>
+                    <li><strong>US/Canada SMS:</strong> ~$0.01 per SMS</li>
+                    <li><strong>Each login attempt:</strong> 1 SMS (verification code)</li>
+                    <li><strong>Session duration:</strong> Users stay logged in (localStorage token), so SMS only sent on initial login</li>
+                </ul>
+            </div>
+
+            <h3>Monthly SMS Costs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>New Users/Month</th>
+                        <th>Re-logins (cleared cache)</th>
+                        <th>Total SMS</th>
+                        <th>Cost (@$0.01/SMS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early</td>
+                        <td>100</td>
+                        <td>50</td>
+                        <td>150</td>
+                        <td><strong>$1.50/month</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>1,000</td>
+                        <td>500</td>
+                        <td>1,500</td>
+                        <td><strong>$15/month</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>10,000</td>
+                        <td>5,000</td>
+                        <td>15,000</td>
+                        <td><strong>$150/month</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success-box">
+                <h4>✅ Cost Optimization: Switch to Email/Password Auth</h4>
+                <p>If SMS costs become prohibitive, consider hybrid approach:</p>
+                <ul>
+                    <li><strong>Option 1:</strong> Email/password auth (100% free, unlimited users)</li>
+                    <li><strong>Option 2:</strong> Phone number as optional (for account recovery only)</li>
+                    <li><strong>Option 3:</strong> Social auth (Google, Facebook) - also free</li>
+                </ul>
+                <p><strong>Potential savings at scale:</strong> $150/month → $0/month</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- AI Processing Costs -->
+        <section class="section">
+            <h2>4. AI Processing Costs (Wine Characteristic Extraction)</h2>
+
+            <h3>AI Cost Structure</h3>
+
+            <p>Two types of AI usage:</p>
+            <ol>
+                <li><strong>Initial wine list upload:</strong> One-time cost per restaurant onboarding</li>
+                <li><strong>Daily/weekly updates:</strong> Ongoing cost for restaurants that frequently update lists</li>
+            </ol>
+
+            <h3>Recommended AI Model: GPT-4o-mini</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Input Cost</th>
+                        <th>Output Cost</th>
+                        <th>Cost Per Wine</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GPT-4o-mini</td>
+                        <td>$0.150 / 1M tokens</td>
+                        <td>$0.600 / 1M tokens</td>
+                        <td>$0.0004 - $0.0008</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 3.5 Haiku</td>
+                        <td>$0.80 / 1M tokens</td>
+                        <td>$4.00 / 1M tokens</td>
+                        <td>$0.0002 - $0.0005</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Assumption:</strong> ~250 input tokens + 100 output tokens per wine analysis</p>
+
+            <h3>One-Time Setup Costs (Initial Wine Lists)</h3>
+
+            <div class="formula">
+<strong>Early Stage (50 restaurants × 50 wines avg):</strong>
+Total wines: 2,500
+Cost per wine: $0.0006 (avg)
+<strong>One-time AI cost: 2,500 × $0.0006 = $1.50</strong>
+
+With caching (40% hit rate after first 10 restaurants):
+<strong>Optimized cost: $1.50 × 0.6 = $0.90</strong>
+
+<strong>Growth Stage (500 restaurants × 50 wines avg):</strong>
+Total wines: 25,000
+Base cost: 25,000 × $0.0006 = $15
+With caching (50% hit rate):
+<strong>Optimized cost: $15 × 0.5 = $7.50</strong>
+
+<strong>Scale (5,000 restaurants × 50 wines avg):</strong>
+Total wines: 250,000
+Base cost: 250,000 × $0.0006 = $150
+With caching (60% hit rate):
+<strong>Optimized cost: $150 × 0.4 = $60</strong>
+            </div>
+
+            <h3>Monthly Ongoing Costs (Daily Updates)</h3>
+
+            <p><strong>Assumptions:</strong></p>
+            <ul>
+                <li>20% of restaurants update wine lists regularly (weekly/daily)</li>
+                <li>Average update: 5 wines changed per update</li>
+                <li>Cache hit rate: 30% (seasonal wines rotate, many are unique)</li>
+            </ul>
+
+            <div class="formula">
+<strong>Early Stage:</strong>
+Active updaters: 50 × 20% = 10 restaurants
+Updates per month: 10 × 4 weeks × 5 wines = 200 wines
+Cost: 200 × $0.0006 × 0.7 (cache miss rate) = <strong>$0.08/month</strong>
+
+<strong>Growth Stage:</strong>
+Active updaters: 500 × 20% = 100 restaurants
+Updates per month: 100 × 4 × 5 = 2,000 wines
+Cost: 2,000 × $0.0006 × 0.7 = <strong>$0.84/month</strong>
+
+<strong>Scale:</strong>
+Active updaters: 5,000 × 20% = 1,000 restaurants
+Updates per month: 1,000 × 4 × 5 = 20,000 wines
+Cost: 20,000 × $0.0006 × 0.7 = <strong>$8.40/month</strong>
+            </div>
+
+            <h3>AI Cost Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>One-Time Setup</th>
+                        <th>Monthly Updates</th>
+                        <th>Year 1 Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early</td>
+                        <td>$0.90</td>
+                        <td>$0.08/month</td>
+                        <td>$1.86</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>$7.50</td>
+                        <td>$0.84/month</td>
+                        <td>$17.58</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>$60</td>
+                        <td>$8.40/month</td>
+                        <td>$160.80</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success-box">
+                <h4>✅ Key Takeaway: AI Costs Are Negligible</h4>
+                <p>Even at 5,000 restaurants with frequent updates, AI processing costs less than <strong>$10/month</strong>. This is 1-3% of total infrastructure costs.</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Other Infrastructure Costs -->
+        <section class="section">
+            <h2>5. Additional Infrastructure Costs</h2>
+
+            <h3>A. Web Hosting (Frontend)</h3>
+
+            <p>React frontend needs to be hosted and served to users.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hosting Option</th>
+                        <th>Bandwidth Included</th>
+                        <th>Cost</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Vercel (Recommended)</strong></td>
+                        <td>100 GB/month</td>
+                        <td>Free (Pro: $20/month)</td>
+                        <td>Early-Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Netlify</strong></td>
+                        <td>100 GB/month</td>
+                        <td>Free (Pro: $19/month)</td>
+                        <td>Early-Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CloudFlare Pages</strong></td>
+                        <td>Unlimited</td>
+                        <td>Free</td>
+                        <td>All stages</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS S3 + CloudFront</strong></td>
+                        <td>50 GB/month (free tier)</td>
+                        <td>$5-50/month</td>
+                        <td>Scale</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Recommended:</strong></p>
+            <ul>
+                <li><strong>Early-Growth:</strong> CloudFlare Pages (Free, unlimited bandwidth)</li>
+                <li><strong>Scale:</strong> CloudFlare Pages or AWS CloudFront ($20-40/month)</li>
+            </ul>
+
+            <p><strong>Estimated Cost:</strong> $0-40/month depending on stage</p>
+
+            <h3>B. Backend Hosting (Node.js API)</h3>
+
+            <p>Express.js backend needs to run 24/7.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hosting Option</th>
+                        <th>Resources</th>
+                        <th>Cost</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Render (Free Tier)</strong></td>
+                        <td>512 MB RAM, sleeps after inactivity</td>
+                        <td>Free</td>
+                        <td>Early stage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Render (Starter)</strong></td>
+                        <td>512 MB RAM, always on</td>
+                        <td>$7/month</td>
+                        <td>Early-Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Railway</strong></td>
+                        <td>1 GB RAM, always on</td>
+                        <td>$5/month</td>
+                        <td>Early-Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DigitalOcean Droplet</strong></td>
+                        <td>1 GB RAM, 25 GB SSD</td>
+                        <td>$6/month</td>
+                        <td>Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS EC2 (t3.small)</strong></td>
+                        <td>2 GB RAM, auto-scaling</td>
+                        <td>$15-30/month</td>
+                        <td>Scale</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Recommended:</strong></p>
+            <ul>
+                <li><strong>Early:</strong> Railway ($5/month) or Render ($7/month)</li>
+                <li><strong>Growth:</strong> DigitalOcean Droplet ($6-12/month)</li>
+                <li><strong>Scale:</strong> AWS EC2 with load balancing ($30-60/month)</li>
+            </ul>
+
+            <h3>C. Caching Layer (Optional but Recommended)</h3>
+
+            <p>Redis cache to reduce Firestore egress costs.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Memory</th>
+                        <th>Cost</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Upstash Redis (Free)</strong></td>
+                        <td>256 MB</td>
+                        <td>Free</td>
+                        <td>Early stage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Upstash Redis (Pay-as-you-go)</strong></td>
+                        <td>1 GB</td>
+                        <td>$10/month</td>
+                        <td>Growth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS ElastiCache</strong></td>
+                        <td>1.5 GB (cache.t3.micro)</td>
+                        <td>$15/month</td>
+                        <td>Scale</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Recommended:</strong> Add caching at Growth stage to save $9-100/month on Firestore egress.</p>
+
+            <h3>D. Domain & SSL</h3>
+            <ul>
+                <li><strong>Domain registration:</strong> $12/year (~$1/month)</li>
+                <li><strong>SSL certificate:</strong> Free (Let's Encrypt or CloudFlare)</li>
+            </ul>
+
+            <h3>E. Monitoring & Error Tracking</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Free Tier</th>
+                        <th>Paid Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sentry (Error Tracking)</td>
+                        <td>5,000 events/month</td>
+                        <td>$26/month (50k events)</td>
+                    </tr>
+                    <tr>
+                        <td>LogRocket (Session Replay)</td>
+                        <td>1,000 sessions/month</td>
+                        <td>$99/month (10k sessions)</td>
+                    </tr>
+                    <tr>
+                        <td>Firebase Analytics</td>
+                        <td>Unlimited</td>
+                        <td>Free</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Recommended:</strong></p>
+            <ul>
+                <li><strong>Early-Growth:</strong> Firebase Analytics (free) + Sentry free tier</li>
+                <li><strong>Scale:</strong> Sentry paid ($26/month)</li>
+            </ul>
+
+            <h3>Infrastructure Cost Summary</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Early</th>
+                        <th>Growth</th>
+                        <th>Scale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Frontend Hosting</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$30</td>
+                    </tr>
+                    <tr>
+                        <td>Backend Hosting</td>
+                        <td>$7</td>
+                        <td>$12</td>
+                        <td>$50</td>
+                    </tr>
+                    <tr>
+                        <td>Caching (Redis)</td>
+                        <td>$0</td>
+                        <td>$10</td>
+                        <td>$15</td>
+                    </tr>
+                    <tr>
+                        <td>Domain</td>
+                        <td>$1</td>
+                        <td>$1</td>
+                        <td>$1</td>
+                    </tr>
+                    <tr>
+                        <td>Monitoring</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$26</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>$8/month</strong></td>
+                        <td><strong>$23/month</strong></td>
+                        <td><strong>$122/month</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Complete Monthly Cost Breakdown -->
+        <section class="section">
+            <h2>6. Complete Monthly Operating Cost Breakdown</h2>
+
+            <h3>Scenario: With Optimizations (Recommended)</h3>
+            <p>Includes caching layer to reduce Firestore egress costs.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Early (50 rest.)</th>
+                        <th>Growth (500 rest.)</th>
+                        <th>Scale (5,000 rest.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Firestore (with caching)</td>
+                        <td>$0.14</td>
+                        <td>$3.52</td>
+                        <td>$46.49</td>
+                    </tr>
+                    <tr>
+                        <td>Firebase Auth (SMS)</td>
+                        <td>$1.50</td>
+                        <td>$15.00</td>
+                        <td>$150.00</td>
+                    </tr>
+                    <tr>
+                        <td>AI Processing (monthly updates)</td>
+                        <td>$0.08</td>
+                        <td>$0.84</td>
+                        <td>$8.40</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend Hosting</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$30</td>
+                    </tr>
+                    <tr>
+                        <td>Backend Hosting</td>
+                        <td>$7</td>
+                        <td>$12</td>
+                        <td>$50</td>
+                    </tr>
+                    <tr>
+                        <td>Redis Caching</td>
+                        <td>$0</td>
+                        <td>$10</td>
+                        <td>$15</td>
+                    </tr>
+                    <tr>
+                        <td>Domain</td>
+                        <td>$1</td>
+                        <td>$1</td>
+                        <td>$1</td>
+                    </tr>
+                    <tr>
+                        <td>Monitoring/Error Tracking</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$26</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL MONTHLY</strong></td>
+                        <td><strong>$9.72</strong></td>
+                        <td><strong>$42.36</strong></td>
+                        <td><strong>$326.89</strong></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>Per-Restaurant Cost</strong></td>
+                        <td><strong>$0.19</strong></td>
+                        <td><strong>$0.08</strong></td>
+                        <td><strong>$0.07</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="cost-box">
+                <h4>💰 Cost Optimization: Switch to Email Auth</h4>
+                <p>Firebase SMS authentication is the 2nd largest cost. Switching to email/password auth eliminates this entirely:</p>
+                <table style="margin-top: 15px;">
+                    <tr>
+                        <th>Stage</th>
+                        <th>With SMS Auth</th>
+                        <th>With Email Auth</th>
+                        <th>Savings</th>
+                    </tr>
+                    <tr>
+                        <td>Early</td>
+                        <td>$9.72/month</td>
+                        <td>$8.22/month</td>
+                        <td>$1.50/month (15%)</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>$42.36/month</td>
+                        <td>$27.36/month</td>
+                        <td>$15/month (35%)</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Scale</td>
+                        <td>$326.89/month</td>
+                        <td>$176.89/month</td>
+                        <td><strong>$150/month (46%)</strong></td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>Scenario: Without Optimizations (No Caching)</h3>
+            <p>For comparison - what costs look like without caching layer:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Early</th>
+                        <th>Growth</th>
+                        <th>Scale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Firestore (no caching)</td>
+                        <td>$0.14</td>
+                        <td>$12.73</td>
+                        <td>$146.26</td>
+                    </tr>
+                    <tr>
+                        <td>Other Infrastructure</td>
+                        <td>$9.58</td>
+                        <td>$29.63</td>
+                        <td>$180.63</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL MONTHLY (no caching)</strong></td>
+                        <td><strong>$9.72</strong></td>
+                        <td><strong>$42.36</strong></td>
+                        <td><strong>$326.89</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="color: #f44336; font-weight: bold;">⚠️ At scale, not implementing caching costs an extra $99.77/month!</p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Development & One-Time Costs -->
+        <section class="section">
+            <h2>7. Development & One-Time Costs</h2>
+
+            <h3>A. Wine List Upload Feature Development</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Scope</th>
+                        <th>Time Estimate</th>
+                        <th>Cost (@$75/hr)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Phase 1: MVP</strong></td>
+                        <td>
+                            - CSV upload endpoint<br>
+                            - Basic column mapper<br>
+                            - GPT-4o-mini integration<br>
+                            - Review UI for low-confidence wines<br>
+                            - Batch import to Firestore
+                        </td>
+                        <td>2-3 weeks (120-180 hrs)</td>
+                        <td>$9,000 - $13,500</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2: Optimization</strong></td>
+                        <td>
+                            - Wine cache system (Redis)<br>
+                            - Tiered AI models<br>
+                            - Advanced column mapper<br>
+                            - Bulk edit tools
+                        </td>
+                        <td>1-2 weeks (60-100 hrs)</td>
+                        <td>$4,500 - $7,500</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3: Advanced (Optional)</strong></td>
+                        <td>
+                            - Wine database API integration<br>
+                            - Image upload + OCR<br>
+                            - Auto-pairing suggestions<br>
+                            - Analytics dashboard
+                        </td>
+                        <td>2-3 weeks (120-180 hrs)</td>
+                        <td>$9,000 - $13,500</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL (Phase 1 + 2)</strong></td>
+                        <td colspan="2"><strong>MVP + Optimizations</strong></td>
+                        <td><strong>$13,500 - $21,000</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>B. Initial Wine List Processing (One-Time AI Costs)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Restaurants Onboarded</th>
+                        <th>Total Wines</th>
+                        <th>AI Cost (with caching)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early</td>
+                        <td>50</td>
+                        <td>2,500</td>
+                        <td>$0.90</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>500</td>
+                        <td>25,000</td>
+                        <td>$7.50</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>5,000</td>
+                        <td>250,000</td>
+                        <td>$60</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>C. Infrastructure Setup</h3>
+            <ul>
+                <li><strong>Firebase project setup:</strong> Free</li>
+                <li><strong>Domain purchase:</strong> $12/year</li>
+                <li><strong>SSL certificate:</strong> Free (Let's Encrypt)</li>
+                <li><strong>OpenAI API account:</strong> Free (pay-as-you-go)</li>
+                <li><strong>Hosting accounts:</strong> Free (CloudFlare, Railway, Render)</li>
+            </ul>
+            <p><strong>Total setup cost:</strong> ~$12 (domain only)</p>
+
+            <h3>Total Launch Costs (Phase 1 MVP)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Development (Phase 1 MVP)</td>
+                        <td>$9,000 - $13,500</td>
+                    </tr>
+                    <tr>
+                        <td>Infrastructure Setup</td>
+                        <td>$12</td>
+                    </tr>
+                    <tr>
+                        <td>Initial Wine Processing (50 restaurants)</td>
+                        <td>$0.90</td>
+                    </tr>
+                    <tr>
+                        <td>First Month Operating Costs</td>
+                        <td>$10</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL TO LAUNCH</strong></td>
+                        <td><strong>$9,023 - $13,523</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Ongoing Operational Costs -->
+        <section class="section">
+            <h2>8. Ongoing Operational Costs (People & Support)</h2>
+
+            <p>Beyond infrastructure, consider human costs:</p>
+
+            <h3>A. Customer Success / Restaurant Support</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Support Volume</th>
+                        <th>Staffing Need</th>
+                        <th>Monthly Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early (50 rest.)</td>
+                        <td>~5-10 support tickets/week</td>
+                        <td>Part-time (10 hrs/week)</td>
+                        <td>$1,500 - $2,000/month</td>
+                    </tr>
+                    <tr>
+                        <td>Growth (500 rest.)</td>
+                        <td>~30-50 tickets/week</td>
+                        <td>1 full-time CS rep</td>
+                        <td>$3,500 - $5,000/month</td>
+                    </tr>
+                    <tr>
+                        <td>Scale (5,000 rest.)</td>
+                        <td>~200-300 tickets/week</td>
+                        <td>3-4 full-time CS reps</td>
+                        <td>$12,000 - $18,000/month</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>💡 Reducing Support Costs</h4>
+                <p>AI-powered wine upload reduces support burden significantly:</p>
+                <ul>
+                    <li><strong>With AI:</strong> ~80% of uploads succeed without intervention</li>
+                    <li><strong>Without AI:</strong> ~50% of restaurants need help manually entering characteristics</li>
+                    <li><strong>Savings:</strong> ~30% reduction in support tickets</li>
+                </ul>
+            </div>
+
+            <h3>B. Backend/DevOps Maintenance</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Effort Required</th>
+                        <th>Monthly Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early</td>
+                        <td>5-10 hrs/month (bug fixes, monitoring)</td>
+                        <td>$500 - $750/month</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>20-30 hrs/month (performance tuning, updates)</td>
+                        <td>$1,500 - $2,250/month</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>40-60 hrs/month (dedicated engineer)</td>
+                        <td>$8,000 - $12,000/month (FTE)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>C. Restaurant Onboarding</h3>
+            <p>Time investment to onboard new restaurants (sales, training, wine list setup):</p>
+            <ul>
+                <li><strong>With AI upload:</strong> 30 min per restaurant (mostly sales/training)</li>
+                <li><strong>Without AI:</strong> 2+ hours per restaurant (manual wine data entry)</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>New Restaurants/Month</th>
+                        <th>Onboarding Time (with AI)</th>
+                        <th>Labor Cost (@$30/hr)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early</td>
+                        <td>5/month</td>
+                        <td>2.5 hours</td>
+                        <td>$75/month</td>
+                    </tr>
+                    <tr>
+                        <td>Growth</td>
+                        <td>50/month</td>
+                        <td>25 hours</td>
+                        <td>$750/month</td>
+                    </tr>
+                    <tr>
+                        <td>Scale</td>
+                        <td>500/month</td>
+                        <td>250 hours</td>
+                        <td>$7,500/month</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <h4>⚠️ Without AI: Onboarding Costs 4x Higher</h4>
+                <p>Manual wine data entry adds ~1.5 hours per restaurant:</p>
+                <ul>
+                    <li><strong>Scale stage without AI:</strong> 500 restaurants × 2 hrs = 1,000 hrs/month = <strong>$30,000/month labor</strong></li>
+                    <li><strong>With AI:</strong> 500 × 0.5 hrs = 250 hrs/month = <strong>$7,500/month labor</strong></li>
+                    <li><strong>Savings:</strong> $22,500/month ($270k/year)</li>
+                </ul>
+            </div>
+
+            <h3>Total Operational Costs (Monthly)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Early</th>
+                        <th>Growth</th>
+                        <th>Scale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Infrastructure (optimized)</td>
+                        <td>$10</td>
+                        <td>$42</td>
+                        <td>$327</td>
+                    </tr>
+                    <tr>
+                        <td>Customer Success</td>
+                        <td>$1,750</td>
+                        <td>$4,250</td>
+                        <td>$15,000</td>
+                    </tr>
+                    <tr>
+                        <td>Backend Maintenance</td>
+                        <td>$625</td>
+                        <td>$1,875</td>
+                        <td>$10,000</td>
+                    </tr>
+                    <tr>
+                        <td>Onboarding Labor</td>
+                        <td>$75</td>
+                        <td>$750</td>
+                        <td>$7,500</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL MONTHLY OPEX</strong></td>
+                        <td><strong>$2,460</strong></td>
+                        <td><strong>$6,917</strong></td>
+                        <td><strong>$32,827</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 20px;"><strong>Key Insight:</strong> Infrastructure costs ($10-327/month) are negligible compared to people costs ($2,450-32,500/month). Optimizing for automation and self-service is critical.</p>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Financial Modeling Summary -->
+        <section class="section">
+            <h2>9. Financial Modeling Summary</h2>
+
+            <h3>Year 1 Total Cost Projection (Early → Growth Path)</h3>
+
+            <p><strong>Assumptions:</strong></p>
+            <ul>
+                <li>Start with 10 restaurants, grow to 500 by end of Year 1</li>
+                <li>Average onboarding: 40 restaurants/month</li>
+                <li>Implement optimizations (caching) at Month 6</li>
+            </ul>
+
+            <div class="formula">
+<strong>ONE-TIME COSTS (Year 1):</strong>
+Development (Phase 1 + 2): $18,000
+Infrastructure setup: $12
+Initial AI processing (500 restaurants): $7.50
+<strong>Total One-Time: $18,020</strong>
+
+<strong>MONTHLY RECURRING (Average):</strong>
+Infrastructure: $25/month average (scales from $10 → $42)
+People (CS + DevOps + Onboarding): $4,500/month average
+<strong>Total Monthly: $4,525/month</strong>
+
+<strong>YEAR 1 TOTAL:</strong>
+One-time: $18,020
+Recurring: $4,525 × 12 = $54,300
+<strong>Total Year 1 Cost: $72,320</strong>
+
+<strong>Per-Restaurant Acquisition Cost:</strong>
+$72,320 / 500 restaurants = <strong>$145 per restaurant</strong>
+            </div>
+
+            <h3>Year 2+ Steady State (Growth Stage Maintained)</h3>
+
+            <div class="formula">
+<strong>MONTHLY RECURRING (500 restaurants):</strong>
+Infrastructure: $42/month
+Customer Success: $4,250/month
+Backend Maintenance: $1,875/month
+Onboarding (50 new/month): $750/month
+<strong>Total Monthly: $6,917/month</strong>
+
+<strong>ANNUAL RECURRING:</strong>
+$6,917 × 12 = <strong>$83,004/year</strong>
+
+<strong>Per-Restaurant Operating Cost:</strong>
+$83,004 / 500 = <strong>$166/year per restaurant</strong>
+Or: <strong>$13.83/month per restaurant</strong>
+            </div>
+
+            <h3>Break-Even Analysis</h3>
+
+            <p>Assuming you charge restaurants a monthly SaaS fee:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Monthly Fee per Restaurant</th>
+                        <th>Revenue @ 500 Restaurants</th>
+                        <th>Monthly Costs</th>
+                        <th>Monthly Profit</th>
+                        <th>Annual Profit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$50/month</td>
+                        <td>$25,000</td>
+                        <td>$6,917</td>
+                        <td>$18,083</td>
+                        <td>$216,996</td>
+                    </tr>
+                    <tr>
+                        <td>$100/month</td>
+                        <td>$50,000</td>
+                        <td>$6,917</td>
+                        <td>$43,083</td>
+                        <td>$516,996</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>$150/month</td>
+                        <td>$75,000</td>
+                        <td>$6,917</td>
+                        <td>$68,083</td>
+                        <td>$816,996</td>
+                    </tr>
+                    <tr>
+                        <td>$200/month</td>
+                        <td>$100,000</td>
+                        <td>$6,917</td>
+                        <td>$93,083</td>
+                        <td>$1,116,996</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success-box">
+                <h4>✅ Unit Economics Are Excellent</h4>
+                <p>Your per-restaurant cost is only <strong>$13.83/month</strong> at the Growth stage. This gives you huge margin:</p>
+                <ul>
+                    <li><strong>At $50/month pricing:</strong> $36.17 profit per restaurant (72% margin)</li>
+                    <li><strong>At $100/month pricing:</strong> $86.17 profit per restaurant (86% margin)</li>
+                    <li><strong>At $150/month pricing:</strong> $136.17 profit per restaurant (91% margin)</li>
+                </ul>
+                <p>This is a highly scalable SaaS business model.</p>
+            </div>
+
+            <h3>Cost Sensitivity Analysis</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Monthly Cost Impact</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>No AI (manual wine entry)</td>
+                        <td>+$22,500/month</td>
+                        <td>Onboarding labor 4x higher</td>
+                    </tr>
+                    <tr>
+                        <td>No caching optimization</td>
+                        <td>+$100/month</td>
+                        <td>Higher Firestore egress</td>
+                    </tr>
+                    <tr>
+                        <td>Switch to email auth</td>
+                        <td>-$150/month</td>
+                        <td>Eliminate SMS costs</td>
+                    </tr>
+                    <tr>
+                        <td>Double user activity</td>
+                        <td>+$50/month</td>
+                        <td>More Firestore reads/egress</td>
+                    </tr>
+                    <tr>
+                        <td>10x scale (5,000 → 50,000 rest.)</td>
+                        <td>+$250,000/month</td>
+                        <td>Mostly people costs (50+ staff)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Recommendations -->
+        <section class="section">
+            <h2>10. Cost Optimization Recommendations</h2>
+
+            <h3>High-Impact Optimizations (Implement Immediately)</h3>
+
+            <ol>
+                <li>
+                    <strong>Implement Wine Caching (Redis)</strong>
+                    <ul>
+                        <li>Cost: $10-15/month</li>
+                        <li>Savings: $100/month at scale (Firestore egress)</li>
+                        <li>ROI: 7-10x return</li>
+                        <li>When: Implement at 100-200 restaurants</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Switch to Email/Password Auth</strong>
+                    <ul>
+                        <li>Cost: $0 (free)</li>
+                        <li>Savings: $150/month at scale (eliminate SMS)</li>
+                        <li>Trade-off: Slightly higher friction than phone auth</li>
+                        <li>When: Implement in MVP or shortly after launch</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Use AI for Wine List Uploads</strong>
+                    <ul>
+                        <li>Cost: $8/month at scale</li>
+                        <li>Savings: $22,500/month in onboarding labor</li>
+                        <li>ROI: 2,800x return</li>
+                        <li>When: Critical for MVP - don't launch without it</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Medium-Impact Optimizations (Implement at Growth Stage)</h3>
+
+            <ol start="4">
+                <li>
+                    <strong>Optimize Firestore Queries</strong>
+                    <ul>
+                        <li>Use composite indexes for common queries</li>
+                        <li>Implement pagination (limit results to 20-50 wines per query)</li>
+                        <li>Cache user preferences in localStorage to reduce reads</li>
+                        <li>Estimated savings: 20-30% reduction in reads</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>CDN for Static Assets</strong>
+                    <ul>
+                        <li>Use CloudFlare Pages (free) for frontend hosting</li>
+                        <li>Reduces bandwidth costs and improves load times</li>
+                        <li>Savings: $20-40/month vs paid hosting</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Batch Wine Updates</strong>
+                    <ul>
+                        <li>Allow restaurants to schedule batch updates (weekly vs daily)</li>
+                        <li>Reduces write operations and AI processing</li>
+                        <li>Savings: 30-50% reduction in daily update costs</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Low-Priority Optimizations (Consider at Scale)</h3>
+
+            <ol start="7">
+                <li>
+                    <strong>Self-Service Knowledge Base</strong>
+                    <ul>
+                        <li>Build FAQ and video tutorials for restaurant onboarding</li>
+                        <li>Reduces support tickets by 20-40%</li>
+                        <li>Savings: $3,000-6,000/month in CS labor at scale</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>AI-Powered Support Bot</strong>
+                    <ul>
+                        <li>Chatbot for common restaurant questions</li>
+                        <li>Cost: $50-100/month (service fee)</li>
+                        <li>Savings: $2,000-4,000/month in CS labor</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Summary: Optimized Cost Structure</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Baseline Monthly Cost</th>
+                        <th>With All Optimizations</th>
+                        <th>Total Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Early (50 rest.)</td>
+                        <td>$2,460</td>
+                        <td>$2,308</td>
+                        <td>$152/month (6%)</td>
+                    </tr>
+                    <tr>
+                        <td>Growth (500 rest.)</td>
+                        <td>$6,917</td>
+                        <td>$5,752</td>
+                        <td>$1,165/month (17%)</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Scale (5,000 rest.)</td>
+                        <td>$32,827</td>
+                        <td>$24,577</td>
+                        <td><strong>$8,250/month (25%)</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="section">
+            <h2>11. Conclusion & Next Steps</h2>
+
+            <h3>Key Takeaways</h3>
+
+            <ol>
+                <li>
+                    <strong>Infrastructure costs are minimal and highly scalable</strong>
+                    <ul>
+                        <li>$10/month at Early stage → $327/month at Scale (5,000 restaurants)</li>
+                        <li>Per-restaurant cost decreases from $0.19 → $0.07 as you scale</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>AI wine processing costs are negligible</strong>
+                    <ul>
+                        <li>$0.08/month at Early → $8.40/month at Scale</li>
+                        <li>Saves $22,500/month in manual labor at scale</li>
+                        <li>2,800x ROI - absolutely critical to implement</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>People costs dominate operating expenses</strong>
+                    <ul>
+                        <li>Customer Success, DevOps, and Onboarding: $2,450-32,500/month</li>
+                        <li>Focus on automation and self-service to scale efficiently</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Unit economics are excellent</strong>
+                    <ul>
+                        <li>Operating cost: $13.83/month per restaurant</li>
+                        <li>At $100/month pricing: 86% gross margin</li>
+                        <li>Highly profitable and scalable SaaS model</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Daily wine list updates are not a cost concern</strong>
+                    <ul>
+                        <li>Even at 1,000 restaurants updating daily: only $8.40/month AI cost</li>
+                        <li>Firestore write operations stay within free tier</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>Recommended Action Plan</h3>
+
+            <div class="info-box">
+                <h4>📋 Phase 1: MVP Launch (Months 1-2)</h4>
+                <ul>
+                    <li>✅ Build CSV upload with AI processing (critical path)</li>
+                    <li>✅ Use free tier infrastructure (Railway, CloudFlare, Upstash Redis free)</li>
+                    <li>✅ Implement email auth instead of SMS ($150/month savings at scale)</li>
+                    <li>✅ Launch with 10-50 pilot restaurants</li>
+                    <li><strong>Investment:</strong> $9,000-13,500 development + $120 infrastructure</li>
+                </ul>
+
+                <h4>📋 Phase 2: Growth (Months 3-6)</h4>
+                <ul>
+                    <li>✅ Scale to 100-200 restaurants</li>
+                    <li>✅ Implement Redis caching ($10/month, saves $100/month at scale)</li>
+                    <li>✅ Optimize Firestore queries (pagination, indexes)</li>
+                    <li>✅ Build self-service knowledge base</li>
+                    <li><strong>Investment:</strong> $4,500-7,500 optimization + $500/month ops</li>
+                </ul>
+
+                <h4>📋 Phase 3: Scale (Months 6-12)</h4>
+                <ul>
+                    <li>✅ Scale to 500+ restaurants</li>
+                    <li>✅ Upgrade hosting to AWS/GCP for redundancy</li>
+                    <li>✅ Implement monitoring (Sentry paid tier)</li>
+                    <li>✅ Add AI support chatbot</li>
+                    <li>✅ Hire dedicated CS team</li>
+                    <li><strong>Investment:</strong> Ramp people costs to $5-7k/month</li>
+                </ul>
+            </div>
+
+            <h3>Financial Model Excel Template</h3>
+            <p>To create a dynamic financial model, use these formulas in Excel/Google Sheets:</p>
+
+            <div class="formula">
+<strong>Monthly Infrastructure Cost =</strong>
+  Firestore_Cost + Auth_Cost + AI_Cost + Hosting_Cost + Caching_Cost + Domain_Cost
+
+<strong>Monthly People Cost =</strong>
+  CS_Headcount × $4,000 + DevOps_Headcount × $10,000 + Onboarding_Hours × $30
+
+<strong>Monthly Total OpEx =</strong>
+  Infrastructure_Cost + People_Cost
+
+<strong>Monthly Revenue =</strong>
+  Restaurant_Count × Monthly_Fee_Per_Restaurant
+
+<strong>Monthly Profit =</strong>
+  Revenue - OpEx
+
+<strong>Gross Margin % =</strong>
+  (Profit / Revenue) × 100
+            </div>
+
+            <p style="margin-top: 30px; text-align: center; font-size: 1.1em; color: #666;">
+                <em>This document provides comprehensive cost data for financial modeling. For implementation planning or questions, contact the SipSync development team.</em>
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #999;">
+            <p>SipSync Complete Cost Analysis &copy; 2026</p>
+            <p style="font-size: 0.9em;">Document Version 1.0 | Prepared for Financial Modeling</p>
+        </footer>
+    </div>
+</body>
+</html>

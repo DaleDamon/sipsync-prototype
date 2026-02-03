@@ -1,0 +1,222 @@
+.results-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.results-content {
+  width: 100%;
+}
+
+.results-content > h2 {
+  text-align: center;
+  color: #8b0000;
+  font-size: 32px;
+  margin: 0 0 30px 0;
+}
+
+/* Profile Card */
+.profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  border: 2px solid #ffe0e0;
+}
+
+.profile-card h3 {
+  color: #8b0000;
+  font-size: 28px;
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.profile-description {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+/* Characteristics Grid */
+.characteristics-grid {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.characteristics-grid h4 {
+  color: #8b0000;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 15px 0;
+}
+
+.characteristics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.characteristic {
+  background-color: #fff8f8;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid #8b0000;
+}
+
+.char-label {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.char-value {
+  display: block;
+  font-size: 14px;
+  color: #8b0000;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Example Wines */
+.example-wines {
+  text-align: center;
+}
+
+.example-wines h4 {
+  color: #8b0000;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 10px 0;
+}
+
+.example-wines p {
+  color: #666;
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Auto-navigate Notice */
+.auto-navigate-notice {
+  text-align: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.auto-navigate-notice p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.auto-navigate-notice strong {
+  color: #8b0000;
+  font-size: 16px;
+}
+
+/* Results Actions */
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-button {
+  padding: 15px 30px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.action-button.primary {
+  background-color: #8b0000;
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #a10000;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.action-button.secondary {
+  background-color: white;
+  color: #8b0000;
+  border: 2px solid #8b0000;
+}
+
+.action-button.secondary:hover {
+  background-color: #fff8f8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .results-container {
+    padding: 20px 15px;
+    min-height: auto;
+  }
+
+  .results-content > h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .profile-card {
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+
+  .profile-card h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .profile-description {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .characteristics {
+    grid-template-columns: 1fr;
+  }
+
+  .characteristics-grid {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .characteristic {
+    padding: 10px;
+  }
+
+  .char-label {
+    font-size: 11px;
+  }
+
+  .char-value {
+    font-size: 13px;
+  }
+
+  .action-button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/AuthScreen.css';
+import { API_URL } from '../config';
 
 function AuthScreen({ onLogin }) {
   const [step, setStep] = useState('phone'); // 'phone' or 'verify'
@@ -8,8 +9,6 @@ function AuthScreen({ onLogin }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const API_URL = 'http://localhost:5000/api';
 
   const handleSendCode = async (e) => {
     e.preventDefault();

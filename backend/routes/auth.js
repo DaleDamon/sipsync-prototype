@@ -287,4 +287,272 @@ router.get('/user/:userId/visited-restaurants', async (req, res) => {
   }
 });
 
+// POST /api/auth/quiz/submit
+// Submit quiz answers and calculate wine preference profile
+router.post('/quiz/submit', async (req, res) => {
+  try {
+    const { userId, answers } = req.body;
+
+    if (!userId || !answers || answers.length !== 15) {
+      return res.status(400).json({ error: 'User ID and 15 quiz answers are required' });
+    }
+
+    // Define the 10 profiles with their metadata
+    const profiles = [
+      {
+        id: 'full-bodied-red-enthusiast',
+        name: 'Full-Bodied Red Enthusiast',
+        wineType: 'red',
+        characteristics: {
+          acidity: 'medium',
+          tannins: 'high',
+          bodyWeight: 'full',
+          sweetness: 'dry',
+          flavorNotes: ['oak', 'spice', 'cherry']
+        }
+      },
+      {
+        id: 'medium-bodied-red-aficionado',
+        name: 'Medium-Bodied Red Aficionado',
+        wineType: 'red',
+        characteristics: {
+          acidity: 'medium',
+          tannins: 'low',
+          bodyWeight: 'medium',
+          sweetness: 'medium',
+          flavorNotes: ['cherry', 'berry', 'vanilla']
+        }
+      },
+      {
+        id: 'spiced-red-connoisseur',
+        name: 'Spiced Red Connoisseur',
+        wineType: 'red',
+        characteristics: {
+          acidity: 'medium',
+          tannins: 'medium',
+          bodyWeight: 'full',
+          sweetness: 'dry',
+          flavorNotes: ['spice', 'cherry', 'oak']
+        }
+      },
+      {
+        id: 'light-bodied-red-devotee',
+        name: 'Light-Bodied Red Devotee',
+        wineType: 'red',
+        characteristics: {
+          acidity: 'high',
+          tannins: 'low',
+          bodyWeight: 'light',
+          sweetness: 'dry',
+          flavorNotes: ['berry', 'floral', 'citrus']
+        }
+      },
+      {
+        id: 'crisp-acidic-white-enthusiast',
+        name: 'Crisp & Acidic White Enthusiast',
+        wineType: 'white',
+        characteristics: {
+          acidity: 'high',
+          tannins: 'low',
+          bodyWeight: 'light',
+          sweetness: 'dry',
+          flavorNotes: ['citrus', 'floral']
+        }
+      },
+      {
+        id: 'full-bodied-white-aficionado',
+        name: 'Full-Bodied White Aficionado',
+        wineType: 'white',
+        characteristics: {
+          acidity: 'low',
+          tannins: 'low',
+          bodyWeight: 'full',
+          sweetness: 'dry',
+          flavorNotes: ['oak', 'vanilla', 'butter']
+        }
+      },
+      {
+        id: 'aromatic-white-connoisseur',
+        name: 'Aromatic White Connoisseur',
+        wineType: 'white',
+        characteristics: {
+          acidity: 'medium',
+          tannins: 'low',
+          bodyWeight: 'medium',
+          sweetness: 'medium',
+          flavorNotes: ['floral', 'citrus', 'spice']
+        }
+      },
+      {
+        id: 'fruit-forward-white-devotee',
+        name: 'Fruit-Forward White Devotee',
+        wineType: 'white',
+        characteristics: {
+          acidity: 'medium',
+          tannins: 'low',
+          bodyWeight: 'medium',
+          sweetness: 'medium',
+          flavorNotes: ['citrus', 'berry']
+        }
+      },
+      {
+        id: 'sparkling-wine-enthusiast',
+        name: 'Sparkling Wine Enthusiast',
+        wineType: 'sparkling',
+        characteristics: {
+          acidity: 'high',
+          tannins: 'low',
+          bodyWeight: 'light',
+          sweetness: 'dry',
+          flavorNotes: ['citrus', 'floral']
+        }
+      },
+      {
+        id: 'dessert-wine-aficionado',
+        name: 'Dessert Wine Aficionado',
+        wineType: 'dessert',
+        characteristics: {
+          acidity: 'low',
+          tannins: 'low',
+          bodyWeight: 'medium',
+          sweetness: 'sweet',
+          flavorNotes: ['berry', 'vanilla']
+        }
+      }
+    ];
+
+    // Scoring matrix: for each answer, which profiles get points
+    const scoringMatrix = [
+      // Q1: Coffee
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }, { id: 'spiced-red-connoisseur', points: 1 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 3 }, { id: 'full-bodied-white-aficionado', points: 2 }, { id: 'aromatic-white-connoisseur', points: 1 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }] },
+      // Q2: Chocolate
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }, { id: 'spiced-red-connoisseur', points: 1 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 3 }],
+        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 1 }, { id: 'dessert-wine-aficionado', points: 2 }] },
+      // Q3: Tea
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
+        1: [{ id: 'spiced-red-connoisseur', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
+        2: [{ id: 'dessert-wine-aficionado', points: 3 }, { id: 'fruit-forward-white-devotee', points: 2 }] },
+      // Q4: Citrus
+      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
+        1: [{ id: 'fruit-forward-white-devotee', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
+        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'full-bodied-red-enthusiast', points: 2 }] },
+      // Q5: Salad Dressing
+      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
+        2: [{ id: 'full-bodied-white-aficionado', points: 3 }] },
+      // Q6: Morning Drink
+      { 0: [{ id: 'sparkling-wine-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }],
+        1: [{ id: 'aromatic-white-connoisseur', points: 3 }],
+        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'dessert-wine-aficionado', points: 2 }] },
+      // Q7: Meal Preference
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
+        1: [{ id: 'spiced-red-connoisseur', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
+      // Q8: Soup
+      { 0: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'full-bodied-red-enthusiast', points: 2 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
+      // Q9: Pasta Sauce
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
+        1: [{ id: 'spiced-red-connoisseur', points: 3 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q10: Dessert Lover
+      { 0: [{ id: 'dessert-wine-aficionado', points: 3 }],
+        1: [{ id: 'aromatic-white-connoisseur', points: 2 }, { id: 'medium-bodied-red-aficionado', points: 2 }],
+        2: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q11: Beverage Sweetness
+      { 0: [{ id: 'dessert-wine-aficionado', points: 3 }],
+        1: [{ id: 'aromatic-white-connoisseur', points: 3 }],
+        2: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q12: Spice Tolerance
+      { 0: [{ id: 'spiced-red-connoisseur', points: 3 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }] },
+      // Q13: Herb Preference
+      { 0: [{ id: 'aromatic-white-connoisseur', points: 2 }, { id: 'light-bodied-red-devotee', points: 2 }],
+        1: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'full-bodied-white-aficionado', points: 2 }],
+        2: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q14: Fruit Style
+      { 0: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
+        1: [{ id: 'fruit-forward-white-devotee', points: 3 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
+      // Q15: Occasion
+      { 0: [{ id: 'sparkling-wine-enthusiast', points: 3 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'full-bodied-white-aficionado', points: 2 }],
+        2: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
+        3: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }] }
+    ];
+
+    // Calculate scores
+    const profileScores = {};
+    profiles.forEach(p => profileScores[p.id] = 0);
+
+    answers.forEach((answerIndex, questionIndex) => {
+      const scoringForQuestion = scoringMatrix[questionIndex];
+      if (scoringForQuestion && scoringForQuestion[answerIndex]) {
+        scoringForQuestion[answerIndex].forEach(({ id, points }) => {
+          profileScores[id] += points;
+        });
+      }
+    });
+
+    // Find winning profile
+    let winningProfileId = null;
+    let maxScore = -1;
+
+    for (const [profileId, score] of Object.entries(profileScores)) {
+      if (score > maxScore) {
+        maxScore = score;
+        winningProfileId = profileId;
+      }
+    }
+
+    // Get winning profile details
+    const winningProfile = profiles.find(p => p.id === winningProfileId);
+
+    // Save quiz result to user document
+    const userRef = db.collection('users').doc(userId);
+    const preferencesData = {
+      wineType: winningProfile.wineType,
+      acidity: winningProfile.characteristics.acidity,
+      tannins: winningProfile.characteristics.tannins,
+      bodyWeight: winningProfile.characteristics.bodyWeight,
+      sweetness: winningProfile.characteristics.sweetness,
+      flavorNotes: winningProfile.characteristics.flavorNotes,
+      priceRange: { min: 20, max: 100 }
+    };
+
+    try {
+      // Use set with merge to handle both new and existing users
+      await userRef.set({
+        quizProfile: winningProfile.name,
+        quizCompletedAt: new Date(),
+        savedPreferences: [preferencesData]
+      }, { merge: true });
+
+      console.log(`[QUIZ] Quiz submitted successfully for user: ${userId}, Profile: ${winningProfile.name}`);
+
+      res.json({
+        profile: winningProfile.name,
+        profileId: winningProfile.id,
+        wineType: winningProfile.wineType,
+        characteristics: winningProfile.characteristics,
+        preferences: preferencesData
+      });
+    } catch (updateError) {
+      console.error(`[QUIZ] Error saving quiz to user ${userId}:`, updateError.message);
+      throw updateError;
+    }
+  } catch (error) {
+    console.error('Error submitting quiz:', error.message || error);
+    res.status(500).json({
+      error: 'Failed to submit quiz',
+      details: error.message || 'Unknown error'
+    });
+  }
+});
+
 module.exports = router;

@@ -37,6 +37,33 @@
   opacity: 0.9;
 }
 
+.user-profile-badge {
+  margin: 12px 0 0 0;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.retake-quiz-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retake-quiz-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: white;
+}
+
 .error-message {
   background-color: #ffe0e0;
   color: #8b0000;

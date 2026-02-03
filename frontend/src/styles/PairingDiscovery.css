@@ -20,6 +20,112 @@
   border-left: 4px solid #8b0000;
 }
 
+/* Quiz Profile Banner */
+.quiz-banner {
+  background: linear-gradient(135deg, #8b0000 0%, #a10000 100%);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
+}
+
+.quiz-banner .banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.quiz-banner .banner-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.quiz-banner .banner-text p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.quiz-banner .banner-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.apply-profile-btn,
+.quiz-prompt-btn {
+  background-color: white;
+  color: #8b0000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.apply-profile-btn:hover,
+.quiz-prompt-btn:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.apply-profile-btn:active,
+.quiz-prompt-btn:active {
+  transform: translateY(0);
+}
+
+.banner-close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.banner-close-btn:hover {
+  transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+  .quiz-banner .banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .quiz-banner .banner-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .apply-profile-btn,
+  .quiz-prompt-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .banner-close-btn {
+    align-self: flex-end;
+    margin-top: -30px;
+    margin-right: -10px;
+  }
+}
+
 /* Preferences Section at Top */
 .preferences-section {
   background: white;
@@ -507,4 +613,109 @@
 
 .save-pairing-btn:active {
   transform: scale(0.98);
+}
+
+/* Info Icons */
+.info-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-block;
+  user-select: none;
+}
+
+.info-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Info Modal Specific Styling */
+.info-modal {
+  max-width: 700px;
+  padding: 32px;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.modal-close-btn:hover {
+  color: #333;
+}
+
+.info-modal h2 {
+  color: #8b0000;
+  font-size: 24px;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+/* Characteristic Explanation Layout */
+.characteristic-explanation {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 24px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.char-left,
+.char-right {
+  flex: 1;
+}
+
+.char-left h3,
+.char-right h3 {
+  font-size: 18px;
+  color: #8b0000;
+  margin: 0 0 12px 0;
+}
+
+.char-left p,
+.char-right p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+}
+
+.char-arrow {
+  font-size: 32px;
+  color: #8b0000;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  .info-modal {
+    max-width: 90%;
+    padding: 24px;
+  }
+
+  .characteristic-explanation {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .char-arrow {
+    transform: rotate(90deg);
+    font-size: 24px;
+  }
 }

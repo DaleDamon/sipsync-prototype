@@ -1,0 +1,158 @@
+.polar-graph-container {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.polar-graph-header {
+  text-align: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.polar-graph-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.polar-graph-header .profile-name {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+.polar-graph-svg {
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  display: block;
+}
+
+.grid-circle {
+  opacity: 0.5;
+}
+
+.axis-line {
+  opacity: 0.3;
+}
+
+.axis-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.profile-polygon {
+  transition: all 0.3s ease;
+}
+
+.reference-polygon {
+  opacity: 0.5;
+}
+
+.graph-legend {
+  display: flex;
+  gap: 24px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 2px solid #999;
+}
+
+.legend-line {
+  width: 30px;
+  height: 2px;
+  background: #999;
+  position: relative;
+  background-image: linear-gradient(90deg, #999 0%, #999 40%, transparent 40%, transparent 60%, #999 60%, #999 100%);
+}
+
+.graph-interpretation {
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.graph-interpretation h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.graph-interpretation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.graph-interpretation li {
+  font-size: 13px;
+  color: #555;
+  padding: 8px 0;
+}
+
+.graph-interpretation strong {
+  color: #333;
+  display: block;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .polar-graph-container {
+    padding: 16px;
+  }
+
+  .polar-graph-svg {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .graph-legend {
+    gap: 16px;
+  }
+
+  .graph-interpretation ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print styles */
+@media print {
+  .polar-graph-container {
+    page-break-inside: avoid;
+    border: 1px solid #999;
+    break-inside: avoid;
+  }
+
+  .polar-graph-svg {
+    max-width: 100%;
+  }
+}

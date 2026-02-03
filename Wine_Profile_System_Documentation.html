@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipSync Wine Profile System Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 60px 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid #8b0000;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #8b0000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+
+        h2 {
+            color: #8b0000;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #8b0000;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #a10000;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .profile-group {
+            background-color: #f9f9f9;
+            border-left: 4px solid #d4af37;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .profile-name {
+            color: #8b0000;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+
+        th {
+            background-color: #8b0000;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .question-box {
+            background-color: #fff8f8;
+            border: 1px solid #ffe0e0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .question-num {
+            color: #8b0000;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .answer {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .profile-mapping {
+            background-color: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .wine-char {
+            display: inline-block;
+            background-color: #d4af37;
+            color: #8b0000;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin: 4px 4px 4px 0;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .reasoning {
+            background-color: #f0f8ff;
+            border-left: 4px solid #4169e1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .reasoning h4 {
+            color: #4169e1;
+            margin-bottom: 10px;
+        }
+
+        .overview-box {
+            background-color: #fff8f8;
+            border: 2px solid #8b0000;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .toc {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            list-style-position: inside;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #8b0000;
+            text-decoration: none;
+        }
+
+        .footer {
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .polar-graph {
+            max-width: 100%;
+            height: auto;
+            margin: 30px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+            display: block;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+                padding: 40px;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            .section {
+                page-break-inside: avoid;
+            }
+            .polar-graph {
+                page-break-inside: avoid;
+                border: 1px solid #999;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🍷 SipSync Wine Profile System</h1>
+            <p class="subtitle">Complete Documentation of the 10 Consumer Wine Profiles</p>
+            <p style="margin-top: 15px; color: #999; font-size: 0.95em;">Created: January 2026 | SipSync Platform</p>
+        </header>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li>Executive Summary</li>
+                <li>System Overview & Design Principles</li>
+                <li>The 10 Wine Consumer Profiles</li>
+                <li>Quiz Question Mapping</li>
+                <li>Scoring Algorithm & Reasoning</li>
+                <li>Profile Characteristics Reference</li>
+            </ul>
+        </div>
+
+        <!-- Executive Summary -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+            <p>
+                The SipSync Wine Profile System is a sophisticated classification framework designed to identify and categorize wine consumer preferences through a 15-question interactive quiz. The system analyzes user responses to everyday food and drink questions to classify individuals into one of 10 distinct wine consumer profiles, each with unique characteristic preferences for acidity, tannins, body weight, sweetness, and flavor profiles.
+            </p>
+            <p>
+                Rather than asking users directly about wine (which requires expertise), the quiz asks about familiar foods and beverages that naturally correlate with wine preferences. This approach makes wine discovery accessible to both novices and experts.
+            </p>
+        </section>
+
+        <!-- System Overview -->
+        <section class="section">
+            <h2>System Overview & Design Principles</h2>
+
+            <h3>Core Philosophy</h3>
+            <p>
+                The wine profile system is built on three fundamental principles:
+            </p>
+            <ol style="margin-left: 20px; margin-bottom: 15px;">
+                <li><strong>Accessibility:</strong> Questions focus on everyday foods and drinks that users encounter regularly, requiring no wine knowledge</li>
+                <li><strong>Scientific Basis:</strong> Each question maps to legitimate wine characteristics (acidity, tannins, body, sweetness) that are measurable and industry-standard</li>
+                <li><strong>Comprehensive Coverage:</strong> The 10 profiles span the full spectrum of wine types and consumer preferences across red, white, sparkling, and dessert wines</li>
+            </ol>
+
+            <h3>The 5 Wine Dimensions</h3>
+            <p>All profiles are defined by five key wine characteristics:</p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li><strong>Acidity:</strong> The brightness and tartness level (Low, Medium, High)</li>
+                <li><strong>Tannins:</strong> The drying sensation in the mouth (Low, Medium, High) - mainly relevant for red wines</li>
+                <li><strong>Body Weight:</strong> The fullness/weight of the wine on the palate (Light, Medium, Full)</li>
+                <li><strong>Sweetness:</strong> Residual sugar level (Dry, Medium, Sweet)</li>
+                <li><strong>Flavor Profile:</strong> Dominant flavor characteristics (oak, spice, cherry, citrus, floral, berry, vanilla, etc.)</li>
+            </ul>
+
+            <div class="reasoning">
+                <h4>Design Reasoning</h4>
+                <p>
+                    These five dimensions were selected because they are: (1) scientifically measurable in wines, (2) independent enough to provide meaningful distinction, (3) directly perceptible to consumers, and (4) sufficient to narrow down wine recommendations to a manageable set while maintaining personalization.
+                </p>
+            </div>
+        </section>
+
+        <!-- The 10 Wine Profiles -->
+        <section class="section">
+            <h2>The 10 Wine Consumer Profiles</h2>
+
+            <h3>Red Wine Profiles (4)</h3>
+
+            <div class="profile-group">
+                <div class="profile-name">1. Full-Bodied Red Enthusiast</div>
+                <p><strong>Wine Type:</strong> Red</p>
+                <p><strong>Characteristics:</strong> High tannins, full body, intense flavors, dry</p>
+                <p><strong>Flavor Notes:</strong> Oak, spice, blackberry</p>
+                <p><strong>Example Wines:</strong> Cabernet Sauvignon, Malbec, Barolo</p>
+                <p><strong>Consumer Profile:</strong> Likes strong coffee, dark chocolate, grilled steaks</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This profile targets consumers who enjoy intense, structured wines with pronounced tannins. They prefer bold flavors and aren't intimidated by the astringent sensation tannins create. Their preference for strong coffee and dark chocolate indicates they enjoy complex, intense flavors without sweetness.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">2. Medium-Bodied Red Aficionado</div>
+                <p><strong>Wine Type:</strong> Red</p>
+                <p><strong>Characteristics:</strong> Low tannins, medium body, fruity, medium sweetness</p>
+                <p><strong>Flavor Notes:</strong> Cherry, berry, vanilla</p>
+                <p><strong>Example Wines:</strong> Pinot Noir, Merlot, Grenache</p>
+                <p><strong>Consumer Profile:</strong> Likes milk chocolate, fruit smoothies, roasted chicken</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This is the most broadly appealing red wine profile. It bridges the gap between those intimidated by high tannins and those seeking maximum complexity. The preference for milk chocolate and fruit smoothies indicates comfort with both sweetness and fruit-forward flavors, making them approachable wines that don't require the same aging or food pairing sophistication as bold reds.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">3. Spiced Red Connoisseur</div>
+                <p><strong>Wine Type:</strong> Red</p>
+                <p><strong>Characteristics:</strong> Medium tannins, medium-full body, spicy notes, dry</p>
+                <p><strong>Flavor Notes:</strong> Spice, cherry, oak</p>
+                <p><strong>Example Wines:</strong> Syrah/Shiraz, Zinfandel, Tempranillo</p>
+                <p><strong>Consumer Profile:</strong> Likes BBQ sauce, black pepper, grilled meats</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>Consumers in this profile have distinct preferences for wines with peppery, spicy characteristics. Their affinity for BBQ sauce and black pepper indicates they enjoy smoky, peppery flavors. They prefer wines with more structure than the Aficionado but appreciate spice complexity over pure tannin intensity.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">4. Light-Bodied Red Devotee</div>
+                <p><strong>Wine Type:</strong> Red</p>
+                <p><strong>Characteristics:</strong> Low tannins, light body, delicate flavors, dry</p>
+                <p><strong>Flavor Notes:</strong> Berry, floral, citrus</p>
+                <p><strong>Example Wines:</strong> Beaujolais, light Pinot Noir, Gamay</p>
+                <p><strong>Consumer Profile:</strong> Likes fruit teas, light salads, delicate foods</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This profile serves consumers who enjoy wine but prefer lighter, more delicate expressions. Their preference for fruit teas and light salads indicates they're seeking refreshment and elegance rather than intensity. This profile is often appealing to white wine drinkers transitioning to reds, or those with refined palates seeking subtlety.</p>
+                </div>
+            </div>
+
+            <h3>White Wine Profiles (4)</h3>
+
+            <div class="profile-group">
+                <div class="profile-name">5. Crisp & Acidic White Enthusiast</div>
+                <p><strong>Wine Type:</strong> White</p>
+                <p><strong>Characteristics:</strong> High acidity, light body, citrus-forward, dry</p>
+                <p><strong>Flavor Notes:</strong> Citrus, floral</p>
+                <p><strong>Example Wines:</strong> Sauvignon Blanc, Pinot Grigio, Albariño</p>
+                <p><strong>Consumer Profile:</strong> Likes lemonade, citrus fruits, fresh salads</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This is the largest profile for white wine drinkers. The high acidity creates a refreshing, quenching sensation that appeals to those who enjoy bright, zesty flavors. Their preference for lemonade and citrus indicates they enjoy brightness and tartness without sweetness, making these wines perfect for warm weather and fresh foods.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">6. Full-Bodied White Aficionado</div>
+                <p><strong>Wine Type:</strong> White</p>
+                <p><strong>Characteristics:</strong> Low acidity, full body, buttery, dry-medium</p>
+                <p><strong>Flavor Notes:</strong> Oak, vanilla, butter</p>
+                <p><strong>Example Wines:</strong> Oaked Chardonnay, Viognier, White Burgundy</p>
+                <p><strong>Consumer Profile:</strong> Likes creamy sauces, buttered popcorn, rich pasta</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>These consumers seek richness and complexity from white wines. They enjoy the buttery, creamy textures that oak aging imparts. Their food preferences (creamy sauces, rich pasta) indicate they pair wine with substantial, flavorful foods rather than light appetizers, requiring wines with enough body and richness to stand up to rich cuisine.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">7. Aromatic White Connoisseur</div>
+                <p><strong>Wine Type:</strong> White</p>
+                <p><strong>Characteristics:</strong> Medium acidity, medium body, floral notes, medium-sweet</p>
+                <p><strong>Flavor Notes:</strong> Floral, citrus, spice</p>
+                <p><strong>Example Wines:</strong> Riesling, Gewürztraminer, Torrontés</p>
+                <p><strong>Consumer Profile:</strong> Likes honey, floral teas, aromatic spices</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This profile targets consumers with appreciation for aromatic complexity and doesn't mind a touch of residual sweetness. Their preference for floral teas and aromatic spices indicates they have sophisticated, nuanced palates. These wines offer both sweetness and acidity balance, appealing to those seeking complexity beyond just dry or sweet dichotomy.</p>
+                </div>
+            </div>
+
+            <div class="profile-group">
+                <div class="profile-name">8. Fruit-Forward White Devotee</div>
+                <p><strong>Wine Type:</strong> White</p>
+                <p><strong>Characteristics:</strong> Medium acidity, medium body, fruity, medium</p>
+                <p><strong>Flavor Notes:</strong> Citrus, berry</p>
+                <p><strong>Example Wines:</strong> Chenin Blanc, Vermentino, unoaked Chardonnay</p>
+                <p><strong>Consumer Profile:</strong> Likes tropical fruits, fruit salads, light seafood</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This profile bridges between Crisp and Full-Bodied white profiles. Consumers here enjoy fruit-forward character but with more body and complexity than high-acid whites. Their preference for tropical fruits and light seafood indicates they want wines with fruit emphasis but enough structure for varied food pairing.</p>
+                </div>
+            </div>
+
+            <h3>Sparkling Wine Profile (1)</h3>
+
+            <div class="profile-group">
+                <div class="profile-name">9. Sparkling Wine Enthusiast</div>
+                <p><strong>Wine Type:</strong> Sparkling</p>
+                <p><strong>Characteristics:</strong> High acidity, light body, crisp, dry</p>
+                <p><strong>Flavor Notes:</strong> Citrus, floral</p>
+                <p><strong>Example Wines:</strong> Champagne, Prosecco, Cava, Crémant</p>
+                <p><strong>Consumer Profile:</strong> Loves celebrations, brunch, appetizers, light foods</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>While technically a sparkling wine preference, this distinct profile recognizes that some consumers have dedicated preference for bubbles and festive occasions. The scoring algorithm allows this profile to emerge from celebration-oriented questions and those seeking refreshment. This captures the unique pleasure bubbles provide beyond the base wine characteristics.</p>
+                </div>
+            </div>
+
+            <h3>Dessert Wine Profile (1)</h3>
+
+            <div class="profile-group">
+                <div class="profile-name">10. Dessert Wine Aficionado</div>
+                <p><strong>Wine Type:</strong> Dessert</p>
+                <p><strong>Characteristics:</strong> Low acidity, medium-full body, sweet</p>
+                <p><strong>Flavor Notes:</strong> Berry, vanilla</p>
+                <p><strong>Example Wines:</strong> Port, Ice Wine, Moscato, Sauternes, Late Harvest</p>
+                <p><strong>Consumer Profile:</strong> Has a sweet tooth, loves desserts, after-dinner drinks</p>
+                <div class="reasoning">
+                    <h4>Why This Profile Exists</h4>
+                    <p>This distinct profile serves consumers with clear sweet preferences. Rather than forcing them into dry wine categories, this profile celebrates their preference for residual sugar and dessert wine purposes. Questions about dessert frequency and beverage sweetness directly identify these consumers without requiring wine knowledge.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Quiz Questions Mapping -->
+        <section class="section">
+            <h2>Quiz Question Mapping to Profiles</h2>
+
+            <p>
+                Each of the 15 quiz questions is strategically designed to probe one or more of the five wine dimensions. Here's the complete breakdown:
+            </p>
+
+            <h3>Questions 1-3: Tannins (Astringency/Dryness)</h3>
+            <p><em>These questions identify comfort level with drying sensations and intensity preferences.</em></p>
+
+            <div class="question-box">
+                <div class="question-num">Q1: Coffee Preference</div>
+                <p><strong>Question:</strong> "How do you like your coffee?"</p>
+                <div class="answer">
+                    <p><strong>A) Black, no sugar</strong> → High tannin preference (Full-Bodied Red Enthusiast, Spiced Red Connoisseur)</p>
+                    <p><strong>B) With cream and sugar</strong> → Lower tannin preference (Medium-Bodied Red Aficionado)</p>
+                    <p><strong>C) I prefer tea or juice</strong> → Avoid tannins, seek brightness (Crisp White, Sparkling, Light Red)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Black coffee without sugar provides a familiar reference point for tannin astringency. The tannin sensation in wine is similar to the bitter, drying mouthfeel of strong black coffee. Cream and sugar indicate palatability preferences, while avoiding coffee entirely suggests those seeking gentler flavors.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q2: Chocolate Choice</div>
+                <p><strong>Question:</strong> "Dark chocolate or milk chocolate?"</p>
+                <div class="answer">
+                    <p><strong>A) Dark chocolate (85%+ cacao)</strong> → High tannins (Full-Bodied Red Enthusiast)</p>
+                    <p><strong>B) Milk chocolate</strong> → Medium tannins (Medium-Bodied Red Aficionado)</p>
+                    <p><strong>C) White chocolate or fruity candy</strong> → Low tannins, sweet preference (White Wines, Dessert)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Dark chocolate's bitter, astringent sensation mirrors high-tannin red wines. This is a very direct proxy for tannin tolerance. Milk chocolate's sweetness and creaminess appeals to those seeking softer, more approachable wines. White chocolate and fruity candy preferences indicate those seeking sweetness without astringency.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q3: Tea Preference</div>
+                <p><strong>Question:</strong> "What's your go-to tea?"</p>
+                <div class="answer">
+                    <p><strong>A) Black tea, unsweetened</strong> → High tannins (Full-Bodied Red Enthusiast)</p>
+                    <p><strong>B) Green tea or herbal tea</strong> → Medium tannins (Spiced Red Connoisseur, Aromatic White)</p>
+                    <p><strong>C) Fruit tea or sweet iced tea</strong> → Sweet preference (Dessert Wine, Aromatic White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Black tea is high in tannins, providing another familiar reference. Green tea offers moderate tannins with grass/vegetal notes. Herbal teas offer low tannins. Sweet iced tea clearly indicates sweet preference. This question provides a second validation of tannin preferences.</p>
+                </div>
+            </div>
+
+            <h3>Questions 4-6: Acidity (Brightness/Tartness)</h3>
+            <p><em>These questions measure affinity for bright, acidic sensations versus preference for softness.</em></p>
+
+            <div class="question-box">
+                <div class="question-num">Q4: Citrus Enjoyment</div>
+                <p><strong>Question:</strong> "How do you feel about sour/tangy flavors?"</p>
+                <div class="answer">
+                    <p><strong>A) Love them! Gimme all the citrus</strong> → High acidity (Crisp White, Sparkling)</p>
+                    <p><strong>B) Like them in moderation</strong> → Medium acidity (Fruit-Forward White, Aromatic White)</p>
+                    <p><strong>C) Prefer milder, less tangy flavors</strong> → Low acidity (Full-Bodied White, Full-Bodied Red)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>This directly measures acidity preference through a universal food experience. Citrus acidity in beverages directly correlates to wine acidity perception. Those who love tartness will appreciate bright, high-acid wines. Those avoiding tartness prefer softer, rounder wines.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q5: Salad Dressing</div>
+                <p><strong>Question:</strong> "What salad dressing do you prefer?"</p>
+                <div class="answer">
+                    <p><strong>A) Vinaigrette or lemon juice</strong> → High acidity (Crisp White, Sparkling)</p>
+                    <p><strong>B) Ranch or Caesar</strong> → Medium acidity (Medium-Bodied Red, Fruit-Forward White)</p>
+                    <p><strong>C) Creamy or oil-based</strong> → Low acidity (Full-Bodied White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Vinaigrette's acidity is a daily food reference point. This is a behavioral/preference question that indicates actual choices, making it highly predictive. Creamy dressings suggest those who avoid brightness, while vinegar-based suggests those seeking it. This is the second acidity validation question.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q6: Morning Drink</div>
+                <p><strong>Question:</strong> "What's your ideal morning drink?"</p>
+                <div class="answer">
+                    <p><strong>A) Orange juice or grapefruit juice</strong> → High acidity (Sparkling, Crisp White)</p>
+                    <p><strong>B) Smoothie or fruit blend</strong> → Medium acidity (Aromatic White)</p>
+                    <p><strong>C) Hot chocolate or creamy latte</strong> → Low acidity (Full-Bodied White, Dessert)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Morning drink choices reveal consistent flavor preferences. OJ/grapefruit juice drinkers actively seek acidic refreshment. Smoothies indicate comfort with fruit-forward medium flavors. Hot chocolate/latte drinkers show preference for creamy, rounded flavors. This provides third acidity confirmation.</p>
+                </div>
+            </div>
+
+            <h3>Questions 7-9: Body Weight (Intensity/Richness)</h3>
+            <p><em>These questions measure comfort with rich, full-bodied foods versus light, delicate preferences.</em></p>
+
+            <div class="question-box">
+                <div class="question-num">Q7: Meal Preference</div>
+                <p><strong>Question:</strong> "Which meal sounds most appealing?"</p>
+                <div class="answer">
+                    <p><strong>A) Grilled steak with bold sauce</strong> → Full body (Full-Bodied Red Enthusiast)</p>
+                    <p><strong>B) Roasted chicken with herbs</strong> → Medium body (Spiced Red, Fruit-Forward White)</p>
+                    <p><strong>C) Fresh fish with lemon</strong> → Light body (Crisp White, Sparkling, Light Red)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Meal richness is a direct proxy for body weight preference. Steak drinkers need full-bodied wines to complement the richness. Light fish indicates preference for lighter wines. Chicken sits in the middle. This is the most direct body-weight indicator question.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q8: Soup Choice</div>
+                <p><strong>Question:</strong> "What soup do you crave?"</p>
+                <div class="answer">
+                    <p><strong>A) Rich, creamy chowder or bisque</strong> → Full body (Full-Bodied Red, Full-Bodied White)</p>
+                    <p><strong>B) Tomato soup or minestrone</strong> → Medium body (Medium-Bodied Red, Aromatic White)</p>
+                    <p><strong>C) Clear broth or light gazpacho</strong> → Light body (Crisp White, Sparkling)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Soup preferences reveal comfort with richness vs. lightness. Creamy soups appeal to those seeking full-bodied wines. Clear broths appeal to those wanting lightness. This provides a second validation of body-weight preferences through a different food context.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q9: Pasta Sauce</div>
+                <p><strong>Question:</strong> "What pasta sauce is your favorite?"</p>
+                <div class="answer">
+                    <p><strong>A) Hearty meat sauce or Bolognese</strong> → Full body (Full-Bodied Red Enthusiast)</p>
+                    <p><strong>B) Tomato basil or marinara</strong> → Medium body (Spiced Red Connoisseur)</p>
+                    <p><strong>C) Light olive oil or pesto</strong> → Light body (Crisp White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Pasta sauce richness is another daily-life indicator of body-weight preference. Bolognese is rich and meaty (full-bodied wine match). Tomato-based is moderate. Light oil is delicate. This third validation question covers yet another food category, improving accuracy.</p>
+                </div>
+            </div>
+
+            <h3>Questions 10-11: Sweetness Tolerance</h3>
+            <p><em>These questions directly identify preference for residual sugar in beverages.</em></p>
+
+            <div class="question-box">
+                <div class="question-num">Q10: Dessert Lover</div>
+                <p><strong>Question:</strong> "How do you feel about dessert?"</p>
+                <div class="answer">
+                    <p><strong>A) Must have dessert every meal!</strong> → Sweet preference (Dessert Wine Aficionado)</p>
+                    <p><strong>B) Sometimes, when I'm in the mood</strong> → Medium sweetness (Aromatic White, Medium-Bodied Red)</p>
+                    <p><strong>C) Rarely eat sweets, prefer savory</strong> → Dry preference (Full-Bodied Red, Crisp White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Dessert frequency is one of the strongest indicators of residual sugar tolerance. Dessert-lovers will enjoy sweet wines. Savory-preference people clearly need dry wines. This is the most direct sweetness indicator and serves as the primary sweetness-preference filter.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q11: Beverage Sweetness</div>
+                <p><strong>Question:</strong> "How sweet do you like your drinks?"</p>
+                <div class="answer">
+                    <p><strong>A) The sweeter the better</strong> → Sweet preference (Dessert Wine Aficionado)</p>
+                    <p><strong>B) A little sweetness is nice</strong> → Medium sweetness (Aromatic White)</p>
+                    <p><strong>C) I prefer unsweetened/dry</strong> → Dry preference (Full-Bodied Red, Crisp White, Spiced Red)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>This directly measures sweetness preference in beverages (coffee sweetening, juice choice, etc.). It provides the second validation of sweetness preferences and is highly predictive because it's a direct preference statement about the exact characteristic (sweetness in drinks = sweetness in wine).</p>
+                </div>
+            </div>
+
+            <h3>Questions 12-15: Flavor Profiles & Context</h3>
+            <p><em>These questions identify specific flavor preferences and usage occasions.</em></p>
+
+            <div class="question-box">
+                <div class="question-num">Q12: Spice Tolerance</div>
+                <p><strong>Question:</strong> "How do you handle spice?"</p>
+                <div class="answer">
+                    <p><strong>A) Bring on the heat!</strong> → Spicy flavor preference (Spiced Red Connoisseur)</p>
+                    <p><strong>B) Medium spice is perfect</strong> → Balanced (Medium-Bodied Red, Fruit-Forward White)</p>
+                    <p><strong>C) Mild flavors please</strong> → Delicate preference (Light-Bodied Red, Aromatic White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Spice tolerance directly correlates to preference for peppery, spicy wine notes. Those who enjoy heat will appreciate Syrah's black pepper notes or Zinfandel's spicy character. This differentiates the Spiced Red profile from others. Mild-preference people need delicate wines without assertive spice notes.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q13: Herb Preference</div>
+                <p><strong>Question:</strong> "Fresh herbs or earthy flavors?"</p>
+                <div class="answer">
+                    <p><strong>A) Love fresh herbs and floral flavors</strong> → Floral/herbal notes (Aromatic White, Light-Bodied Red)</p>
+                    <p><strong>B) Prefer earthy, woody flavors</strong> → Oak notes (Full-Bodied Red, Full-Bodied White)</p>
+                    <p><strong>C) Fruity and bright flavors</strong> → Fruit-forward (Medium-Bodied Red, Crisp White)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Herb/earthy preferences indicate comfort with wine complexity types. Floral preference matches aromatic whites. Earthy/oak preference indicates those who enjoy the vanilla, toast, spice from barrel aging. Fruity preference indicates those seeking primary fruit flavors over added complexity. This separates profiles within wine color categories.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q14: Fruit Style</div>
+                <p><strong>Question:</strong> "What fruits do you gravitate toward?"</p>
+                <div class="answer">
+                    <p><strong>A) Berries and cherries</strong> → Red fruit notes (Medium-Bodied Red, Sparkling)</p>
+                    <p><strong>B) Tropical fruits</strong> → Tropical notes (Fruit-Forward White)</p>
+                    <p><strong>C) Citrus fruits</strong> → Citrus notes (Crisp White, Sparkling, Light Red)</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Fruit preferences are highly predictive of wine flavor preferences because wines naturally express similar fruits based on variety and climate. Berry lovers will recognize those flavors in Pinot Noir. Citrus lovers will find them in Sauvignon Blanc. This question validates flavor profile preferences identified by other questions.</p>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-num">Q15: Occasion Preference</div>
+                <p><strong>Question:</strong> "What's your ideal dining occasion?"</p>
+                <div class="answer">
+                    <p><strong>A) Celebration with friends</strong> → Sparkling Wine Enthusiast</p>
+                    <p><strong>B) Cozy dinner at home</strong> → Medium-Bodied Red, Full-Bodied White</p>
+                    <p><strong>C) Fancy steakhouse dinner</strong> → Full-Bodied Red Enthusiast</p>
+                    <p><strong>D) Brunch or light lunch</strong> → Crisp White, Aromatic White</p>
+                </div>
+                <div class="reasoning">
+                    <h4>Why This Question Works</h4>
+                    <p>Occasion preference captures usage context and wine suitability. Celebration lovers naturally gravitate toward sparkling. Steakhouse diners seek bold reds. Brunch lovers prefer light, crisp wines. Cozy dinner suggests moderate wines. This contextual question helps finalize profile selection when scores are close, providing tiebreaker logic.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Scoring Algorithm -->
+        <section class="section">
+            <h2>Scoring Algorithm & Reasoning</h2>
+
+            <h3>How the Algorithm Works</h3>
+            <p>
+                The quiz uses a sophisticated point-based scoring system where each answer awards points to one or more of the 10 profiles. The algorithm works as follows:
+            </p>
+
+            <ol style="margin-left: 20px; margin-bottom: 20px;">
+                <li><strong>Initialize Scores:</strong> Each of the 10 profiles starts with 0 points</li>
+                <li><strong>Process Answers:</strong> For each of the 15 questions, the user's answer triggers points for relevant profiles</li>
+                <li><strong>Award Points:</strong> Each answer awards 1-3 points to various profiles based on the answer's relevance
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>3 points = strong indicator of that profile</li>
+                        <li>2 points = moderate indicator of that profile</li>
+                        <li>1 point = weak indicator of that profile</li>
+                    </ul>
+                </li>
+                <li><strong>Calculate Winner:</strong> After all 15 questions, the profile with the highest total score wins</li>
+                <li><strong>Apply Tiebreaker:</strong> If two profiles have equal scores, tiebreaker rules apply (see below)</li>
+            </ol>
+
+            <h3>Point Distribution Philosophy</h3>
+            <p>
+                Points are assigned based on how strongly each answer indicates a profile preference. For example:
+            </p>
+
+            <table>
+                <tr>
+                    <th>Question</th>
+                    <th>Answer</th>
+                    <th>Profile</th>
+                    <th>Points</th>
+                    <th>Reasoning</th>
+                </tr>
+                <tr>
+                    <td rowspan="3">Q1: Coffee</td>
+                    <td>A) Black, no sugar</td>
+                    <td>Full-Bodied Red Enthusiast</td>
+                    <td>3</td>
+                    <td>Very strong indicator of high tannin tolerance</td>
+                </tr>
+                <tr>
+                    <td>A) Black, no sugar</td>
+                    <td>Spiced Red Connoisseur</td>
+                    <td>1</td>
+                    <td>Moderate indicator, not specifically about spice</td>
+                </tr>
+                <tr>
+                    <td>B) Cream and sugar</td>
+                    <td>Medium-Bodied Red Aficionado</td>
+                    <td>3</td>
+                    <td>Clear softening preference suggests medium tannins</td>
+                </tr>
+            </table>
+
+            <div class="reasoning">
+                <h4>Why Three-Tier Scoring?</h4>
+                <p>
+                    Using three point levels (1, 2, 3) instead of binary (0/1) or continuous scoring allows the algorithm to:
+                    <ul style="margin-left: 20px;">
+                        <li>Capture gradations of relevance (exact match vs. adjacent profiles vs. weak connection)</li>
+                        <li>Allow secondary profiles to benefit from answers that aren't their primary indicator</li>
+                        <li>Reduce noise while maintaining sensitivity to answer patterns</li>
+                        <li>Keep the total point range manageable (0-90 points maximum = 15 questions × 6 max points per question)</li>
+                    </ul>
+                </p>
+            </div>
+
+            <h3>Tiebreaker Rules</h3>
+            <p>
+                If two profiles have equal final scores, the following tiebreaker rules apply in order:
+            </p>
+            <ol style="margin-left: 20px; margin-bottom: 20px;">
+                <li><strong>Red vs. White Tiebreaker:</strong> If a red and white profile are tied, check Q10-Q11 (dessert/sweetness preference) to distinguish</li>
+                <li><strong>Same-Category Tiebreaker:</strong> If two reds or two whites are tied, examine their flavor-profile answers (Q12-Q14)</li>
+                <li><strong>Final Tiebreaker:</strong> If still tied, default to the most versatile profile (Medium-Bodied Red Aficionado for reds, Crisp & Acidic White Enthusiast for whites)</li>
+            </ol>
+
+            <div class="reasoning">
+                <h4>Why These Rules?</h4>
+                <p>
+                    Tiebreaker rules provide rational defaults when user responses don't clearly distinguish between profiles. The most versatile profiles are chosen as defaults because they:
+                    <ul style="margin-left: 20px;">
+                        <li>Appeal to the broadest consumer base</li>
+                        <li>Work with the widest variety of foods</li>
+                        <li>Offer the least likelihood of user dissatisfaction</li>
+                        <li>Provide excellent foundation for users to then refine preferences manually</li>
+                    </ul>
+                </p>
+            </div>
+
+            <h3>Example Scoring Scenario</h3>
+            <p>
+                Let's walk through a partial example with a hypothetical user who answers:
+            </p>
+            <ul style="margin-left: 20px;">
+                <li>Q1 (Coffee) → B) Cream and sugar</li>
+                <li>Q2 (Chocolate) → B) Milk chocolate</li>
+                <li>Q4 (Citrus) → C) Prefer milder</li>
+                <li>Q7 (Meal) → B) Roasted chicken</li>
+            </ul>
+
+            <table>
+                <tr>
+                    <th>Profile</th>
+                    <th>Q1 Points</th>
+                    <th>Q2 Points</th>
+                    <th>Q4 Points</th>
+                    <th>Q7 Points</th>
+                    <th>Running Total</th>
+                </tr>
+                <tr>
+                    <td>Full-Bodied Red Enthusiast</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>Medium-Bodied Red Aficionado</td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>9</td>
+                </tr>
+                <tr>
+                    <td>Crisp & Acidic White Enthusiast</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>2</td>
+                </tr>
+                <tr style="background-color: #fff8f8;">
+                    <td colspan="5"><em>... (after all 15 questions, Medium-Bodied Red Aficionado likely leads significantly)</em></td>
+                </tr>
+            </table>
+
+            <p>
+                This example shows how the algorithm accumulates evidence across questions, with stronger indicators (3 points) building a compelling case for a particular profile.
+            </p>
+        </section>
+
+        <!-- Reference Table -->
+        <section class="section">
+            <h2>Profile Characteristics Reference Table</h2>
+
+            <table>
+                <tr>
+                    <th>Profile</th>
+                    <th>Wine Type</th>
+                    <th>Acidity</th>
+                    <th>Tannins</th>
+                    <th>Body</th>
+                    <th>Sweetness</th>
+                    <th>Flavor Notes</th>
+                </tr>
+                <tr>
+                    <td><strong>1. Full-Bodied Red Enthusiast</strong></td>
+                    <td>Red</td>
+                    <td>Medium</td>
+                    <td>High</td>
+                    <td>Full</td>
+                    <td>Dry</td>
+                    <td>Oak, spice, cherry</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Medium-Bodied Red Aficionado</strong></td>
+                    <td>Red</td>
+                    <td>Medium</td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Cherry, berry, vanilla</td>
+                </tr>
+                <tr>
+                    <td><strong>3. Spiced Red Connoisseur</strong></td>
+                    <td>Red</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Full</td>
+                    <td>Dry</td>
+                    <td>Spice, cherry, oak</td>
+                </tr>
+                <tr>
+                    <td><strong>4. Light-Bodied Red Devotee</strong></td>
+                    <td>Red</td>
+                    <td>High</td>
+                    <td>Low</td>
+                    <td>Light</td>
+                    <td>Dry</td>
+                    <td>Berry, floral, citrus</td>
+                </tr>
+                <tr>
+                    <td><strong>5. Crisp & Acidic White Enthusiast</strong></td>
+                    <td>White</td>
+                    <td>High</td>
+                    <td>Low</td>
+                    <td>Light</td>
+                    <td>Dry</td>
+                    <td>Citrus, floral</td>
+                </tr>
+                <tr>
+                    <td><strong>6. Full-Bodied White Aficionado</strong></td>
+                    <td>White</td>
+                    <td>Low</td>
+                    <td>Low</td>
+                    <td>Full</td>
+                    <td>Dry</td>
+                    <td>Oak, vanilla, butter</td>
+                </tr>
+                <tr>
+                    <td><strong>7. Aromatic White Connoisseur</strong></td>
+                    <td>White</td>
+                    <td>Medium</td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Floral, citrus, spice</td>
+                </tr>
+                <tr>
+                    <td><strong>8. Fruit-Forward White Devotee</strong></td>
+                    <td>White</td>
+                    <td>Medium</td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Citrus, berry</td>
+                </tr>
+                <tr>
+                    <td><strong>9. Sparkling Wine Enthusiast</strong></td>
+                    <td>Sparkling</td>
+                    <td>High</td>
+                    <td>Low</td>
+                    <td>Light</td>
+                    <td>Dry</td>
+                    <td>Citrus, floral</td>
+                </tr>
+                <tr>
+                    <td><strong>10. Dessert Wine Aficionado</strong></td>
+                    <td>Dessert</td>
+                    <td>Low</td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>Sweet</td>
+                    <td>Berry, vanilla</td>
+                </tr>
+            </table>
+        </section>
+
+        <div class="page-break"></div>
+
+        <!-- Polar Graph Visualizations -->
+        <section class="section">
+            <h2>Profile Visualization: Polar Graphs</h2>
+            <p>
+                The following polar (radar) graphs provide visual representations of how wine profiles compare across the five key dimensions. Each dimension is rated on a scale of 0-100, where higher values indicate stronger characteristics.
+            </p>
+
+            <h3>The Five Dimensions Explained</h3>
+            <div class="profile-group">
+                <p><strong>Acidity:</strong> 0 = Soft, Round | 50 = Balanced | 100 = Bright, Crisp</p>
+                <p><strong>Tannins:</strong> 0 = Smooth, Low | 50 = Moderate | 100 = Astringent, High</p>
+                <p><strong>Body:</strong> 0 = Light, Delicate | 50 = Medium | 100 = Full, Rich</p>
+                <p><strong>Sweetness:</strong> 0 = Bone Dry | 50 = Off-Dry to Medium | 100 = Sweet</p>
+                <p><strong>Flavor Intensity:</strong> 0 = Subtle, Delicate | 50 = Balanced | 100 = Bold, Complex</p>
+            </div>
+
+            <h3>Example 1: Full-Bodied Red Enthusiast Profile</h3>
+            <p>This profile demonstrates someone who prefers wines with high intensity and structure.</p>
+
+            <svg class="polar-graph" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circle grid -->
+                <circle cx="250" cy="250" r="40" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="80" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="120" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="160" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+
+                <!-- Axes -->
+                <line x1="250" y1="250" x2="250" y2="90" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="380" y2="190" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="360" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="140" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="120" y2="190" stroke="#999" stroke-width="1"/>
+
+                <!-- Labels -->
+                <text x="250" y="75" text-anchor="middle" font-size="12" font-weight="bold" fill="#8b0000">Acidity</text>
+                <text x="395" y="165" font-size="12" font-weight="bold" fill="#8b0000">Tannins</text>
+                <text x="380" y="370" font-size="12" font-weight="bold" fill="#8b0000">Body</text>
+                <text x="80" y="370" font-size="12" font-weight="bold" fill="#8b0000">Sweetness</text>
+                <text x="85" y="165" font-size="12" font-weight="bold" fill="#8b0000">Intensity</text>
+
+                <!-- Profile data polygon: Full-Bodied Red Enthusiast (Medium Acidity=50, High Tannins=90, Full Body=90, Dry Sweetness=10, Bold Intensity=85) -->
+                <polygon points="250,88 363,162 350,330 175,330 137,162"
+                         fill="rgba(139, 0, 0, 0.2)" stroke="#8b0000" stroke-width="2"/>
+
+                <!-- Reference polygon: All 50s (average/balanced) -->
+                <polygon points="250,130 335,186 305,295 195,295 165,186"
+                         fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+
+                <!-- Legend -->
+                <line x1="50" y1="460" x2="70" y2="460" stroke="#8b0000" stroke-width="2"/>
+                <text x="75" y="465" font-size="11" fill="#333">Full-Bodied Red Enthusiast</text>
+
+                <line x1="50" y1="480" x2="70" y2="480" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+                <text x="75" y="485" font-size="11" fill="#333">Average Profile (Baseline)</text>
+            </svg>
+
+            <p style="margin-top: 20px;">
+                <strong>Interpretation:</strong> The Full-Bodied Red Enthusiast profile shows high values for Tannins (90), Body (90), and Flavor Intensity (85), indicating a preference for wines with structure, weight, and complex flavors. The low Sweetness value (10) confirms a preference for dry wines, while medium Acidity (50) suggests the focus is more on tannin structure than brightness.
+            </p>
+
+            <h3 style="margin-top: 40px;">Example 2: Crisp & Acidic White Enthusiast Profile</h3>
+            <p>This profile shows the opposite preference: bright, light wines with high acidity.</p>
+
+            <svg class="polar-graph" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circle grid -->
+                <circle cx="250" cy="250" r="40" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="80" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="120" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="160" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+
+                <!-- Axes -->
+                <line x1="250" y1="250" x2="250" y2="90" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="380" y2="190" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="360" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="140" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="120" y2="190" stroke="#999" stroke-width="1"/>
+
+                <!-- Labels -->
+                <text x="250" y="75" text-anchor="middle" font-size="12" font-weight="bold" fill="#4169e1">Acidity</text>
+                <text x="395" y="165" font-size="12" font-weight="bold" fill="#4169e1">Tannins</text>
+                <text x="380" y="370" font-size="12" font-weight="bold" fill="#4169e1">Body</text>
+                <text x="80" y="370" font-size="12" font-weight="bold" fill="#4169e1">Sweetness</text>
+                <text x="85" y="165" font-size="12" font-weight="bold" fill="#4169e1">Intensity</text>
+
+                <!-- Profile data polygon: Crisp White (High Acidity=85, Low Tannins=10, Light Body=20, Dry Sweetness=10, Medium Intensity=60) -->
+                <polygon points="250,68 270,244 295,300 210,300 230,244"
+                         fill="rgba(65, 105, 225, 0.2)" stroke="#4169e1" stroke-width="2"/>
+
+                <!-- Reference polygon: All 50s -->
+                <polygon points="250,130 335,186 305,295 195,295 165,186"
+                         fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+
+                <!-- Legend -->
+                <line x1="50" y1="460" x2="70" y2="460" stroke="#4169e1" stroke-width="2"/>
+                <text x="75" y="465" font-size="11" fill="#333">Crisp & Acidic White Enthusiast</text>
+
+                <line x1="50" y1="480" x2="70" y2="480" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+                <text x="75" y="485" font-size="11" fill="#333">Average Profile (Baseline)</text>
+            </svg>
+
+            <p style="margin-top: 20px;">
+                <strong>Interpretation:</strong> The Crisp & Acidic White Enthusiast shows the opposite pattern: very high Acidity (85) dominates the profile, while Tannins (10) and Body (20) are minimal. This reflects a preference for bright, refreshing wines that are light-bodied and don't require the structure that red wines provide.
+            </p>
+
+            <h3 style="margin-top: 40px;">Example 3: Dessert Wine Aficionado Profile</h3>
+            <p>This profile represents someone with a clear preference for sweetness and richness.</p>
+
+            <svg class="polar-graph" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background circle grid -->
+                <circle cx="250" cy="250" r="40" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="80" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="120" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                <circle cx="250" cy="250" r="160" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+
+                <!-- Axes -->
+                <line x1="250" y1="250" x2="250" y2="90" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="380" y2="190" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="360" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="140" y2="340" stroke="#999" stroke-width="1"/>
+                <line x1="250" y1="250" x2="120" y2="190" stroke="#999" stroke-width="1"/>
+
+                <!-- Labels -->
+                <text x="250" y="75" text-anchor="middle" font-size="12" font-weight="bold" fill="#d4a574">Acidity</text>
+                <text x="395" y="165" font-size="12" font-weight="bold" fill="#d4a574">Tannins</text>
+                <text x="380" y="370" font-size="12" font-weight="bold" fill="#d4a574">Body</text>
+                <text x="80" y="370" font-size="12" font-weight="bold" fill="#d4a574">Sweetness</text>
+                <text x="85" y="165" font-size="12" font-weight="bold" fill="#d4a574">Intensity</text>
+
+                <!-- Profile data polygon: Dessert Wine (Low Acidity=20, Low Tannins=10, Medium Body=60, High Sweetness=90, Bold Intensity=75) -->
+                <polygon points="250,154 268,244 340,280 160,280 182,244"
+                         fill="rgba(212, 165, 116, 0.2)" stroke="#d4a574" stroke-width="2"/>
+
+                <!-- Reference polygon: All 50s -->
+                <polygon points="250,130 335,186 305,295 195,295 165,186"
+                         fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+
+                <!-- Legend -->
+                <line x1="50" y1="460" x2="70" y2="460" stroke="#d4a574" stroke-width="2"/>
+                <text x="75" y="465" font-size="11" fill="#333">Dessert Wine Aficionado</text>
+
+                <line x1="50" y1="480" x2="70" y2="480" stroke="#d4af37" stroke-width="1" stroke-dasharray="5,5"/>
+                <text x="75" y="485" font-size="11" fill="#333">Average Profile (Baseline)</text>
+            </svg>
+
+            <p style="margin-top: 20px;">
+                <strong>Interpretation:</strong> The Dessert Wine Aficionado profile shows a distinctive pattern with very high Sweetness (90) and elevated Flavor Intensity (75) and Body (60). Low Acidity (20) and minimal Tannins (10) make these wines soft and approachable, focusing entirely on the pleasure of residual sugar and rich flavors rather than structure or complexity.
+            </p>
+
+            <h3 style="margin-top: 40px;">Using Polar Graphs on the Profile Page</h3>
+            <p>
+                These polar graph visualizations can be integrated into the user profile page to provide immediate visual feedback about their wine preferences. A real-time polar graph showing:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li>The user's current profile characteristics (solid filled area)</li>
+                <li>The baseline average profile for reference (dashed line)</li>
+                <li>Optional comparison to another profile of their choosing</li>
+                <li>Color-coded to match the user's wine type (red, white, sparkling, dessert)</li>
+            </ul>
+            <p>
+                This visual representation makes it immediately clear to users why certain wines are recommended and helps them understand what characteristics they should look for when exploring new wines independently.
+            </p>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>
+                The SipSync Wine Profile System represents a comprehensive, scientifically-grounded approach to identifying wine consumer preferences without requiring wine expertise. By mapping everyday food and beverage preferences to fundamental wine characteristics, the system makes wine discovery accessible, engaging, and accurate.
+            </p>
+            <p>
+                The 10 profiles cover the full spectrum of wine types (red, white, sparkling, dessert) and consumer preferences (dry to sweet, light to full-bodied, delicate to intense). The 15-question quiz provides sufficient data points to confidently classify users while remaining quick and engaging to complete.
+            </p>
+            <p>
+                This system serves as the foundation for personalized wine recommendations throughout the SipSync platform, ensuring that every user receives suggestions aligned with their true preferences from day one.
+            </p>
+        </section>
+
+        <div class="footer">
+            <p>SipSync Wine Profile System Documentation | Version 1.0 | January 2026</p>
+            <p>This document is confidential and serves as backup reference for the wine profile classification system.</p>
+        </div>
+    </div>
+</body>
+</html>

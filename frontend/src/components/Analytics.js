@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Analytics.css';
+import { API_URL } from '../config';
 
 function Analytics({ user }) {
   const [stats, setStats] = useState(null);
@@ -8,8 +9,6 @@ function Analytics({ user }) {
   const [preferencesTrends, setPreferencesTrends] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     fetchAnalyticsData();

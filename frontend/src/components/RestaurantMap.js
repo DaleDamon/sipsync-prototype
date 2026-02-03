@@ -3,13 +3,12 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/RestaurantMap.css';
+import { API_URL } from '../config';
 
 function RestaurantMap({ onRestaurantSelect }) {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const API_URL = 'http://localhost:5000/api';
 
   // Custom marker icon (traditional wine glass shaped)
   const customIcon = new L.Icon({

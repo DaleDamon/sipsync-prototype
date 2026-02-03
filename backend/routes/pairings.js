@@ -25,6 +25,11 @@ function getDefaultFoodPairings(wineType) {
       { name: 'Caviar & Canapés', description: 'Champagne and caviar is the ultimate celebration pairing', pairing: 'Luxurious and elegant' },
       { name: 'Appetizer Platter', description: 'Sparkling wine works with a variety of appetizers', pairing: 'Great for parties and celebrations' },
     ],
+    dessert: [
+      { name: 'Chocolate Cake', description: 'Sweet dessert wines pair beautifully with rich chocolate desserts', pairing: 'Classic indulgent combination' },
+      { name: 'Crème Brûlée', description: 'The caramel and custard flavors complement dessert wine perfectly', pairing: 'Sophisticated French pairing' },
+      { name: 'Fruit Tart', description: 'Fruit-forward dessert wines enhance fresh fruit tarts', pairing: 'Light and elegant finish' },
+    ],
   };
 
   // Normalize wine type (handle special characters and case variations)
@@ -39,7 +44,7 @@ function getDefaultFoodPairings(wineType) {
     return pairingsByType.rosé;
   }
 
-  return pairingsByType[normalizedType] || pairingsByType.red;
+  return pairingsByType[normalizedType] || pairingsByType.dessert || pairingsByType.red;
 }
 
 // Helper function to calculate match score between user preferences and wine
@@ -69,6 +74,7 @@ function calculateMatchScore(userPreferences, wine) {
   }
 
   // Flavor profile match
+  // Available flavor notes: oak, cherry, citrus, berry, vanilla, spice, floral, chocolate, earthy, tropical, herbal, honey
   if (userPreferences.flavorNotes && userPreferences.flavorNotes.length > 0) {
     const matchedFlavors = userPreferences.flavorNotes.filter((flavor) =>
       wine.flavorProfile.includes(flavor)

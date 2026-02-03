@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/UserProfile.css';
+import PolarGraph from './PolarGraph';
+import { API_URL } from '../config';
 
-function UserProfile({ user }) {
+function UserProfile({ user, onRetakeQuiz }) {
   const [pairingHistory, setPairingHistory] = useState([]);
   const [visitedRestaurants, setVisitedRestaurants] = useState([]);
+  const [quizProfile, setQuizProfile] = useState(null);
+  const [savedPreferences, setSavedPreferences] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     if (user && user.userId) {
@@ -19,6 +21,20 @@ function UserProfile({ user }) {
     try {
       setLoading(true);
       setError('');
+
+      // Fetch user data to get quiz profile and preferences
+      const userResponse = await fetch(
+        `${API_URL}/auth/user/${user.userId}`
+      );
+      const userData = await userResponse.json();
+      if (userResponse.ok) {
+        if (userData.quizProfile) {
+          setQuizProfile(userData.quizProfile);
+        }
+        if (userData.savedPreferences && userData.savedPreferences.length > 0) {
+          setSavedPreferences(userData.savedPreferences[0]);
+        }
+      }
 
       // Fetch pairing history
       const historyResponse = await fetch(
@@ -68,13 +84,27 @@ function UserProfile({ user }) {
         <h2>Your Profile</h2>
         <div className="user-info">
           <p className="user-name">{user?.userId || 'User'}</p>
+          {quizProfile && (
+            <p className="user-profile-badge">
+              🍷 Wine Profile: <strong>{quizProfile}</strong>
+            </p>
+          )}
           <p className="user-stats">
             {pairingHistory.length} saved pairings • {visitedRestaurants.length} restaurants
           </p>
         </div>
+        {onRetakeQuiz && (
+          <button className="retake-quiz-btn" onClick={onRetakeQuiz}>
+            Retake Wine Quiz
+          </button>
+        )}
       </div>
 
       {error && <div className="error-message">{error}</div>}
+
+      {quizProfile && savedPreferences && (
+        <PolarGraph preferences={savedPreferences} profileName={quizProfile} />
+      )}
 
       <div className="profile-content">
         {/* Recent Pairings Section */}
