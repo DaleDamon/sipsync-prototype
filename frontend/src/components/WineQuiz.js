@@ -12,138 +12,152 @@ function WineQuiz({ user, onComplete }) {
   const questions = [
     {
       id: 1,
-      question: "How do you like your coffee?",
+      question: "How do you take your coffee in the morning?",
       answers: [
-        "Black, no sugar",
-        "With cream and sugar",
-        "I prefer tea or juice"
+        "Black and strong (espresso style)",
+        "Black with a splash of cream",
+        "Latte or cappuccino (half coffee, half milk)",
+        "Sweet coffee drink or I skip coffee entirely"
       ]
     },
     {
       id: 2,
-      question: "Dark chocolate or milk chocolate?",
+      question: "What type of chocolate do you reach for?",
       answers: [
-        "Dark chocolate (85%+ cacao)",
-        "Milk chocolate",
-        "White chocolate or fruity candy"
+        "85%+ dark chocolate (very intense, bitter)",
+        "60-70% dark chocolate (rich but balanced)",
+        "Milk chocolate (sweet and creamy)",
+        "White chocolate or fruit-flavored candy"
       ]
     },
     {
       id: 3,
-      question: "What's your go-to tea?",
+      question: "What's your everyday tea preference?",
       answers: [
-        "Black tea, unsweetened",
-        "Green tea or herbal tea",
-        "Fruit tea or sweet iced tea"
+        "Strong black tea, completely unsweetened",
+        "Green tea or herbal tea, unsweetened",
+        "Flavored tea with a touch of honey",
+        "Sweet iced tea or I don't drink tea"
       ]
     },
     {
       id: 4,
-      question: "How do you feel about sour/tangy flavors?",
+      question: "How do you feel about sour and tangy flavors?",
       answers: [
-        "Love them! Gimme all the citrus",
-        "Like them in moderation",
-        "Prefer milder, less tangy flavors"
+        "Love them intensely (citrus, vinegar, sharp)",
+        "Like them in good measure",
+        "Prefer them balanced with sweetness",
+        "Prefer mild, smooth flavors overall"
       ]
     },
     {
       id: 5,
-      question: "What salad dressing do you prefer?",
+      question: "What's your ideal salad dressing?",
       answers: [
-        "Vinaigrette or lemon juice",
-        "Ranch or Caesar",
-        "Creamy or oil-based"
+        "Sharp vinaigrette or lemon-based",
+        "Balanced vinaigrette or light dressing",
+        "Creamy ranch or Caesar",
+        "Rich, oil-based or avocado dressing"
       ]
     },
     {
       id: 6,
-      question: "What's your ideal morning drink?",
+      question: "What's your ideal morning beverage?",
       answers: [
-        "Orange juice or grapefruit juice",
-        "Smoothie or fruit blend",
-        "Hot chocolate or creamy latte"
+        "Citrus juice (orange, grapefruit, lemon)",
+        "Green smoothie or fresh fruit blend",
+        "Regular smoothie or coffee with milk",
+        "Hot chocolate, creamy latte, or milk drink"
       ]
     },
     {
       id: 7,
-      question: "Which meal sounds most appealing?",
+      question: "Which main course appeals to you most?",
       answers: [
-        "Grilled steak with bold sauce",
-        "Roasted chicken with herbs",
-        "Fresh fish with lemon"
+        "Grilled beef with bold, charred flavors",
+        "Herb-roasted chicken or pork",
+        "Seared fish with citrus or light sauce",
+        "Pasta with cream sauce or butter"
       ]
     },
     {
       id: 8,
-      question: "What soup do you crave?",
+      question: "What type of soup do you crave?",
       answers: [
         "Rich, creamy chowder or bisque",
-        "Tomato soup or minestrone",
-        "Clear broth or light gazpacho"
+        "Balanced tomato or vegetable soup",
+        "Light tomato-based or minestrone",
+        "Clear broth, consommé, or gazpacho"
       ]
     },
     {
       id: 9,
-      question: "What pasta sauce is your favorite?",
+      question: "What's your go-to pasta sauce?",
       answers: [
-        "Hearty meat sauce or Bolognese",
-        "Tomato basil or marinara",
-        "Light olive oil or pesto"
+        "Hearty meat sauce or rich Bolognese",
+        "Balanced tomato-based or traditional marinara",
+        "Light tomato or fresh basil sauce",
+        "Olive oil, garlic, or light cream sauce"
       ]
     },
     {
       id: 10,
-      question: "How do you feel about dessert?",
+      question: "How important is dessert to you?",
       answers: [
-        "Must have dessert every meal!",
-        "Sometimes, when I'm in the mood",
-        "Rarely eat sweets, prefer savory"
+        "Essential! I need something sweet daily",
+        "I enjoy dessert several times a week",
+        "Occasionally, when I'm in the mood",
+        "Rarely or never, prefer savory"
       ]
     },
     {
       id: 11,
-      question: "How sweet do you like your drinks?",
+      question: "How sweet should your drinks be?",
       answers: [
-        "The sweeter the better",
-        "A little sweetness is nice",
-        "I prefer unsweetened/dry"
+        "Very sweet - the sweeter the better",
+        "Moderately sweet is pleasant",
+        "Lightly sweet or balanced",
+        "Unsweetened or completely dry"
       ]
     },
     {
       id: 12,
-      question: "How do you handle spice?",
+      question: "How do you feel about spicy heat?",
       answers: [
-        "Bring on the heat!",
-        "Medium spice is perfect",
-        "Mild flavors please"
+        "Bring on maximum heat and intensity!",
+        "Moderate spice with good flavor",
+        "Mild spice or just a little kick",
+        "No spice at all, prefer mild flavors"
       ]
     },
     {
       id: 13,
-      question: "Fresh herbs or earthy flavors?",
+      question: "What flavor profile appeals to you most?",
       answers: [
-        "Love fresh herbs and floral flavors",
-        "Prefer earthy, woody flavors",
-        "Fruity and bright flavors"
+        "Fresh, herbaceous, and floral notes",
+        "Earthy, mineral, or woody flavors",
+        "Fruity and bright flavors",
+        "Rich, savory, or umami flavors"
       ]
     },
     {
       id: 14,
-      question: "What fruits do you gravitate toward?",
+      question: "Which fruits do you naturally gravitate toward?",
       answers: [
-        "Berries and cherries",
-        "Tropical fruits (pineapple, mango)",
-        "Citrus fruits (lemon, lime, orange)"
+        "Dark berries, plums, or cherries",
+        "Tropical fruits like mango or pineapple",
+        "Stone fruits like peach or apricot",
+        "Citrus fruits like lemon, lime, or orange"
       ]
     },
     {
       id: 15,
-      question: "What's your ideal dining occasion?",
+      question: "What's your ideal dining scenario?",
       answers: [
-        "Celebration with friends",
-        "Cozy dinner at home",
-        "Fancy steakhouse dinner",
-        "Brunch or light lunch"
+        "Celebration with a big group of friends",
+        "Cozy dinner at home with loved ones",
+        "Fancy steakhouse or upscale restaurant",
+        "Brunch, casual lunch, or relaxed meal"
       ]
     }
   ];

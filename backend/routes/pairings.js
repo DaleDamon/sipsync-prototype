@@ -49,6 +49,19 @@ function getDefaultFoodPairings(wineType) {
 
 // Helper function to calculate match score between user preferences and wine
 function calculateMatchScore(userPreferences, wine) {
+  console.log('\n=== MATCH SCORE CALCULATION ===');
+  console.log('Wine:', wine.name);
+  console.log('User Preferences:', JSON.stringify(userPreferences, null, 2));
+  console.log('Wine Data:', JSON.stringify({
+    type: wine.type,
+    acidity: wine.acidity,
+    tannins: wine.tannins,
+    bodyWeight: wine.bodyWeight,
+    flavorProfile: wine.flavorProfile,
+    sweetnessLevel: wine.sweetnessLevel,
+    price: wine.price
+  }, null, 2));
+
   let totalScore = 0;
   let categoryCount = 0;
 
@@ -57,6 +70,7 @@ function calculateMatchScore(userPreferences, wine) {
     const acidityMatch = userPreferences.acidity === wine.acidity ? 1 : 0.5;
     totalScore += acidityMatch;
     categoryCount++;
+    console.log(`Acidity: ${userPreferences.acidity} vs ${wine.acidity} = ${acidityMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Tannins match
@@ -64,6 +78,7 @@ function calculateMatchScore(userPreferences, wine) {
     const tanninsMatch = userPreferences.tannins === wine.tannins ? 1 : 0.5;
     totalScore += tanninsMatch;
     categoryCount++;
+    console.log(`Tannins: ${userPreferences.tannins} vs ${wine.tannins} = ${tanninsMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Body weight match
@@ -71,6 +86,7 @@ function calculateMatchScore(userPreferences, wine) {
     const bodyMatch = userPreferences.bodyWeight === wine.bodyWeight ? 1 : 0.5;
     totalScore += bodyMatch;
     categoryCount++;
+    console.log(`Body: ${userPreferences.bodyWeight} vs ${wine.bodyWeight} = ${bodyMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Flavor profile match
@@ -82,6 +98,8 @@ function calculateMatchScore(userPreferences, wine) {
     const flavorMatch = matchedFlavors.length / userPreferences.flavorNotes.length;
     totalScore += flavorMatch;
     categoryCount++;
+    console.log(`Flavors: [${userPreferences.flavorNotes.join(', ')}] vs [${wine.flavorProfile.join(', ')}]`);
+    console.log(`  Matched: [${matchedFlavors.join(', ')}] = ${flavorMatch} (${matchedFlavors.length}/${userPreferences.flavorNotes.length}) (total: ${totalScore}/${categoryCount})`);
   }
 
   // Sweetness match
@@ -89,6 +107,7 @@ function calculateMatchScore(userPreferences, wine) {
     const sweetnessMatch = userPreferences.sweetness === wine.sweetnessLevel ? 1 : 0.5;
     totalScore += sweetnessMatch;
     categoryCount++;
+    console.log(`Sweetness: ${userPreferences.sweetness} vs ${wine.sweetnessLevel} = ${sweetnessMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Price match
@@ -97,6 +116,7 @@ function calculateMatchScore(userPreferences, wine) {
     const priceMatch = wine.price >= min && wine.price <= max ? 1 : 0.5;
     totalScore += priceMatch;
     categoryCount++;
+    console.log(`Price: $${wine.price} in [$${min}-$${max}] = ${priceMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Wine type match
@@ -104,9 +124,14 @@ function calculateMatchScore(userPreferences, wine) {
     const typeMatch = userPreferences.wineType === wine.type ? 1 : 0;
     totalScore += typeMatch;
     categoryCount++;
+    console.log(`Type: ${userPreferences.wineType} vs ${wine.type} = ${typeMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
-  return categoryCount > 0 ? totalScore / categoryCount : 0;
+  const finalScore = categoryCount > 0 ? totalScore / categoryCount : 0;
+  console.log(`\nFINAL SCORE: ${totalScore} / ${categoryCount} = ${finalScore} (${Math.round(finalScore * 100)}%)`);
+  console.log('=== END CALCULATION ===\n');
+
+  return finalScore;
 }
 
 // POST /api/pairings/find

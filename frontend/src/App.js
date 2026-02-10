@@ -109,7 +109,6 @@ function App() {
       <nav className="navbar">
         <div className="logo-container">
           <img src="/SipSync Logo.png" alt="SipSync" className="logo-image" />
-          <span className="logo-text">SipSync</span>
         </div>
         {user && (
           <div className="nav-menu">

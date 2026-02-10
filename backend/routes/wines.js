@@ -22,6 +22,56 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
       return res.status(400).json({ error: 'Wine name and type are required' });
     }
 
+    // Validate wine type
+    const validTypes = ['red', 'white', 'rosé', 'sparkling', 'dessert'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({
+        error: `Invalid wine type "${type}". Must be one of: ${validTypes.join(', ')}`
+      });
+    }
+
+    // Validate acidity if provided
+    const validAcidity = ['low', 'medium', 'high'];
+    if (acidity && !validAcidity.includes(acidity)) {
+      return res.status(400).json({
+        error: `Invalid acidity "${acidity}". Must be one of: ${validAcidity.join(', ')}`
+      });
+    }
+
+    // Validate tannins if provided
+    const validTannins = ['low', 'medium', 'high'];
+    if (tannins && !validTannins.includes(tannins)) {
+      return res.status(400).json({
+        error: `Invalid tannins "${tannins}". Must be one of: ${validTannins.join(', ')}`
+      });
+    }
+
+    // Validate bodyWeight if provided
+    const validBodyWeight = ['light', 'medium', 'full'];
+    if (bodyWeight && !validBodyWeight.includes(bodyWeight)) {
+      return res.status(400).json({
+        error: `Invalid bodyWeight "${bodyWeight}". Must be one of: ${validBodyWeight.join(', ')}`
+      });
+    }
+
+    // Validate sweetnessLevel if provided
+    const validSweetness = ['dry', 'medium', 'sweet'];
+    if (sweetnessLevel && !validSweetness.includes(sweetnessLevel)) {
+      return res.status(400).json({
+        error: `Invalid sweetnessLevel "${sweetnessLevel}". Must be one of: ${validSweetness.join(', ')}`
+      });
+    }
+
+    // Validate price
+    if (typeof price !== 'undefined' && (typeof price !== 'number' || price < 0)) {
+      return res.status(400).json({ error: 'Price must be a non-negative number' });
+    }
+
+    // Validate flavorProfile is an array
+    if (flavorProfile && !Array.isArray(flavorProfile)) {
+      return res.status(400).json({ error: 'flavorProfile must be an array of flavor strings' });
+    }
+
     const wine = {
       name,
       type,
