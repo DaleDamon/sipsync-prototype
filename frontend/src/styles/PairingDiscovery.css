@@ -455,6 +455,20 @@
   margin: 10px 0;
 }
 
+.wine-region {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 4px 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.region-icon {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
 .wine-details {
   display: flex;
   flex-direction: column;
@@ -588,6 +602,10 @@
   .slider-item {
     flex: 0 1 100%;
     min-width: auto;
+  }
+
+  .wine-region {
+    font-size: 0.8rem;
   }
 }
 

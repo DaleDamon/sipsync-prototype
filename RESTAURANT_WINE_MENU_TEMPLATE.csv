@@ -1,0 +1,15 @@
+year,producer,varietal,region,type,price,acidity,tannins,bodyWeight,sweetnessLevel,flavorProfile
+2019,Caymus,Cabernet Sauvignon,Napa Valley - CA,red,65,medium,high,full,dry,"oak, cherry, spice"
+2020,Cakebread,Chardonnay,Napa Valley - CA,white,45,high,low,full,dry,"citrus, vanilla, oak"
+,Veuve Clicquot,Champagne Brut,Reims - France,sparkling,65,high,low,medium,dry,"citrus, floral"
+2021,Moscato,Moscato d'Asti,Piedmont - Italy,sparkling,28,medium,low,light,sweet,"citrus, honey"
+2020,Domaine Willamette,Pinot Noir,Willamette Valley - OR,red,58,medium,medium,medium,dry,"cherry, berry, earthy"
+2021,Cloudy Bay,Sauvignon Blanc,Marlborough - New Zealand,white,45,high,low,light,dry,"citrus, herbaceous, floral"
+2019,Antinori,Chianti Classico,Tuscany - Italy,red,52,medium,medium,full,dry,"cherry, spice, earthy"
+2021,Whispering Angel,Provence Rosé,Provence - France,rosé,38,medium,low,light,dry,"strawberry, citrus, floral"
+2019,Ceretto,Barbera d'Alba,Piedmont - Italy,red,48,medium,medium,full,dry,"berry, spice, chocolate"
+2021,Sella & Mosca,Vermentino,Sardinia - Italy,white,35,high,low,light,dry,"citrus, mineral"
+2018,Gaja,Nebbiolo,Piedmont - Italy,red,75,medium,high,full,dry,"cherry, tobacco, earthy"
+2010,Taylor Fladgate,Port,Douro - Portugal,dessert,48,low,low,medium,sweet,"chocolate, berry, vanilla"
+2023,House Brand,Red Blend,Local,red,18,medium,medium,medium,dry,"cherry, fruit"
+2023,House Brand,White Blend,Local,white,16,medium,low,light,dry,citrus

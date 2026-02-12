@@ -122,6 +122,15 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
 
   const debounceTimer = useRef(null);
 
+  // Helper function to get display name for wines
+  const getWineDisplayName = (wine) => {
+    const parts = [];
+    if (wine.year && wine.year.trim()) parts.push(wine.year);
+    if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
+    if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
+    return parts.join(' ') || wine.name || 'Unnamed Wine';
+  };
+
   // Fetch restaurants on mount and load saved preferences
   useEffect(() => {
     fetchRestaurants();
@@ -340,7 +349,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
           restaurantId: selectedRestaurant,
           wineId: wine.wineId,
           matchScore: wine.matchScore,
-          wineName: wine.name,
+          wineName: getWineDisplayName(wine),
           restaurantName: restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || ''
         }),
       });
@@ -628,9 +637,18 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
             {matches.map((wine) => (
               <div key={wine.wineId} className="wine-card">
                 <div className="wine-header">
-                  <h4>{wine.name}</h4>
+                  <h4>
+                    {wine.year && `${wine.year} `}
+                    {wine.producer} {wine.varietal}
+                  </h4>
                   <span className="match-score">{(wine.matchScore * 100).toFixed(0)}% match</span>
                 </div>
+                {wine.region && (
+                  <p className="wine-region">
+                    <span className="region-icon">📍</span>
+                    {wine.region}
+                  </p>
+                )}
                 <p className="wine-type">{wine.type}</p>
                 <p className="wine-price">${wine.price}</p>
                 <div className="wine-details">

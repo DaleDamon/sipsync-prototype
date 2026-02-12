@@ -8,6 +8,10 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
   try {
     const { restaurantId } = req.params;
     const {
+      year,
+      producer,
+      varietal,
+      region,
       name,
       type,
       acidity,
@@ -18,8 +22,32 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
       price,
     } = req.body;
 
-    if (!name || !type) {
-      return res.status(400).json({ error: 'Wine name and type are required' });
+    // Support both new format (producer/varietal) and old format (name)
+    const hasNewFormat = producer || varietal;
+    const hasOldFormat = name;
+
+    if (!type) {
+      return res.status(400).json({ error: 'Wine type is required' });
+    }
+
+    // Validate new format fields if provided
+    if (hasNewFormat) {
+      if (!producer || !producer.trim()) {
+        return res.status(400).json({ error: 'Producer is required' });
+      }
+
+      if (!varietal || !varietal.trim()) {
+        return res.status(400).json({ error: 'Varietal is required' });
+      }
+
+      if (!region || !region.trim()) {
+        return res.status(400).json({ error: 'Region is required' });
+      }
+    } else if (!hasOldFormat) {
+      // If neither new nor old format provided, error
+      return res.status(400).json({
+        error: 'Either provide (producer, varietal, region) or (name) field'
+      });
     }
 
     // Validate wine type
@@ -73,7 +101,16 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
     }
 
     const wine = {
-      name,
+      // New format fields (if provided)
+      ...(hasNewFormat && {
+        year: year || '',
+        producer: producer.trim(),
+        varietal: varietal.trim(),
+        region: region.trim(),
+      }),
+      // Old format field (if provided, for backward compatibility)
+      ...(hasOldFormat && { name }),
+      // Common fields
       type,
       acidity: acidity || 'medium',
       tannins: tannins || 'medium',

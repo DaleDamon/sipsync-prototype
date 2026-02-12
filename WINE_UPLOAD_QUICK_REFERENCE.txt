@@ -1,0 +1,179 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    SipSync WINE MENU UPLOAD - QUICK REFERENCE                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REQUIRED FIELDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. NAME (Wine name)
+   Example: "Cabernet Sauvignon 2019"
+
+2. TYPE (Must be exactly one)
+   ├─ red
+   ├─ white
+   ├─ rosé
+   ├─ sparkling
+   └─ dessert
+
+3. PRICE (USD, numbers only)
+   Examples: 18, 45, 65, 350
+   ✓ 65        ✓ 18.50
+   ✗ $65       ✗ 65.00 USD
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OPTIONAL FIELDS (Leave blank if unknown)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACIDITY
+  ├─ low      (soft, smooth)
+  ├─ medium   (balanced)
+  └─ high     (bright, crisp)
+
+TANNINS
+  ├─ low      (smooth, silky)
+  ├─ medium   (balanced)
+  └─ high     (dry, gripping - mostly reds)
+
+BODY WEIGHT
+  ├─ light    (thin, delicate)
+  ├─ medium   (balanced)
+  └─ full     (heavy, rich)
+
+SWEETNESS LEVEL
+  ├─ dry      (no residual sugar)
+  ├─ medium   (slightly sweet)
+  └─ sweet    (dessert-like)
+
+FLAVOR PROFILE (choose multiple, comma-separated)
+  oak, cherry, citrus, berry, vanilla, spice, floral, chocolate,
+  earthy, tropical, herbal, honey
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXAMPLES BY WINE TYPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RED WINE
+  Name: Cabernet Sauvignon 2019
+  Type: red
+  Price: 65
+  Acidity: medium
+  Tannins: high
+  Body: full
+  Sweetness: dry
+  Flavors: oak, cherry, spice
+
+WHITE WINE
+  Name: Chardonnay 2020
+  Type: white
+  Price: 45
+  Acidity: high
+  Tannins: low
+  Body: full
+  Sweetness: dry
+  Flavors: citrus, vanilla, oak
+
+SPARKLING
+  Name: Champagne Brut
+  Type: sparkling
+  Price: 65
+  Acidity: high
+  Tannins: low
+  Body: medium
+  Sweetness: dry
+  Flavors: citrus, floral
+
+DESSERT
+  Name: Port 2010
+  Type: dessert
+  Price: 48
+  Acidity: low
+  Tannins: low
+  Body: medium
+  Sweetness: sweet
+  Flavors: chocolate, berry, vanilla
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CSV FORMAT (How to use in Excel/Google Sheets)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HEADER ROW (exactly as shown):
+name,type,price,acidity,tannins,bodyWeight,sweetnessLevel,flavorProfile
+
+EXAMPLE ROW:
+Cabernet Sauvignon 2019,red,65,medium,high,full,dry,"oak, cherry, spice"
+
+FLAVOR PROFILE RULES:
+  ✓ Single flavor:    oak
+  ✓ Multiple (CSV):   "oak, cherry, spice"   (with quotes)
+  ✓ Empty:            (leave blank)
+  ✗ Wrong:            oak, cherry, spice     (missing quotes)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMMON MISTAKES TO AVOID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Price: "$65" or "65.00 USD"     → Use: 65
+❌ Type: "Red Wine" or "RED"       → Use: red
+❌ Acidity: "super-high"           → Use: high
+❌ FlavorProfile: oak, cherry      → Use: "oak, cherry"
+❌ Missing required fields         → name, type, price MUST be present
+❌ Invalid flavor name: "fruity"   → Use approved list only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DEFAULT VALUES (if you leave optional fields blank)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+acidity:          medium
+tannins:          medium
+bodyWeight:       medium
+sweetnessLevel:   dry
+flavorProfile:    (empty)
+
+MINIMAL VALID ENTRY:
+  Name: House Red 2023
+  Type: red
+  Price: 18
+  (All other fields will use defaults above)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VALID FLAVOR NOTES (complete list)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ oak           ✓ cherry       ✓ citrus       ✓ berry
+✓ vanilla       ✓ spice        ✓ floral       ✓ chocolate
+✓ earthy        ✓ tropical     ✓ herbal       ✓ honey
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+UPLOAD STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Download template: RESTAURANT_WINE_MENU_TEMPLATE.csv
+
+2. Open in Excel or Google Sheets
+
+3. Fill in your wines:
+   - Row per wine
+   - Match column headers exactly
+
+4. Validate data:
+   ✓ All wines have name, type, price
+   ✓ Type is: red, white, rosé, sparkling, or dessert
+   ✓ Price is a number (no $)
+   ✓ Optional fields match allowed values
+   ✓ Flavors are in approved list
+
+5. Export as CSV:
+   Excel: File → Save As → CSV UTF-8
+   Google Sheets: File → Download → CSV
+
+6. Upload via API or contact support
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEED HELP?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+See full guide:  RESTAURANT_WINE_MENU_FORMAT.md
+View examples:   Look at current restaurant wines in system
+Contact:         support@sipsync.com
+

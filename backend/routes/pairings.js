@@ -47,10 +47,19 @@ function getDefaultFoodPairings(wineType) {
   return pairingsByType[normalizedType] || pairingsByType.dessert || pairingsByType.red;
 }
 
+// Helper function to get display name for wine (supports both old and new format)
+function getWineDisplayName(wine) {
+  const parts = [];
+  if (wine.year && wine.year.trim()) parts.push(wine.year);
+  if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
+  if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
+  return parts.join(' ') || wine.name || 'Unnamed Wine';
+}
+
 // Helper function to calculate match score between user preferences and wine
 function calculateMatchScore(userPreferences, wine) {
   console.log('\n=== MATCH SCORE CALCULATION ===');
-  console.log('Wine:', wine.name);
+  console.log('Wine:', getWineDisplayName(wine));
   console.log('User Preferences:', JSON.stringify(userPreferences, null, 2));
   console.log('Wine Data:', JSON.stringify({
     type: wine.type,

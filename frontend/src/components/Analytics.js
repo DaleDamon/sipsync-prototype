@@ -47,6 +47,14 @@ function Analytics({ user }) {
     }
   };
 
+  const getWineDisplayName = (wine) => {
+    const parts = [];
+    if (wine.year && wine.year.trim()) parts.push(wine.year);
+    if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
+    if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
+    return parts.join(' ') || wine.name || 'Unnamed Wine';
+  };
+
   if (loading) {
     return <div className="analytics-container"><p className="loading">Loading analytics...</p></div>;
   }
@@ -106,9 +114,15 @@ function Analytics({ user }) {
             {popularWines.map((wine, idx) => (
               <div key={idx} className="wine-card-analytics">
                 <div className="wine-header-analytics">
-                  <h4>{wine.name}</h4>
+                  <h4>{getWineDisplayName(wine)}</h4>
                   <span className="wine-type-badge">{wine.type}</span>
                 </div>
+                {wine.region && (
+                  <p className="wine-region">
+                    <span className="region-icon">📍</span>
+                    {wine.region}
+                  </p>
+                )}
                 <p className="wine-price">${wine.price}</p>
                 <p className="match-count">
                   🎯 {wine.matchCount} matches
