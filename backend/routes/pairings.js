@@ -176,9 +176,16 @@ router.post('/find', async (req, res) => {
 
     // Filter and sort by match score
     let matchedWines = scoredWines
+      .filter((wine) => {
+        // If wine type is specified, filter to only that type
+        if (userPreferences.wineType && userPreferences.wineType !== 'any') {
+          return wine.type === userPreferences.wineType;
+        }
+        return true; // If no type specified, include all wines
+      })
       .filter((wine) => wine.matchScore >= 0.6) // Only show wines with 60%+ match
       .sort((a, b) => b.matchScore - a.matchScore)
-      .slice(0, 10); // Return top 10 matches
+      .slice(0, 6); // Return top 6 matches
 
     // Fetch food pairings for each wine
     matchedWines = await Promise.all(
