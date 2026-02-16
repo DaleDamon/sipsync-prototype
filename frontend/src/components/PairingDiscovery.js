@@ -366,7 +366,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
   };
 
   const wineTypes = ['red', 'white', 'rosé', 'sparkling', 'dessert'];
-  const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral', 'chocolate', 'earthy', 'tropical', 'herbal', 'honey'];
+  const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral', 'chocolate', 'earthy', 'tropical', 'herbal', 'honey', 'pear'];
 
   return (
     <div className="discovery-container">

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SipSync Wine Menu Upload - Quick Reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #8B0000 0%, #4a0000 100%);
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #8B0000;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #8B0000;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #8B0000;
+            box-shadow: 0 5px 15px rgba(139,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #8B0000;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-left: 4px solid #8B0000;
+            padding-left: 12px;
+        }
+
+        .card ul, .card ol {
+            margin-left: 20px;
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #8B0000;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #8B0000;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #555;
+            font-size: 1.15em;
+            margin-top: 15px;
+            margin-bottom: 12px;
+        }
+
+        .field-group {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #8B0000;
+        }
+
+        .field-group strong {
+            color: #8B0000;
+            font-size: 1.05em;
+        }
+
+        .field-group p {
+            color: #666;
+            margin-top: 8px;
+            margin-left: 15px;
+        }
+
+        .correct {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .example-box {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th {
+            background: #8B0000;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:nth-child(even) {
+            background: white;
+        }
+
+        table tr:nth-child(odd) {
+            background: #f9f9f9;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ff9800;
+            margin: 15px 0;
+        }
+
+        .danger {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #f44336;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+            margin: 15px 0;
+        }
+
+        .flavor-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .flavor-badge {
+            background: #8B0000;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        .column-2 {
+            column-count: 2;
+            column-gap: 30px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #8B0000;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .card {
+                page-break-inside: avoid;
+            }
+            .section {
+                page-break-inside: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .flavor-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍷 SipSync Wine Menu Upload</h1>
+            <p>Quick Reference Guide for Restaurant Partners</p>
+        </div>
+
+        <div class="section">
+            <h2>📌 Required Fields (What You MUST Fill In)</h2>
+
+            <div class="field-group">
+                <strong>1. YEAR (Vintage Year)</strong>
+                <p>The year the wine was produced. Can be blank for non-vintage wines.</p>
+                <p>Examples: <span class="correct">✓ 2019</span> | <span class="correct">✓ (blank for non-vintage)</span> | <span class="incorrect">✗ "twenty nineteen"</span></p>
+            </div>
+
+            <div class="field-group">
+                <strong>2. PRODUCER (Winery/Brand Name)</strong>
+                <p>The company that makes the wine. This field is REQUIRED.</p>
+                <p>Examples: <span class="correct">✓ Caymus</span> | <span class="correct">✓ Veuve Clicquot</span> | <span class="incorrect">✗ Unknown</span></p>
+            </div>
+
+            <div class="field-group">
+                <strong>3. VARIETAL (Grape Type)</strong>
+                <p>The type of grape used. This field is REQUIRED.</p>
+                <p>Examples: <span class="correct">✓ Cabernet Sauvignon</span> | <span class="correct">✓ Chardonnay</span> | <span class="incorrect">✗ Red Wine</span></p>
+            </div>
+
+            <div class="field-group">
+                <strong>4. REGION (Location)</strong>
+                <p>Where the wine comes from. This field is REQUIRED.</p>
+                <p>Examples: <span class="correct">✓ Napa Valley - CA</span> | <span class="correct">✓ Reims - France</span> | <span class="incorrect">✗ (blank)</span></p>
+            </div>
+
+            <div class="field-group">
+                <strong>5. TYPE (Wine Category)</strong>
+                <p>The style of wine. Choose exactly one:</p>
+                <p style="margin-left: 25px;">
+                    <span class="correct">✓ red</span> |
+                    <span class="correct">✓ white</span> |
+                    <span class="correct">✓ rosé</span> |
+                    <span class="correct">✓ sparkling</span> |
+                    <span class="correct">✓ dessert</span>
+                </p>
+            </div>
+
+            <div class="field-group">
+                <strong>6. PRICE (Cost in USD)</strong>
+                <p>The price per bottle. Numbers only, no currency symbol.</p>
+                <p>Examples: <span class="correct">✓ 65</span> | <span class="correct">✓ 18.50</span> | <span class="incorrect">✗ $65</span> | <span class="incorrect">✗ 65.00 USD</span></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🍇 Optional Fields (Nice to Have)</h2>
+
+            <div class="grid-container">
+                <div class="card">
+                    <h3>Acidity</h3>
+                    <ul>
+                        <li><strong>Low:</strong> Soft, smooth</li>
+                        <li><strong>Medium:</strong> Balanced</li>
+                        <li><strong>High:</strong> Bright, crisp</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Tannins</h3>
+                    <ul>
+                        <li><strong>Low:</strong> Smooth, silky</li>
+                        <li><strong>Medium:</strong> Balanced</li>
+                        <li><strong>High:</strong> Dry, gripping (mostly reds)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Body Weight</h3>
+                    <ul>
+                        <li><strong>Light:</strong> Thin, delicate</li>
+                        <li><strong>Medium:</strong> Balanced</li>
+                        <li><strong>Full:</strong> Heavy, rich</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Sweetness Level</h3>
+                    <ul>
+                        <li><strong>Dry:</strong> No residual sugar</li>
+                        <li><strong>Medium:</strong> Slightly sweet</li>
+                        <li><strong>Sweet:</strong> Dessert-like</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Flavor Profile (Choose Multiple)</h3>
+            <div class="flavor-list">
+                <div class="flavor-badge">oak</div>
+                <div class="flavor-badge">cherry</div>
+                <div class="flavor-badge">citrus</div>
+                <div class="flavor-badge">berry</div>
+                <div class="flavor-badge">vanilla</div>
+                <div class="flavor-badge">spice</div>
+                <div class="flavor-badge">floral</div>
+                <div class="flavor-badge">chocolate</div>
+                <div class="flavor-badge">earthy</div>
+                <div class="flavor-badge">tropical</div>
+                <div class="flavor-badge">herbal</div>
+                <div class="flavor-badge">honey</div>
+                <div class="flavor-badge">pear</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 CSV Format (Excel/Google Sheets)</h2>
+
+            <h3>Header Row (Copy This Exactly)</h3>
+            <div class="example-box">
+year,producer,varietal,region,type,price,acidity,tannins,bodyWeight,sweetnessLevel,flavorProfile
+            </div>
+
+            <h3>Example Data Rows</h3>
+            <div class="example-box">
+2019,Caymus,Cabernet Sauvignon,Napa Valley - CA,red,65,medium,high,full,dry,"oak, cherry, spice"
+,Veuve Clicquot,Champagne Brut,Reims - France,sparkling,65,high,low,medium,dry,"citrus, floral"
+            </div>
+
+            <h3>CSV Rules</h3>
+            <ul>
+                <li><strong>Multiple flavors:</strong> Use quotes: <code>"oak, cherry, spice"</code></li>
+                <li><strong>Single flavor:</strong> <code>oak</code> (no quotes)</li>
+                <li><strong>Leave cell empty:</strong> For blank year or missing optional fields</li>
+                <li><strong>No special characters:</strong> Use simple text only</li>
+            </ul>
+        </div>
+
+        <div class="danger">
+            <h3>❌ Common Mistakes to Avoid</h3>
+            <ul>
+                <li>Price: "$65" or "65.00 USD" → <span class="correct">Use: 65</span></li>
+                <li>Type: "Red Wine" or "RED" → <span class="correct">Use: red</span></li>
+                <li>Acidity: "super-high" → <span class="correct">Use: high</span></li>
+                <li>Flavors: oak, cherry (no quotes) → <span class="correct">Use: "oak, cherry"</span></li>
+                <li>Missing producer/varietal/region → <span class="correct">REQUIRED - do not skip</span></li>
+                <li>Invalid flavor name: "fruity" → <span class="correct">Use approved list only</span></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📋 Upload Process (6 Easy Steps)</h2>
+
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Download Template</strong>
+                <p>Get <code>RESTAURANT_WINE_MENU_TEMPLATE.csv</code> which has the correct headers and examples.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Open in Excel or Google Sheets</strong>
+                <p>Import the template into your favorite spreadsheet application.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Fill in Your Wines</strong>
+                <p>One wine per row. Match the column headers exactly. Year can be blank for non-vintage.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Validate Your Data</strong>
+                <p>Check that all required fields are filled and all values match the approved lists.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>Export as CSV</strong>
+                <p><strong>Excel:</strong> File → Save As → CSV UTF-8<br>
+                <strong>Google Sheets:</strong> File → Download → Comma Separated Values (.csv)</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">6</span>
+                <strong>Upload to SipSync</strong>
+                <p>Use the API endpoint or contact our support team to upload your wine list.</p>
+            </div>
+        </div>
+
+        <div class="success">
+            <h3>✓ How Your Wines Will Display</h3>
+            <p><strong>Vintage wine example:</strong> "2019 Caymus Cabernet Sauvignon" with 📍 Napa Valley - CA</p>
+            <p><strong>Non-vintage example:</strong> "Veuve Clicquot Champagne Brut" with 📍 Reims - France</p>
+            <p>The system automatically concatenates your fields for a beautiful, professional display!</p>
+        </div>
+
+        <div class="section">
+            <h2>✓ Default Values (If You Leave Fields Blank)</h2>
+            <table>
+                <tr>
+                    <th>Field</th>
+                    <th>Default Value</th>
+                </tr>
+                <tr>
+                    <td>acidity</td>
+                    <td>"medium"</td>
+                </tr>
+                <tr>
+                    <td>tannins</td>
+                    <td>"medium"</td>
+                </tr>
+                <tr>
+                    <td>bodyWeight</td>
+                    <td>"medium"</td>
+                </tr>
+                <tr>
+                    <td>sweetnessLevel</td>
+                    <td>"dry"</td>
+                </tr>
+                <tr>
+                    <td>flavorProfile</td>
+                    <td>(empty list)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="highlight">
+            <h3>💡 Pro Tips</h3>
+            <ol>
+                <li><strong>Use CSV:</strong> Most restaurant staff are comfortable with Excel</li>
+                <li><strong>Be specific with regions:</strong> "Napa Valley - CA" is better than "California"</li>
+                <li><strong>Keep it focused:</strong> 3-5 flavors per wine is ideal</li>
+                <li><strong>Test first:</strong> Try uploading one wine, then do batch uploads</li>
+                <li><strong>Update seasonally:</strong> Add new wines, remove out-of-stock items regularly</li>
+            </ol>
+        </div>
+
+        <footer>
+            <p><strong>SipSync Wine Menu Upload Quick Reference</strong> | Updated February 2026</p>
+            <p>Questions? Contact us at <strong>support@sipsync.com</strong></p>
+            <p>📖 For detailed information, see: RESTAURANT_WINE_MENU_FORMAT.md</p>
+        </footer>
+    </div>
+</body>
+</html>
