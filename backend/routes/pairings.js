@@ -179,13 +179,17 @@ router.post('/find', async (req, res) => {
       .filter((wine) => {
         // If wine type is specified, filter to only that type
         if (userPreferences.wineType && userPreferences.wineType !== 'any') {
+          console.log(`[FILTER] Checking wine type: ${wine.type} vs ${userPreferences.wineType}`);
           return wine.type === userPreferences.wineType;
         }
         return true; // If no type specified, include all wines
       })
       .filter((wine) => wine.matchScore >= 0.6) // Only show wines with 60%+ match
-      .sort((a, b) => b.matchScore - a.matchScore)
-      .slice(0, 6); // Return top 6 matches
+      .sort((a, b) => b.matchScore - a.matchScore);
+
+    console.log(`[PAIRINGS] Before slice: ${matchedWines.length} wines`);
+    matchedWines = matchedWines.slice(0, 6); // Return top 6 matches
+    console.log(`[PAIRINGS] After slice: ${matchedWines.length} wines`);
 
     // Fetch food pairings for each wine
     matchedWines = await Promise.all(
@@ -254,6 +258,11 @@ router.post('/find', async (req, res) => {
       userPreferences,
       matches: matchedWines,
       totalMatches: matchedWines.length,
+      _debug: {
+        sliceLimit: 6,
+        actualCount: matchedWines.length,
+        codeVersion: '2025-02-16-optimized'
+      }
     });
   } catch (error) {
     console.error('Error finding pairings:', error);
