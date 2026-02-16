@@ -13,7 +13,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
     bodyWeight: 'medium',
     flavorNotes: [],
     sweetness: 'dry',
-    priceRange: { min: 20, max: 100 },
+    priceRange: { min: 0, max: 100 },
   };
 
   // Mapping from quiz profiles to wine preferences
@@ -25,7 +25,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'full',
       flavorNotes: ['oak', 'spice', 'cherry'],
       sweetness: 'dry',
-      priceRange: { min: 20, max: 150 },
+      priceRange: { min: 0, max: 150 },
     },
     'medium-bodied-red-aficionado': {
       wineType: 'red',
@@ -34,7 +34,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'medium',
       flavorNotes: ['cherry', 'berry', 'vanilla'],
       sweetness: 'medium',
-      priceRange: { min: 20, max: 100 },
+      priceRange: { min: 0, max: 100 },
     },
     'spiced-red-connoisseur': {
       wineType: 'red',
@@ -43,7 +43,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'full',
       flavorNotes: ['spice', 'cherry', 'oak'],
       sweetness: 'dry',
-      priceRange: { min: 20, max: 120 },
+      priceRange: { min: 0, max: 120 },
     },
     'light-bodied-red-devotee': {
       wineType: 'red',
@@ -52,7 +52,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'light',
       flavorNotes: ['berry', 'floral', 'citrus'],
       sweetness: 'dry',
-      priceRange: { min: 15, max: 80 },
+      priceRange: { min: 0, max: 80 },
     },
     'crisp-acidic-white-enthusiast': {
       wineType: 'white',
@@ -61,7 +61,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'light',
       flavorNotes: ['citrus', 'floral'],
       sweetness: 'dry',
-      priceRange: { min: 15, max: 80 },
+      priceRange: { min: 0, max: 80 },
     },
     'full-bodied-white-aficionado': {
       wineType: 'white',
@@ -70,7 +70,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'full',
       flavorNotes: ['oak', 'vanilla'],
       sweetness: 'dry',
-      priceRange: { min: 25, max: 150 },
+      priceRange: { min: 0, max: 150 },
     },
     'aromatic-white-connoisseur': {
       wineType: 'white',
@@ -79,7 +79,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'medium',
       flavorNotes: ['floral', 'citrus', 'spice'],
       sweetness: 'medium',
-      priceRange: { min: 20, max: 100 },
+      priceRange: { min: 0, max: 100 },
     },
     'fruit-forward-white-devotee': {
       wineType: 'white',
@@ -88,7 +88,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'medium',
       flavorNotes: ['citrus', 'berry'],
       sweetness: 'medium',
-      priceRange: { min: 15, max: 90 },
+      priceRange: { min: 0, max: 90 },
     },
     'sparkling-wine-enthusiast': {
       wineType: 'sparkling',
@@ -97,7 +97,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'light',
       flavorNotes: ['citrus', 'floral'],
       sweetness: 'dry',
-      priceRange: { min: 15, max: 100 },
+      priceRange: { min: 0, max: 100 },
     },
     'dessert-wine-aficionado': {
       wineType: 'dessert',
@@ -106,7 +106,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       bodyWeight: 'medium',
       flavorNotes: ['berry', 'vanilla'],
       sweetness: 'sweet',
-      priceRange: { min: 15, max: 120 },
+      priceRange: { min: 0, max: 120 },
     },
   };
 
