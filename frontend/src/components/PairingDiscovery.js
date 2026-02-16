@@ -244,7 +244,12 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
 
       // Load most recent saved preferences (manual adjustments from user)
       if (data.savedPreferences && data.savedPreferences.length > 0) {
-        setPreferences(data.savedPreferences[0]);
+        const savedPrefs = data.savedPreferences[0];
+        // Update outdated price minimum (was previously 15-25, now should be 0)
+        if (savedPrefs.priceRange && savedPrefs.priceRange.min > 0) {
+          savedPrefs.priceRange.min = 0;
+        }
+        setPreferences(savedPrefs);
       } else {
         // No saved preferences, use defaults (but user may have quiz profile to apply)
         setPreferences(defaultPreferences);
