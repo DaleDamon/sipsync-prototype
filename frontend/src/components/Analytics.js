@@ -123,7 +123,7 @@ function Analytics({ user }) {
       {preferencesTrends && (
         <section className="analytics-section">
           <h3>👥 User Preference Trends</h3>
-          <p className="section-subtitle">What SipSync users prefer most</p>
+          <p className="section-subtitle">Based on confirmed wine selections</p>
           <div className="preferences-grid">
             <div className="preference-card">
               <h4>🫗 Acidity</h4>
@@ -138,8 +138,8 @@ function Analytics({ user }) {
                         className="preference-bar"
                         style={{
                           width: `${
-                            preferencesTrends.trends.totalUsers > 0
-                              ? (count / preferencesTrends.trends.totalUsers) * 100
+                            preferencesTrends.totalSelections > 0
+                              ? (count / preferencesTrends.totalSelections) * 100
                               : 0
                           }%`,
                         }}
@@ -164,8 +164,8 @@ function Analytics({ user }) {
                         className="preference-bar"
                         style={{
                           width: `${
-                            preferencesTrends.trends.totalUsers > 0
-                              ? (count / preferencesTrends.trends.totalUsers) * 100
+                            preferencesTrends.totalSelections > 0
+                              ? (count / preferencesTrends.totalSelections) * 100
                               : 0
                           }%`,
                         }}
@@ -190,8 +190,8 @@ function Analytics({ user }) {
                         className="preference-bar"
                         style={{
                           width: `${
-                            preferencesTrends.trends.totalUsers > 0
-                              ? (count / preferencesTrends.trends.totalUsers) * 100
+                            preferencesTrends.totalSelections > 0
+                              ? (count / preferencesTrends.totalSelections) * 100
                               : 0
                           }%`,
                         }}
@@ -202,6 +202,34 @@ function Analytics({ user }) {
                 ))}
               </div>
             </div>
+
+            {preferencesTrends.trends.sweetnessLevel && (
+            <div className="preference-card">
+              <h4>🍬 Sweetness</h4>
+              <div className="preference-breakdown">
+                {Object.entries(preferencesTrends.trends.sweetnessLevel).map(([level, count]) => (
+                  <div key={level} className="preference-item">
+                    <span className="preference-label">
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </span>
+                    <div className="preference-bar-container">
+                      <div
+                        className="preference-bar"
+                        style={{
+                          width: `${
+                            preferencesTrends.totalSelections > 0
+                              ? (count / preferencesTrends.totalSelections) * 100
+                              : 0
+                          }%`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="preference-count">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            )}
           </div>
 
           {Object.keys(preferencesTrends.trends.wineTypes).length > 0 && (
@@ -215,7 +243,7 @@ function Analytics({ user }) {
                       <span className="wine-type-name">
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </span>
-                      <span className="wine-type-badge-count">{count} users</span>
+                      <span className="wine-type-badge-count">{count} selection{count !== 1 ? 's' : ''}</span>
                     </div>
                   ))}
               </div>

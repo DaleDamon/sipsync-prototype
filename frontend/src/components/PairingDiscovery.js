@@ -416,7 +416,12 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
           wineId: wine.wineId,
           matchScore: wine.matchScore,
           wineName: getWineDisplayName(wine),
-          restaurantName: restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || ''
+          restaurantName: restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || '',
+          wineType: wine.type || '',
+          acidity: wine.acidity || '',
+          tannins: wine.tannins || '',
+          bodyWeight: wine.bodyWeight || '',
+          sweetnessLevel: wine.sweetnessLevel || ''
         }),
       });
 

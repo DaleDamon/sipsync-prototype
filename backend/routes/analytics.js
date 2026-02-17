@@ -189,7 +189,7 @@ router.get('/restaurant-stats', async (req, res) => {
 });
 
 // GET /api/analytics/preference-trends
-// Get the most common user preference patterns
+// Get preference trends based on actual wine selections (Confirm Selection clicks)
 router.get('/preference-trends', async (req, res) => {
   try {
     const usersSnapshot = await db.collection('users').get();
@@ -197,35 +197,48 @@ router.get('/preference-trends', async (req, res) => {
       acidity: { low: 0, medium: 0, high: 0 },
       tannins: { low: 0, medium: 0, high: 0 },
       bodyWeight: { light: 0, medium: 0, full: 0 },
+      sweetnessLevel: { dry: 0, medium: 0, sweet: 0 },
       wineTypes: {},
-      totalUsers: usersSnapshot.size,
     };
+    let totalSelections = 0;
 
-    usersSnapshot.forEach((userDoc) => {
-      const user = userDoc.data();
-      if (user.savedPreferences && user.savedPreferences.length > 0) {
-        const prefs = user.savedPreferences[0];
+    // Iterate through all users' pairing history (confirmed selections)
+    for (const userDoc of usersSnapshot.docs) {
+      const pairingHistorySnapshot = await db
+        .collection('users')
+        .doc(userDoc.id)
+        .collection('pairing_history')
+        .get();
 
-        if (prefs.acidity && trends.acidity[prefs.acidity] !== undefined) {
-          trends.acidity[prefs.acidity] += 1;
+      pairingHistorySnapshot.forEach((pairingDoc) => {
+        const pairing = pairingDoc.data();
+        totalSelections++;
+
+        if (pairing.acidity && trends.acidity[pairing.acidity] !== undefined) {
+          trends.acidity[pairing.acidity] += 1;
         }
-        if (prefs.tannins && trends.tannins[prefs.tannins] !== undefined) {
-          trends.tannins[prefs.tannins] += 1;
+        if (pairing.tannins && trends.tannins[pairing.tannins] !== undefined) {
+          trends.tannins[pairing.tannins] += 1;
         }
-        if (prefs.bodyWeight && trends.bodyWeight[prefs.bodyWeight] !== undefined) {
-          trends.bodyWeight[prefs.bodyWeight] += 1;
+        if (pairing.bodyWeight && trends.bodyWeight[pairing.bodyWeight] !== undefined) {
+          trends.bodyWeight[pairing.bodyWeight] += 1;
         }
-        if (prefs.wineType && prefs.wineType !== 'any') {
-          trends.wineTypes[prefs.wineType] = (trends.wineTypes[prefs.wineType] || 0) + 1;
+        if (pairing.sweetnessLevel && trends.sweetnessLevel[pairing.sweetnessLevel] !== undefined) {
+          trends.sweetnessLevel[pairing.sweetnessLevel] += 1;
         }
-      }
-    });
+        if (pairing.wineType) {
+          trends.wineTypes[pairing.wineType] = (trends.wineTypes[pairing.wineType] || 0) + 1;
+        }
+      });
+    }
 
     res.json({
       trends,
+      totalSelections,
       mostPopularAcidity: Object.entries(trends.acidity).sort((a, b) => b[1] - a[1])[0],
       mostPopularTannins: Object.entries(trends.tannins).sort((a, b) => b[1] - a[1])[0],
       mostPopularBodyWeight: Object.entries(trends.bodyWeight).sort((a, b) => b[1] - a[1])[0],
+      mostPopularSweetness: Object.entries(trends.sweetnessLevel).sort((a, b) => b[1] - a[1])[0],
       mostPopularWineType: Object.entries(trends.wineTypes).sort((a, b) => b[1] - a[1])[0],
     });
   } catch (error) {

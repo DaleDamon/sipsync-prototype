@@ -27,7 +27,10 @@ router.post('/send-verification', async (req, res) => {
     }
 
     // Generate a 6-digit verification code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // In test mode (no Twilio), use fixed code so testers can easily sign in
+    const code = twilioClient
+      ? Math.floor(100000 + Math.random() * 900000).toString()
+      : '123456';
 
     // Store the code (expires in 10 minutes)
     verificationCodes[phoneNumber] = {
@@ -43,14 +46,12 @@ router.post('/send-verification', async (req, res) => {
         to: phoneNumber,
       });
     } else {
-      // For testing without Twilio, log the code
       console.log(`[TEST MODE] Verification code for ${phoneNumber}: ${code}`);
     }
 
     res.json({
       message: 'Verification code sent',
       phoneNumber,
-      testCode: twilioClient ? undefined : code, // Include code in test mode for testing
     });
   } catch (error) {
     console.error('Error sending verification:', error);
