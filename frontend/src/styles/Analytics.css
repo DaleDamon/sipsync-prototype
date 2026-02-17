@@ -507,76 +507,11 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .analytics-container {
-    padding: 20px 12px;
+    padding: 16px 12px;
   }
 
   .analytics-container h2 {
-    font-size: 24px;
-  }
-
-  .analytics-section h3 {
-    font-size: 20px;
-  }
-
-  .preferences-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .preference-item {
-    grid-template-columns: 65px 1fr 40px;
-    gap: 8px;
-  }
-
-  .preference-label {
-    font-size: 12px;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .stat-card {
-    padding: 15px;
-  }
-
-  .stat-value {
-    font-size: 28px;
-  }
-
-  .wine-type-cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .wines-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .pairings-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .preference-card {
-    padding: 15px;
-  }
-
-  .wine-preference-card {
-    padding: 15px;
-  }
-
-  .restaurants-list {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 400px) {
-  .analytics-container {
-    padding: 15px 8px;
-  }
-
-  .analytics-container h2 {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 6px;
   }
 
@@ -590,60 +525,136 @@
   }
 
   .analytics-section h3 {
-    font-size: 18px;
+    font-size: 19px;
+    padding-bottom: 10px;
   }
 
+  .section-subtitle {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  /* Stats - clean 2x2 grid */
   .stats-grid {
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .stat-card {
-    padding: 12px;
+    padding: 16px 12px;
+    border-radius: 8px;
   }
 
   .stat-value {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .stat-label {
-    font-size: 11px;
+    font-size: 12px;
   }
 
-  .preference-item {
-    grid-template-columns: 55px 1fr 35px;
-    gap: 6px;
-  }
-
-  .preference-label {
-    font-size: 11px;
-  }
-
-  .preference-bar-container {
-    height: 16px;
-  }
-
-  .preference-count {
-    font-size: 11px;
-  }
-
-  .wine-card-analytics {
-    padding: 15px;
-  }
-
-  .wine-header-analytics h4 {
-    font-size: 14px;
+  /* Wine type breakdown */
+  .wine-types-breakdown {
+    padding: 16px;
+    border-radius: 8px;
   }
 
   .wine-type-cards {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
 
   .wine-type-card {
-    padding: 10px;
+    padding: 12px 8px;
+  }
+
+  .wine-type-label {
+    font-size: 12px;
   }
 
   .wine-type-count {
     font-size: 20px;
+  }
+
+  /* Popular wines - single column, compact cards */
+  .wines-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .wine-card-analytics {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  .wine-header-analytics h4 {
+    font-size: 15px;
+  }
+
+  .match-count {
+    font-size: 14px;
+  }
+
+  /* Preference trend cards - single column */
+  .preferences-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .preference-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .preference-card h4 {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  /* Preference bars - readable labels */
+  .preference-item {
+    grid-template-columns: 70px 1fr 36px;
+    gap: 10px;
+  }
+
+  .preference-label {
+    font-size: 13px;
+  }
+
+  .preference-bar-container {
+    height: 22px;
+    border-radius: 11px;
+  }
+
+  .preference-count {
+    font-size: 13px;
+  }
+
+  /* Wine type preferences */
+  .wine-preference-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .wine-type-item {
+    padding: 12px;
+  }
+
+  .wine-type-name {
+    font-size: 14px;
+  }
+
+  .wine-type-badge-count {
+    font-size: 12px;
+  }
+
+  /* Pairings */
+  .pairings-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .restaurants-list {
+    grid-template-columns: 1fr;
   }
 }

@@ -200,29 +200,76 @@
 
 @media (max-width: 768px) {
   .profile-container {
-    padding: 20px 10px;
+    padding: 16px 12px;
   }
 
   .profile-header {
-    padding: 30px 20px;
+    padding: 24px 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
   }
 
   .profile-header h2 {
-    font-size: 28px;
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+
+  .user-info {
+    padding: 14px;
+  }
+
+  .user-name {
+    font-size: 18px;
+  }
+
+  .user-stats {
+    font-size: 13px;
+  }
+
+  .retake-quiz-btn {
+    min-height: 44px;
+    padding: 10px 20px;
+  }
+
+  .profile-content {
+    gap: 16px;
   }
 
   .section {
-    padding: 20px;
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .section h3 {
+    font-size: 18px;
+    margin-bottom: 14px;
   }
 
   .pairing-header,
   .restaurant-header {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .pairing-info h4,
+  .restaurant-info h4 {
+    font-size: 15px;
   }
 
   .match-score,
   .pairing-count {
     margin-left: 0;
+    align-self: flex-start;
+  }
+
+  .pairings-list,
+  .restaurants-list {
+    gap: 10px;
+  }
+
+  .pairing-card,
+  .restaurant-card {
+    padding: 14px;
+    border-radius: 8px;
   }
 }
