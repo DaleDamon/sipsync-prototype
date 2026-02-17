@@ -131,6 +131,54 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
     return parts.join(' ') || wine.name || 'Unnamed Wine';
   };
 
+  // Helper function to get color based on match percentage
+  const getMatchColor = (matchScore) => {
+    const percentage = matchScore * 100;
+    if (percentage > 87) return '#4CAF50'; // Green
+    if (percentage >= 70) return '#FFC107'; // Yellow
+    return '#FF6B6B'; // Red
+  };
+
+  // Circular progress indicator component
+  const CircularProgress = ({ percentage }) => {
+    const radius = 30;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+    const color = getMatchColor(percentage / 100);
+
+    return (
+      <svg width="70" height="70" viewBox="0 0 70 70" className="match-score-circle">
+        {/* Background circle */}
+        <circle cx="35" cy="35" r={radius} fill="none" stroke="#e0e0e0" strokeWidth="5" />
+        {/* Progress circle */}
+        <circle
+          cx="35"
+          cy="35"
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth="5"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          style={{ transition: 'stroke-dashoffset 0.3s ease' }}
+        />
+        {/* Text */}
+        <text
+          x="35"
+          y="40"
+          textAnchor="middle"
+          fontSize="18"
+          fontWeight="bold"
+          fill={color}
+          className="match-percentage-text"
+        >
+          {Math.round(percentage)}%
+        </text>
+      </svg>
+    );
+  };
+
   // Fetch restaurants on mount and load saved preferences
   useEffect(() => {
     fetchRestaurants();
@@ -646,7 +694,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
                     {wine.year && `${wine.year} `}
                     {wine.producer} {wine.varietal}
                   </h4>
-                  <span className="match-score">{(wine.matchScore * 100).toFixed(0)}% match</span>
+                  <CircularProgress percentage={wine.matchScore * 100} />
                 </div>
                 {wine.region && (
                   <p className="wine-region">

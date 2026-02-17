@@ -432,14 +432,15 @@
   flex: 1;
 }
 
-.match-score {
-  background-color: #d4af37;
-  color: #8b0000;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  white-space: nowrap;
+.match-score-circle {
+  flex-shrink: 0;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.match-percentage-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .wine-type {
