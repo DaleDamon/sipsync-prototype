@@ -41,14 +41,6 @@ function Analytics({ user }) {
     }
   };
 
-  const getWineDisplayName = (wine) => {
-    const parts = [];
-    if (wine.year && wine.year.trim()) parts.push(wine.year);
-    if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
-    if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
-    return parts.join(' ') || wine.name || 'Unnamed Wine';
-  };
-
   if (loading) {
     return <div className="analytics-container"><p className="loading">Loading analytics...</p></div>;
   }
@@ -103,33 +95,16 @@ function Analytics({ user }) {
       {popularWines.length > 0 && (
         <section className="analytics-section">
           <h3>⭐ Most Popular Wines</h3>
-          <p className="section-subtitle">Most frequently matched wines across all restaurants</p>
+          <p className="section-subtitle">Most frequently selected wines by users</p>
           <div className="wines-grid">
             {popularWines.map((wine, idx) => (
               <div key={idx} className="wine-card-analytics">
                 <div className="wine-header-analytics">
-                  <h4>{getWineDisplayName(wine)}</h4>
-                  <span className="wine-type-badge">{wine.type}</span>
+                  <h4>{wine.wineName}</h4>
                 </div>
-                {wine.region && (
-                  <p className="wine-region">
-                    <span className="region-icon">📍</span>
-                    {wine.region}
-                  </p>
-                )}
-                <p className="wine-price">${wine.price}</p>
                 <p className="match-count">
-                  🎯 {wine.matchCount} matches
+                  ❤️ {wine.selectionCount} selection{wine.selectionCount !== 1 ? 's' : ''}
                 </p>
-                {wine.flavorProfile && wine.flavorProfile.length > 0 && (
-                  <div className="flavor-tags-analytics">
-                    {wine.flavorProfile.map((flavor) => (
-                      <span key={flavor} className="flavor-tag-analytics">
-                        {flavor}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
           </div>
