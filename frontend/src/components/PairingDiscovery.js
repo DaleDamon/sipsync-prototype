@@ -223,7 +223,19 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
     try {
       const response = await fetch(`${API_URL}/restaurants`);
       const data = await response.json();
-      setRestaurants(data.restaurants || []);
+      const restaurantList = data.restaurants || [];
+      setRestaurants(restaurantList);
+
+      // Auto-select Quartino if available
+      if (restaurantList.length > 0) {
+        const quartino = restaurantList.find(r => r.name === 'Quartino');
+        if (quartino) {
+          setSelectedRestaurant(quartino);
+        } else if (restaurantList.length === 1) {
+          // Fallback: if only one restaurant, select it
+          setSelectedRestaurant(restaurantList[0]);
+        }
+      }
     } catch (err) {
       setError('Failed to fetch restaurants: ' + err.message);
     }
