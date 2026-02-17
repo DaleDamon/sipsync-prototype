@@ -119,6 +119,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
   const [hasQuiz, setHasQuiz] = useState(false); // Whether user has taken quiz
   const [showQuizBanner, setShowQuizBanner] = useState(false); // Whether to show quiz prompt banner
   const [activeInfoModal, setActiveInfoModal] = useState(null); // 'acidity', 'tannins', 'body', 'sweetness', or null
+  const [confirmationModal, setConfirmationModal] = useState(null); // {wineName, show} for wine selection confirmation
 
   const debounceTimer = useRef(null);
 
@@ -420,8 +421,15 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       });
 
       if (response.ok) {
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus(''), 2000);
+        // Show confirmation modal with wine name
+        setConfirmationModal({
+          wineName: getWineDisplayName(wine),
+          show: true
+        });
+        // Auto-close modal after 4 seconds
+        setTimeout(() => {
+          setConfirmationModal(null);
+        }, 4000);
       } else {
         setError('Failed to save pairing');
       }
@@ -438,6 +446,28 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
       <h2>Find Your Perfect Wine</h2>
 
       {error && <div className="error-message">{error}</div>}
+
+      {/* Wine Selection Confirmation Modal */}
+      {confirmationModal && (
+        <div className="modal-overlay" onClick={() => setConfirmationModal(null)}>
+          <div className="confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content">
+              <div className="modal-icon">🍷</div>
+              <h3>Wine Selected!</h3>
+              <p className="selected-wine">{confirmationModal.wineName}</p>
+              <p className="modal-message">
+                Enjoy your wine! We hope you love this pairing as much as we do. Cheers! 🍾
+              </p>
+              <button
+                className="modal-close-btn"
+                onClick={() => setConfirmationModal(null)}
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quiz Profile Banner */}
       {showQuizBanner && (
@@ -737,7 +767,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
                   className="save-pairing-btn"
                   onClick={() => savePairing(wine)}
                 >
-                  ♥ Save Pairing
+                  ♥ Confirm Selection
                 </button>
               </div>
             ))}
