@@ -767,38 +767,65 @@
     min-height: 44px;
   }
 
-  /* Info modal */
+  /* Info modal - mobile redesign */
   .info-modal {
-    max-width: 92%;
-    padding: 24px 18px;
+    max-width: 94%;
+    padding: 20px 16px;
   }
 
   .info-modal h2 {
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 16px;
   }
 
   .characteristic-explanation {
-    gap: 12px;
-    padding: 14px;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: none;
+    margin: 16px 0;
+  }
+
+  .char-left,
+  .char-right {
+    flex: 1;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
   }
 
   .char-left h3,
   .char-right h3 {
-    font-size: 14px;
+    font-size: 15px;
+    margin-bottom: 8px;
   }
 
   .char-left p,
   .char-right p {
     font-size: 12px;
+    line-height: 1.5;
   }
 
   .char-arrow {
-    font-size: 24px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    flex-shrink: 0;
   }
 
   .info-modal-close-btn {
-    top: 12px;
-    right: 12px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .info-modal .modal-btn.primary {
+    width: 100%;
+    min-height: 44px;
+    font-size: 15px;
   }
 }
 
@@ -1000,10 +1027,3 @@
   transform: scale(1.05);
 }
 
-/* Responsive for mobile */
-@media (max-width: 768px) {
-  .info-modal {
-    max-width: 90%;
-    padding: 24px;
-  }
-}

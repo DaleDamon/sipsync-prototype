@@ -7,6 +7,7 @@ import RestaurantMap from './components/RestaurantMap';
 import QRScanner from './components/QRScanner';
 import UserProfile from './components/UserProfile';
 import WineQuiz from './components/WineQuiz';
+import { API_URL } from './config';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -44,7 +45,7 @@ function App() {
   // Check if user has saved preferences
   const checkUserPreferences = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/user/${userId}`);
+      const response = await fetch(`${API_URL}/auth/user/${userId}`);
       if (response.ok) {
         const userData = await response.json();
         if (!userData.savedPreferences || userData.savedPreferences.length === 0) {
@@ -113,8 +114,9 @@ function App() {
         {user && (
           <div className="nav-menu">
             <button
-              className={`nav-btn ${currentScreen === 'discovery' ? 'active' : ''}`}
+              className={`nav-btn ${!showQuiz && currentScreen === 'discovery' ? 'active' : ''}`}
               onClick={() => {
+                setShowQuiz(false);
                 setCurrentScreen('discovery');
                 setPreSelectedRestaurant(null);
               }}
@@ -122,26 +124,26 @@ function App() {
               Find Wines
             </button>
             <button
-              className={`nav-btn ${currentScreen === 'map' ? 'active' : ''}`}
-              onClick={() => setCurrentScreen('map')}
+              className={`nav-btn ${!showQuiz && currentScreen === 'map' ? 'active' : ''}`}
+              onClick={() => { setShowQuiz(false); setCurrentScreen('map'); }}
             >
               Map
             </button>
             <button
-              className={`nav-btn ${currentScreen === 'analytics' ? 'active' : ''}`}
-              onClick={() => setCurrentScreen('analytics')}
+              className={`nav-btn ${!showQuiz && currentScreen === 'analytics' ? 'active' : ''}`}
+              onClick={() => { setShowQuiz(false); setCurrentScreen('analytics'); }}
             >
               Trending
             </button>
             <button
-              className={`nav-btn ${currentScreen === 'profile' ? 'active' : ''}`}
-              onClick={() => setCurrentScreen('profile')}
+              className={`nav-btn ${!showQuiz && currentScreen === 'profile' ? 'active' : ''}`}
+              onClick={() => { setShowQuiz(false); setCurrentScreen('profile'); }}
             >
               Profile
             </button>
             <button
               className={`nav-btn ${showQRScanner ? 'active' : ''}`}
-              onClick={() => setShowQRScanner(true)}
+              onClick={() => { setShowQuiz(false); setShowQRScanner(true); }}
             >
               Scan
             </button>
