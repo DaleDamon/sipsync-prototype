@@ -2,51 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
 
-// Helper function to generate default food pairings based on wine type
-function getDefaultFoodPairings(wineType) {
-  const pairingsByType = {
-    red: [
-      { name: 'Grilled Steak', description: 'Medium to full-bodied red wine pairs perfectly with a juicy grilled steak', pairing: 'Classic pairing that highlights both the wine and meat' },
-      { name: 'Roasted Lamb', description: 'Red wine complements the rich, savory flavors of roasted lamb', pairing: 'Traditional French bistro pairing' },
-      { name: 'Beef Burger', description: 'A quality red wine elevates a gourmet burger experience', pairing: 'Great for casual dining' },
-    ],
-    white: [
-      { name: 'Grilled Fish', description: 'White wine\'s acidity complements fresh grilled fish beautifully', pairing: 'Coastal Mediterranean tradition' },
-      { name: 'Pasta Alfredo', description: 'Creamy pasta sauces pair wonderfully with white wine', pairing: 'Italian classic combination' },
-      { name: 'Shrimp Scampi', description: 'Light white wine enhances garlic and butter flavors in shrimp', pairing: 'Sophisticated seafood pairing' },
-    ],
-    rosé: [
-      { name: 'Salad with Goat Cheese', description: 'Rosé\'s light fruitiness pairs with fresh salads and tangy cheese', pairing: 'Perfect summer lunch' },
-      { name: 'Grilled Chicken', description: 'Rosé is versatile enough for grilled chicken dishes', pairing: 'Balanced flavor combination' },
-      { name: 'Fruit Dessert', description: 'Rosé\'s sweetness complements fruit-based desserts', pairing: 'Delicate and refreshing' },
-    ],
-    sparkling: [
-      { name: 'Oysters', description: 'Sparkling wine\'s bubbles and acidity are perfect with fresh oysters', pairing: 'Classic French coastal pairing' },
-      { name: 'Caviar & Canapés', description: 'Champagne and caviar is the ultimate celebration pairing', pairing: 'Luxurious and elegant' },
-      { name: 'Appetizer Platter', description: 'Sparkling wine works with a variety of appetizers', pairing: 'Great for parties and celebrations' },
-    ],
-    dessert: [
-      { name: 'Chocolate Cake', description: 'Sweet dessert wines pair beautifully with rich chocolate desserts', pairing: 'Classic indulgent combination' },
-      { name: 'Crème Brûlée', description: 'The caramel and custard flavors complement dessert wine perfectly', pairing: 'Sophisticated French pairing' },
-      { name: 'Fruit Tart', description: 'Fruit-forward dessert wines enhance fresh fruit tarts', pairing: 'Light and elegant finish' },
-    ],
-  };
-
-  // Normalize wine type (handle special characters and case variations)
-  const normalizedType = wineType.toLowerCase()
-    .replace(/\u00e9/g, 'e')  // é to e
-    .replace(/\u00f4/g, 'o')  // ô to o
-    .replace(/[^\w]/g, '')    // Remove other special characters
-    .trim();
-
-  // Check for rosé variations
-  if (normalizedType.includes('rose') || normalizedType.includes('ros')) {
-    return pairingsByType.rosé;
-  }
-
-  return pairingsByType[normalizedType] || pairingsByType.dessert || pairingsByType.red;
-}
-
 // Helper function to get display name for wine (supports both old and new format)
 function getWineDisplayName(wine) {
   const parts = [];
@@ -190,68 +145,6 @@ router.post('/find', async (req, res) => {
     console.log(`[PAIRINGS] Before slice: ${matchedWines.length} wines`);
     matchedWines = matchedWines.slice(0, 6); // Return top 6 matches
     console.log(`[PAIRINGS] After slice: ${matchedWines.length} wines`);
-
-    // Fetch food pairings for each wine
-    matchedWines = await Promise.all(
-      matchedWines.map(async (wine) => {
-        const pairingsSnapshot = await db
-          .collection('restaurants')
-          .doc(restaurantId)
-          .collection('pairings')
-          .where('wineId', '==', wine.wineId)
-          .get();
-
-        // Sort by pairing score descending and limit to top 3
-        const pairingsDocs = pairingsSnapshot.docs
-          .sort((a, b) => (b.data().pairingScore || 0) - (a.data().pairingScore || 0))
-          .slice(0, 3);
-
-        let foodPairings = [];
-        for (const doc of pairingsDocs) {
-          const pairing = doc.data();
-          // Fetch food item details
-          const foodDoc = await db
-            .collection('restaurants')
-            .doc(restaurantId)
-            .collection('foodItems')
-            .doc(pairing.foodItemId)
-            .get();
-
-          if (foodDoc.exists) {
-            foodPairings.push({
-              pairingId: doc.id,
-              pairingScore: pairing.pairingScore,
-              pairingReason: pairing.pairingReason,
-              foodItem: {
-                foodItemId: pairing.foodItemId,
-                ...foodDoc.data(),
-              },
-            });
-          }
-        }
-
-        // If no food pairings found, generate default pairings for this wine type
-        if (foodPairings.length === 0) {
-          const defaultPairings = getDefaultFoodPairings(wine.type);
-          foodPairings = defaultPairings.map((pairing, index) => ({
-            pairingId: `default-${wine.wineId}-${index}`,
-            pairingScore: 8,
-            pairingReason: pairing.pairing,
-            foodItem: {
-              foodItemId: `default-${wine.wineId}-${index}`,
-              name: pairing.name,
-              description: pairing.description,
-            },
-            isDefault: true,
-          }));
-        }
-
-        return {
-          ...wine,
-          foodPairings,
-        };
-      })
-    );
 
     res.json({
       restaurantId,

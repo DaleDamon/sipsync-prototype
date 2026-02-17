@@ -303,6 +303,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'full-bodied-red-enthusiast',
         name: 'Full-Bodied Red Enthusiast',
         wineType: 'red',
+        dimensions: { acidity: 45, tannins: 90, body: 90, sweetness: 15, intensity: 75 },
         characteristics: {
           acidity: 'medium',
           tannins: 'high',
@@ -315,6 +316,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'medium-bodied-red-aficionado',
         name: 'Medium-Bodied Red Aficionado',
         wineType: 'red',
+        dimensions: { acidity: 60, tannins: 30, body: 45, sweetness: 30, intensity: 60 },
         characteristics: {
           acidity: 'medium',
           tannins: 'low',
@@ -327,6 +329,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'spiced-red-connoisseur',
         name: 'Spiced Red Connoisseur',
         wineType: 'red',
+        dimensions: { acidity: 45, tannins: 75, body: 90, sweetness: 15, intensity: 75 },
         characteristics: {
           acidity: 'medium',
           tannins: 'medium',
@@ -339,6 +342,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'light-bodied-red-devotee',
         name: 'Light-Bodied Red Devotee',
         wineType: 'red',
+        dimensions: { acidity: 75, tannins: 30, body: 30, sweetness: 15, intensity: 45 },
         characteristics: {
           acidity: 'high',
           tannins: 'low',
@@ -351,6 +355,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'crisp-acidic-white-enthusiast',
         name: 'Crisp & Acidic White Enthusiast',
         wineType: 'white',
+        dimensions: { acidity: 90, tannins: 15, body: 30, sweetness: 15, intensity: 75 },
         characteristics: {
           acidity: 'high',
           tannins: 'low',
@@ -363,6 +368,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'full-bodied-white-aficionado',
         name: 'Full-Bodied White Aficionado',
         wineType: 'white',
+        dimensions: { acidity: 45, tannins: 15, body: 90, sweetness: 15, intensity: 75 },
         characteristics: {
           acidity: 'low',
           tannins: 'low',
@@ -375,6 +381,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'aromatic-white-connoisseur',
         name: 'Aromatic White Connoisseur',
         wineType: 'white',
+        dimensions: { acidity: 60, tannins: 15, body: 45, sweetness: 60, intensity: 60 },
         characteristics: {
           acidity: 'medium',
           tannins: 'low',
@@ -387,6 +394,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'fruit-forward-white-devotee',
         name: 'Fruit-Forward White Devotee',
         wineType: 'white',
+        dimensions: { acidity: 45, tannins: 15, body: 45, sweetness: 60, intensity: 45 },
         characteristics: {
           acidity: 'medium',
           tannins: 'low',
@@ -399,6 +407,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'sparkling-wine-enthusiast',
         name: 'Sparkling Wine Enthusiast',
         wineType: 'sparkling',
+        dimensions: { acidity: 75, tannins: 15, body: 30, sweetness: 15, intensity: 45 },
         characteristics: {
           acidity: 'high',
           tannins: 'low',
@@ -411,6 +420,7 @@ router.post('/quiz/submit', async (req, res) => {
         id: 'dessert-wine-aficionado',
         name: 'Dessert Wine Aficionado',
         wineType: 'dessert',
+        dimensions: { acidity: 45, tannins: 45, body: 60, sweetness: 90, intensity: 75 },
         characteristics: {
           acidity: 'low',
           tannins: 'low',
@@ -421,69 +431,86 @@ router.post('/quiz/submit', async (req, res) => {
       }
     ];
 
-    // Scoring matrix: for each answer, which profiles get points
+    // Scoring matrix V5: Variable points (1/2/3) to reduce ties and create score differentiation
+    // Strong correlations get 3 points, standard get 2, weak get 1
+    // Core profiles: 13-14 max points | Rare profiles (SPK, DST): 10 max points
+    // This increases score granularity from 7 values (0-12) to 25+ possible values
     const scoringMatrix = [
-      // Q1: Coffee
-      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }, { id: 'spiced-red-connoisseur', points: 1 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 3 }, { id: 'full-bodied-white-aficionado', points: 2 }, { id: 'aromatic-white-connoisseur', points: 1 }],
-        2: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }] },
-      // Q2: Chocolate
-      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }, { id: 'spiced-red-connoisseur', points: 1 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 3 }],
-        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 1 }, { id: 'dessert-wine-aficionado', points: 2 }] },
-      // Q3: Tea
+      // Q1: Coffee (Black/Strong → Sweet/Skip)
       { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
-        1: [{ id: 'spiced-red-connoisseur', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
-        2: [{ id: 'dessert-wine-aficionado', points: 3 }, { id: 'fruit-forward-white-devotee', points: 2 }] },
-      // Q4: Citrus
-      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
-        1: [{ id: 'fruit-forward-white-devotee', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
-        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'full-bodied-red-enthusiast', points: 2 }] },
-      // Q5: Salad Dressing
-      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
-        2: [{ id: 'full-bodied-white-aficionado', points: 3 }] },
-      // Q6: Morning Drink
-      { 0: [{ id: 'sparkling-wine-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }],
-        1: [{ id: 'aromatic-white-connoisseur', points: 3 }],
-        2: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'dessert-wine-aficionado', points: 2 }] },
-      // Q7: Meal Preference
-      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
-        1: [{ id: 'spiced-red-connoisseur', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
-        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
-      // Q8: Soup
-      { 0: [{ id: 'full-bodied-white-aficionado', points: 2 }, { id: 'full-bodied-red-enthusiast', points: 2 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }],
-        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
-      // Q9: Pasta Sauce
-      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
-        1: [{ id: 'spiced-red-connoisseur', points: 3 }],
-        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }] },
-      // Q10: Dessert Lover
-      { 0: [{ id: 'dessert-wine-aficionado', points: 3 }],
-        1: [{ id: 'aromatic-white-connoisseur', points: 2 }, { id: 'medium-bodied-red-aficionado', points: 2 }],
-        2: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
-      // Q11: Beverage Sweetness
-      { 0: [{ id: 'dessert-wine-aficionado', points: 3 }],
-        1: [{ id: 'aromatic-white-connoisseur', points: 3 }],
-        2: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
-      // Q12: Spice Tolerance
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 2 }],
+        3: [{ id: 'fruit-forward-white-devotee', points: 2 }] },
+      // Q2: Chocolate (Dark → White)
       { 0: [{ id: 'spiced-red-connoisseur', points: 3 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'fruit-forward-white-devotee', points: 2 }],
-        2: [{ id: 'light-bodied-red-devotee', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }] },
-      // Q13: Herb Preference
-      { 0: [{ id: 'aromatic-white-connoisseur', points: 2 }, { id: 'light-bodied-red-devotee', points: 2 }],
-        1: [{ id: 'full-bodied-red-enthusiast', points: 2 }, { id: 'full-bodied-white-aficionado', points: 2 }],
-        2: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'crisp-acidic-white-enthusiast', points: 2 }] },
-      // Q14: Fruit Style
-      { 0: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }],
+        1: [{ id: 'full-bodied-white-aficionado', points: 2 }],
+        2: [{ id: 'aromatic-white-connoisseur', points: 2 }],
+        3: [{ id: 'dessert-wine-aficionado', points: 2 }] },
+      // Q3: Tea (Strong → Skip)
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 2 }],
+        1: [{ id: 'light-bodied-red-devotee', points: 3 }],
+        2: [{ id: 'fruit-forward-white-devotee', points: 2 }],
+        3: [{ id: 'aromatic-white-connoisseur', points: 2 }] },
+      // Q4: Acidity (Love → Prefer Mild)
+      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }],
+        1: [{ id: 'fruit-forward-white-devotee', points: 2 }],
+        2: [{ id: 'medium-bodied-red-aficionado', points: 2 }],
+        3: [{ id: 'full-bodied-white-aficionado', points: 2 }] },
+      // Q5: Salad Dressing (Vinaigrette → Rich Oil)
+      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }],
+        1: [{ id: 'sparkling-wine-enthusiast', points: 2 }],
+        2: [{ id: 'spiced-red-connoisseur', points: 2 }],
+        3: [{ id: 'full-bodied-white-aficionado', points: 3 }] },
+      // Q6: Morning Drink (Citrus → Hot Chocolate)
+      { 0: [{ id: 'sparkling-wine-enthusiast', points: 2 }],
         1: [{ id: 'fruit-forward-white-devotee', points: 3 }],
-        2: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'sparkling-wine-enthusiast', points: 2 }] },
-      // Q15: Occasion
-      { 0: [{ id: 'sparkling-wine-enthusiast', points: 3 }],
-        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }, { id: 'full-bodied-white-aficionado', points: 2 }],
-        2: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
-        3: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }, { id: 'aromatic-white-connoisseur', points: 2 }] }
+        2: [{ id: 'aromatic-white-connoisseur', points: 3 }],
+        3: [{ id: 'dessert-wine-aficionado', points: 2 }] },
+      // Q7: Meal (Beef → Pasta Cream)
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 3 }],
+        1: [{ id: 'spiced-red-connoisseur', points: 2 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 2 }],
+        3: [{ id: 'full-bodied-white-aficionado', points: 2 }] },
+      // Q8: Soup (Creamy → Clear Broth)
+      { 0: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 3 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 2 }],
+        3: [{ id: 'aromatic-white-connoisseur', points: 2 }] },
+      // Q9: Pasta Sauce (Meat → Light Oil)
+      { 0: [{ id: 'full-bodied-red-enthusiast', points: 2 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }],
+        2: [{ id: 'spiced-red-connoisseur', points: 3 }],
+        3: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q10: Dessert (Essential → Never)
+      { 0: [{ id: 'dessert-wine-aficionado', points: 2 }],
+        1: [{ id: 'aromatic-white-connoisseur', points: 2 }],
+        2: [{ id: 'sparkling-wine-enthusiast', points: 1 }],
+        3: [{ id: 'full-bodied-white-aficionado', points: 2 }] },
+      // Q11: Drink Sweetness (Very Sweet → Dry)
+      { 0: [{ id: 'dessert-wine-aficionado', points: 2 }],
+        1: [{ id: 'fruit-forward-white-devotee', points: 2 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 2 }],
+        3: [{ id: 'sparkling-wine-enthusiast', points: 2 }] },
+      // Q12: Spice (Maximum → None)
+      { 0: [{ id: 'spiced-red-connoisseur', points: 2 }],
+        1: [{ id: 'medium-bodied-red-aficionado', points: 2 }],
+        2: [{ id: 'crisp-acidic-white-enthusiast', points: 3 }],
+        3: [{ id: 'full-bodied-red-enthusiast', points: 2 }] },
+      // Q13: Flavor Profile (Herbaceous → Savory)
+      { 0: [{ id: 'aromatic-white-connoisseur', points: 2 }],
+        1: [{ id: 'sparkling-wine-enthusiast', points: 1 }],
+        2: [{ id: 'fruit-forward-white-devotee', points: 2 }],
+        3: [{ id: 'full-bodied-red-enthusiast', points: 2 }] },
+      // Q14: Fruit Type (Dark Berries → Citrus)
+      { 0: [{ id: 'spiced-red-connoisseur', points: 2 }],
+        1: [{ id: 'dessert-wine-aficionado', points: 1 }],
+        2: [{ id: 'light-bodied-red-devotee', points: 3 }],
+        3: [{ id: 'crisp-acidic-white-enthusiast', points: 2 }] },
+      // Q15: Dining Scenario (Celebration → Casual)
+      { 0: [{ id: 'sparkling-wine-enthusiast', points: 2 }],
+        1: [{ id: 'full-bodied-white-aficionado', points: 2 }],
+        2: [{ id: 'medium-bodied-red-aficionado', points: 3 }],
+        3: [{ id: 'dessert-wine-aficionado', points: 1 }] }
     ];
 
     // Calculate scores
@@ -499,16 +526,21 @@ router.post('/quiz/submit', async (req, res) => {
       }
     });
 
-    // Find winning profile
-    let winningProfileId = null;
+    // Find winning profile with random tie-breaking
     let maxScore = -1;
+    let tiedProfiles = [];
 
     for (const [profileId, score] of Object.entries(profileScores)) {
       if (score > maxScore) {
         maxScore = score;
-        winningProfileId = profileId;
+        tiedProfiles = [profileId];
+      } else if (score === maxScore) {
+        tiedProfiles.push(profileId);
       }
     }
+
+    // Randomly select from tied profiles for fair distribution
+    const winningProfileId = tiedProfiles[Math.floor(Math.random() * tiedProfiles.length)];
 
     // Get winning profile details
     const winningProfile = profiles.find(p => p.id === winningProfileId);
@@ -522,6 +554,7 @@ router.post('/quiz/submit', async (req, res) => {
       bodyWeight: winningProfile.characteristics.bodyWeight,
       sweetness: winningProfile.characteristics.sweetness,
       flavorNotes: winningProfile.characteristics.flavorNotes,
+      dimensions: winningProfile.dimensions,
       priceRange: { min: 20, max: 100 }
     };
 

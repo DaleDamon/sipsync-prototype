@@ -5,7 +5,6 @@ import { API_URL } from '../config';
 function Analytics({ user }) {
   const [stats, setStats] = useState(null);
   const [popularWines, setPopularWines] = useState([]);
-  const [topPairings, setTopPairings] = useState([]);
   const [preferencesTrends, setPreferencesTrends] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,10 +16,9 @@ function Analytics({ user }) {
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
-      const [statsRes, winesRes, pairingsRes, trendsRes] = await Promise.all([
+      const [statsRes, winesRes, trendsRes] = await Promise.all([
         fetch(`${API_URL}/analytics/restaurant-stats`),
         fetch(`${API_URL}/analytics/popular-wines`),
-        fetch(`${API_URL}/analytics/top-pairings`),
         fetch(`${API_URL}/analytics/preference-trends`),
       ]);
 
@@ -31,10 +29,6 @@ function Analytics({ user }) {
       if (winesRes.ok) {
         const winesData = await winesRes.json();
         setPopularWines(winesData.popularWines || []);
-      }
-      if (pairingsRes.ok) {
-        const pairingsData = await pairingsRes.json();
-        setTopPairings(pairingsData.topPairings || []);
       }
       if (trendsRes.ok) {
         const trendsData = await trendsRes.json();
@@ -136,33 +130,6 @@ function Analytics({ user }) {
                     ))}
                   </div>
                 )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Top Food Pairings Section */}
-      {topPairings.length > 0 && (
-        <section className="analytics-section">
-          <h3>🍽️ Top Food & Wine Pairings</h3>
-          <p className="section-subtitle">Highest-rated wine and food combinations</p>
-          <div className="pairings-grid">
-            {topPairings.map((pairing, idx) => (
-              <div key={idx} className="pairing-card-analytics">
-                <div className="pairing-score-badge">{pairing.pairingScore.toFixed(1)}</div>
-                <div className="pairing-content">
-                  <h4>{pairing.wine.name}</h4>
-                  <p className="wine-type-small">{pairing.wine.type}</p>
-                  <div className="pairing-separator"></div>
-                  <p className="food-name">{pairing.foodItem.name}</p>
-                  {pairing.foodItem.description && (
-                    <p className="food-description">{pairing.foodItem.description}</p>
-                  )}
-                  {pairing.pairingReason && (
-                    <p className="pairing-reason">💡 {pairing.pairingReason}</p>
-                  )}
-                </div>
               </div>
             ))}
           </div>

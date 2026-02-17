@@ -673,22 +673,6 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
                     ))}
                   </div>
                 )}
-                {wine.foodPairings && wine.foodPairings.length > 0 && (
-                  <div className="food-pairings">
-                    <p className="pairings-title">Pairs with:</p>
-                    {wine.foodPairings.map((pairing) => (
-                      <div key={pairing.pairingId} className="food-pairing-item">
-                        <p className="food-name">{pairing.foodItem.name}</p>
-                        {pairing.foodItem.description && (
-                          <p className="food-description">{pairing.foodItem.description}</p>
-                        )}
-                        {pairing.pairingReason && (
-                          <p className="pairing-reason">{pairing.pairingReason}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
                 <button
                   className="save-pairing-btn"
                   onClick={() => savePairing(wine)}
