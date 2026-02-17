@@ -826,10 +826,11 @@
     justify-content: center;
     padding: 8px 0;
     flex-shrink: 0;
-    background: linear-gradient(90deg, #f9f9f9 0%, #ffe0e0 50%, #f9f9f9 100%);
+    background: linear-gradient(180deg, #f9f9f9 0%, #ffe0e0 50%, #f9f9f9 100%);
     color: #8b0000;
     font-weight: bold;
     letter-spacing: 4px;
+    transform: rotate(90deg);
   }
 
   .info-modal-close-btn {
