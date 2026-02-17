@@ -575,20 +575,30 @@
 
 @media (max-width: 768px) {
   .discovery-container {
-    padding: 20px 10px;
+    padding: 15px 10px;
+  }
+
+  .discovery-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
   }
 
   .preferences-section {
-    padding: 20px;
+    padding: 15px;
   }
 
   .pref-row {
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+
+  .pref-item {
+    min-width: 0;
   }
 
   .wine-list {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .slider-container {
@@ -607,6 +617,89 @@
 
   .wine-region {
     font-size: 0.8rem;
+  }
+
+  .wine-header h4 {
+    font-size: 14px;
+  }
+
+  .type-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .reset-btn,
+  .save-btn {
+    font-size: 14px;
+  }
+
+  .save-btn {
+    margin-left: 0;
+  }
+
+  .results-panel {
+    padding: 15px;
+  }
+
+  .wine-card {
+    padding: 12px;
+  }
+
+  .modal-content {
+    padding: 24px 16px;
+  }
+
+  .confirmation-modal h3 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .discovery-container {
+    padding: 10px 8px;
+  }
+
+  .discovery-container h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .preferences-section {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .pref-item label {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .type-btn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  .wine-type-buttons {
+    gap: 6px;
+  }
+
+  .price-inputs input {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .quiz-banner {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+
+  .quiz-banner .banner-text h3 {
+    font-size: 15px;
+  }
+
+  .quiz-banner .banner-text p {
+    font-size: 13px;
   }
 }
 

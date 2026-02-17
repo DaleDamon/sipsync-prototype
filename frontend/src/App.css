@@ -183,14 +183,15 @@ body {
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    gap: 15px;
-    padding: 18px 20px;
+    gap: 10px;
+    padding: 12px 15px;
   }
 
   .nav-menu {
     flex-wrap: wrap;
     justify-content: center;
     margin-left: 0;
+    gap: 6px;
   }
 
   .logo-container {
@@ -198,12 +199,50 @@ body {
   }
 
   .logo-image {
-    height: 48px;
+    height: 40px;
   }
 
+  .nav-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .main-content {
+    padding-bottom: 20px;
+  }
+
+  .modal-dialog {
+    max-width: 90%;
+    padding: 24px 20px;
+    margin: 0 15px;
+  }
+
+  .modal-dialog h2 {
+    font-size: 22px;
+  }
+
+  .modal-dialog p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .navbar {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .nav-menu {
+    gap: 4px;
+  }
 
   .nav-btn {
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 10px;
+    padding: 5px 7px;
+    border-width: 1px;
+  }
+
+  .logo-image {
+    height: 34px;
   }
 }
