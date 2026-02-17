@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/WineQuiz.css';
 import QuizResults from './QuizResults';
+import { API_URL } from '../config';
 
 function WineQuiz({ user, onComplete }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -184,7 +185,7 @@ function WineQuiz({ user, onComplete }) {
   const submitQuiz = async (finalAnswers) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/quiz/submit', {
+      const response = await fetch(`${API_URL}/auth/quiz/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -234,6 +235,9 @@ function WineQuiz({ user, onComplete }) {
   return (
     <div className="quiz-container">
       <div className="quiz-header">
+        <button className="quiz-exit-btn" onClick={onComplete} aria-label="Exit quiz">
+          ✕
+        </button>
         <h2>Discover Your Wine Profile</h2>
         <p>Answer a few questions about your food and drink preferences</p>
       </div>

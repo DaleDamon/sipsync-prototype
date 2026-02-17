@@ -10,6 +10,28 @@
 .quiz-header {
   text-align: center;
   margin-bottom: 40px;
+  position: relative;
+}
+
+.quiz-exit-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.quiz-exit-btn:hover {
+  color: #333;
 }
 
 .quiz-header h2 {
