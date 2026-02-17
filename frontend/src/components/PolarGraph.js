@@ -95,7 +95,7 @@ function PolarGraph({ preferences, profileName }) {
         {profileName && <p className="profile-name">{profileName}</p>}
       </div>
 
-      <svg width={svgSize} height={svgSize} className="polar-graph-svg">
+      <svg viewBox={`0 0 ${svgSize} ${svgSize}`} className="polar-graph-svg">
         {/* Grid circles */}
         {gridCircles.map((r, i) => (
           <circle

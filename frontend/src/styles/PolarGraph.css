@@ -132,7 +132,7 @@
 
   .polar-graph-svg {
     width: 100%;
-    max-width: 300px;
+    max-width: 100%;
   }
 
   .graph-legend {
