@@ -97,16 +97,24 @@ function Analytics({ user }) {
           <h3>⭐ Most Popular Wines</h3>
           <p className="section-subtitle">Most frequently selected wines by users</p>
           <div className="wines-grid">
-            {popularWines.map((wine, idx) => (
-              <div key={idx} className="wine-card-analytics">
-                <div className="wine-header-analytics">
-                  <h4>{wine.wineName}</h4>
+            {popularWines.map((wine, idx) => {
+              // Handle both old and new response formats
+              const displayName = wine.wineName || (wine.producer && wine.varietal
+                ? `${wine.year ? wine.year + ' ' : ''}${wine.producer} ${wine.varietal}`
+                : wine.name || 'Unnamed Wine');
+              const count = wine.selectionCount || wine.matchCount || 0;
+
+              return (
+                <div key={idx} className="wine-card-analytics">
+                  <div className="wine-header-analytics">
+                    <h4>{displayName}</h4>
+                  </div>
+                  <p className="match-count">
+                    ❤️ {count} selection{count !== 1 ? 's' : ''}
+                  </p>
                 </div>
-                <p className="match-count">
-                  ❤️ {wine.selectionCount} selection{wine.selectionCount !== 1 ? 's' : ''}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
