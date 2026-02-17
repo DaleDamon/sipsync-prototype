@@ -767,7 +767,7 @@
     min-height: 44px;
   }
 
-  /* Info modal - mobile redesign */
+  /* Info modal - mobile redesign: full-width stacked cards */
   .info-modal {
     max-width: 94%;
     padding: 20px 16px;
@@ -775,46 +775,61 @@
 
   .info-modal h2 {
     font-size: 18px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .characteristic-explanation {
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
     gap: 0;
     padding: 0;
     background: none;
-    margin: 16px 0;
+    margin: 12px 0 16px 0;
   }
 
   .char-left,
   .char-right {
-    flex: 1;
+    flex: none;
+    width: 100%;
     background: #f9f9f9;
-    border-radius: 8px;
-    padding: 14px 12px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
   }
 
+  .char-left {
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .char-right {
+    border-radius: 0 0 10px 10px;
+  }
+
   .char-left h3,
   .char-right h3 {
-    font-size: 15px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    margin-bottom: 6px;
   }
 
   .char-left p,
   .char-right p {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
+    color: #555;
   }
 
   .char-arrow {
-    font-size: 20px;
+    font-size: 16px;
     display: flex;
     align-items: center;
-    padding: 0 6px;
+    justify-content: center;
+    padding: 8px 0;
     flex-shrink: 0;
+    background: linear-gradient(90deg, #f9f9f9 0%, #ffe0e0 50%, #f9f9f9 100%);
+    color: #8b0000;
+    font-weight: bold;
+    letter-spacing: 4px;
   }
 
   .info-modal-close-btn {
