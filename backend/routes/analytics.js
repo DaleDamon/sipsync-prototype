@@ -3,64 +3,48 @@ const router = express.Router();
 const { db } = require('../firebase');
 
 // GET /api/analytics/popular-wines
-// Get the most matched wines across all restaurants
+// Get the most selected wines based on user pairing history
 router.get('/popular-wines', async (req, res) => {
   try {
-    const restaurantsSnapshot = await db.collection('restaurants').get();
-    const wineMatchCount = {};
+    const usersSnapshot = await db.collection('users').get();
+    const wineSelectionCount = {};
 
-    // Iterate through all restaurants and count wine matches
-    for (const restaurantDoc of restaurantsSnapshot.docs) {
-      const winesSnapshot = await db
-        .collection('restaurants')
-        .doc(restaurantDoc.id)
-        .collection('wines')
+    // Iterate through all users and count their wine selections
+    for (const userDoc of usersSnapshot.docs) {
+      const pairingHistorySnapshot = await db
+        .collection('users')
+        .doc(userDoc.id)
+        .collection('pairing_history')
         .get();
 
-      winesSnapshot.forEach((wineDoc) => {
-        const wine = wineDoc.data();
-        const wineId = wineDoc.id;
+      pairingHistorySnapshot.forEach((pairingDoc) => {
+        const pairing = pairingDoc.data();
+        const { wineName } = pairing;
 
-        // Support both old (name) and new (producer/varietal) schema
-        const displayName = wine.producer && wine.varietal
-          ? `${wine.producer} ${wine.varietal}`
-          : wine.name || 'Unnamed Wine';
+        // Use the stored wineName (which is already the concatenated display name)
+        // or fall back to reconstructing if needed
+        const displayName = wineName || 'Unnamed Wine';
+        const key = displayName;
 
-        const key = `${displayName}-${wine.type}`;
-
-        if (!wineMatchCount[key]) {
-          wineMatchCount[key] = {
+        if (!wineSelectionCount[key]) {
+          wineSelectionCount[key] = {
             count: 0,
-            wineId,
-            restaurantId: restaurantDoc.id,
-            details: wine,
+            displayName,
+            wineName,
           };
         }
-        wineMatchCount[key].count += 1;
+        wineSelectionCount[key].count += 1;
       });
     }
 
-    // Sort by match count and return top 10
-    const popularWines = Object.values(wineMatchCount)
+    // Sort by selection count and return top 10
+    const popularWines = Object.values(wineSelectionCount)
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
       .map((wine) => {
-        // Support both old and new schema
-        const year = wine.details.year || '';
-        const producer = wine.details.producer;
-        const varietal = wine.details.varietal;
-        const name = wine.details.name;
-
         return {
-          wineId: wine.wineId,
-          year: year,
-          producer: producer,
-          varietal: varietal,
-          name: name,
-          type: wine.details.type,
-          price: wine.details.price,
-          matchCount: wine.count,
-          flavorProfile: wine.details.flavorProfile,
+          wineName: wine.displayName,
+          selectionCount: wine.count,
         };
       });
 
