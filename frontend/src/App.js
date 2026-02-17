@@ -158,7 +158,7 @@ function App() {
         ) : showQuiz ? (
           <WineQuiz user={user} onComplete={handleQuizComplete} />
         ) : currentScreen === 'discovery' ? (
-          <PairingDiscovery user={user} preSelectedRestaurant={preSelectedRestaurant} />
+          <PairingDiscovery user={user} preSelectedRestaurant={preSelectedRestaurant} onStartQuiz={() => setShowQuiz(true)} />
         ) : currentScreen === 'map' ? (
           <RestaurantMap onRestaurantSelect={handleMapRestaurantSelect} />
         ) : currentScreen === 'analytics' ? (

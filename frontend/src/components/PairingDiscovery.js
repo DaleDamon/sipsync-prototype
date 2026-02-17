@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/PairingDiscovery.css';
 import { API_URL } from '../config';
 
-function PairingDiscovery({ user, preSelectedRestaurant }) {
+function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
@@ -503,7 +503,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
                 <p>Take a quick 15-question quiz to get personalized wine recommendations based on your taste preferences.</p>
               </div>
               <div className="banner-actions">
-                <button className="quiz-prompt-btn" onClick={() => window.location.href = '/'}>
+                <button className="quiz-prompt-btn" onClick={onStartQuiz}>
                   Take the Quiz
                 </button>
                 <button
@@ -789,7 +789,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
         <div className="modal-overlay" onClick={() => setActiveInfoModal(null)}>
           <div className="modal-dialog info-modal" onClick={(e) => e.stopPropagation()}>
             <button
-              className="modal-close-btn"
+              className="info-modal-close-btn"
               onClick={() => setActiveInfoModal(null)}
               aria-label="Close modal"
             >
@@ -821,7 +821,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
         <div className="modal-overlay" onClick={() => setActiveInfoModal(null)}>
           <div className="modal-dialog info-modal" onClick={(e) => e.stopPropagation()}>
             <button
-              className="modal-close-btn"
+              className="info-modal-close-btn"
               onClick={() => setActiveInfoModal(null)}
               aria-label="Close modal"
             >
@@ -853,7 +853,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
         <div className="modal-overlay" onClick={() => setActiveInfoModal(null)}>
           <div className="modal-dialog info-modal" onClick={(e) => e.stopPropagation()}>
             <button
-              className="modal-close-btn"
+              className="info-modal-close-btn"
               onClick={() => setActiveInfoModal(null)}
               aria-label="Close modal"
             >
@@ -885,7 +885,7 @@ function PairingDiscovery({ user, preSelectedRestaurant }) {
         <div className="modal-overlay" onClick={() => setActiveInfoModal(null)}>
           <div className="modal-dialog info-modal" onClick={(e) => e.stopPropagation()}>
             <button
-              className="modal-close-btn"
+              className="info-modal-close-btn"
               onClick={() => setActiveInfoModal(null)}
               aria-label="Close modal"
             >
