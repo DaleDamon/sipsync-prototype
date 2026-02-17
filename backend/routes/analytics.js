@@ -8,7 +8,6 @@ router.get('/popular-wines', async (req, res) => {
   try {
     const restaurantsSnapshot = await db.collection('restaurants').get();
     const wineMatchCount = {};
-    const wineDetails = {};
 
     // Iterate through all restaurants and count wine matches
     for (const restaurantDoc of restaurantsSnapshot.docs) {
@@ -21,7 +20,13 @@ router.get('/popular-wines', async (req, res) => {
       winesSnapshot.forEach((wineDoc) => {
         const wine = wineDoc.data();
         const wineId = wineDoc.id;
-        const key = `${wine.name}-${wine.type}`;
+
+        // Support both old (name) and new (producer/varietal) schema
+        const displayName = wine.producer && wine.varietal
+          ? `${wine.producer} ${wine.varietal}`
+          : wine.name || 'Unnamed Wine';
+
+        const key = `${displayName}-${wine.type}`;
 
         if (!wineMatchCount[key]) {
           wineMatchCount[key] = {
@@ -39,14 +44,25 @@ router.get('/popular-wines', async (req, res) => {
     const popularWines = Object.values(wineMatchCount)
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
-      .map((wine) => ({
-        wineId: wine.wineId,
-        name: wine.details.name,
-        type: wine.details.type,
-        price: wine.details.price,
-        matchCount: wine.count,
-        flavorProfile: wine.details.flavorProfile,
-      }));
+      .map((wine) => {
+        // Support both old and new schema
+        const year = wine.details.year || '';
+        const producer = wine.details.producer;
+        const varietal = wine.details.varietal;
+        const name = wine.details.name;
+
+        return {
+          wineId: wine.wineId,
+          year: year,
+          producer: producer,
+          varietal: varietal,
+          name: name,
+          type: wine.details.type,
+          price: wine.details.price,
+          matchCount: wine.count,
+          flavorProfile: wine.details.flavorProfile,
+        };
+      });
 
     res.json({
       popularWines,
