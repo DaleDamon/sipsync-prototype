@@ -143,7 +143,7 @@ router.post('/find', async (req, res) => {
       .sort((a, b) => b.matchScore - a.matchScore);
 
     console.log(`[PAIRINGS] Before slice: ${matchedWines.length} wines`);
-    matchedWines = matchedWines.slice(0, 6); // Return top 6 matches
+    matchedWines = matchedWines.slice(0, 8); // Return top 8 matches
     console.log(`[PAIRINGS] After slice: ${matchedWines.length} wines`);
 
     res.json({
@@ -152,7 +152,7 @@ router.post('/find', async (req, res) => {
       matches: matchedWines,
       totalMatches: matchedWines.length,
       _debug: {
-        sliceLimit: 6,
+        sliceLimit: 8,
         actualCount: matchedWines.length,
         codeVersion: '2025-02-16-optimized'
       }

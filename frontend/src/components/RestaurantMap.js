@@ -43,8 +43,22 @@ function RestaurantMap({ onRestaurantSelect }) {
     return <div className="map-container"><p className="loading">Loading restaurants...</p></div>;
   }
 
-  // Filter restaurants that have coordinates
-  const restaurantsWithCoords = restaurants.filter(r => r.latitude && r.longitude);
+  // Filter restaurants that have coordinates (support both old and new formats)
+  const restaurantsWithCoords = restaurants.filter(r => {
+    // New format
+    if (r.coordinates?.latitude && r.coordinates?.longitude) return true;
+    // Old format (backward compatibility)
+    if (r.latitude && r.longitude) return true;
+    return false;
+  });
+
+  // Helper function to get coordinates from either format
+  const getCoords = (restaurant) => {
+    if (restaurant.coordinates) {
+      return [restaurant.coordinates.latitude, restaurant.coordinates.longitude];
+    }
+    return [restaurant.latitude, restaurant.longitude];
+  };
 
   return (
     <div className="map-container">
@@ -73,13 +87,32 @@ function RestaurantMap({ onRestaurantSelect }) {
               {restaurantsWithCoords.map((restaurant) => (
                 <Marker
                   key={restaurant.id}
-                  position={[restaurant.latitude, restaurant.longitude]}
+                  position={getCoords(restaurant)}
                   icon={customIcon}
                 >
                   <Popup>
                     <div className="restaurant-popup">
                       <h4>{restaurant.name}</h4>
-                      <p className="location">{restaurant.city}</p>
+                      {restaurant.address?.street ? (
+                        <>
+                          <p className="location">
+                            {restaurant.address.street}<br />
+                            {restaurant.address.city}, {restaurant.address.state} {restaurant.address.zipCode}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="location">{restaurant.city}</p>
+                      )}
+                      {restaurant.contact?.phone && (
+                        <p className="contact-info">📞 {restaurant.contact.phone}</p>
+                      )}
+                      {restaurant.contact?.website && (
+                        <p className="contact-info">
+                          🌐 <a href={restaurant.contact.website} target="_blank" rel="noopener noreferrer">
+                            Website
+                          </a>
+                        </p>
+                      )}
                       <p className="wine-count">
                         {restaurant.wineCount || 0} wines available
                       </p>
@@ -107,7 +140,11 @@ function RestaurantMap({ onRestaurantSelect }) {
                 >
                   <div className="restaurant-info">
                     <h4>{restaurant.name}</h4>
-                    <p className="city">{restaurant.city}</p>
+                    {restaurant.address?.street ? (
+                      <p className="city">{restaurant.address.neighborhood || restaurant.address.city}</p>
+                    ) : (
+                      <p className="city">{restaurant.city}</p>
+                    )}
                     <p className="wine-count">
                       {restaurant.wineCount || 0} wines
                     </p>

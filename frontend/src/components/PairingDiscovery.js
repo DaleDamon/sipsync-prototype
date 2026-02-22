@@ -13,7 +13,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     bodyWeight: 'medium',
     flavorNotes: [],
     sweetness: 'dry',
-    priceRange: { min: 0, max: 100 },
+    priceRange: { min: 0, max: 1000 },
   };
 
   // Mapping from quiz profiles to wine preferences
@@ -227,14 +227,14 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       const restaurantList = data.restaurants || [];
       setRestaurants(restaurantList);
 
-      // Auto-select Quartino if available
-      if (restaurantList.length > 0) {
+      // Auto-select Quartino if available AND no restaurant is pre-selected
+      if (restaurantList.length > 0 && !preSelectedRestaurant && !selectedRestaurant) {
         const quartino = restaurantList.find(r => r.name === 'Quartino');
         if (quartino) {
-          setSelectedRestaurant(quartino);
+          setSelectedRestaurant(quartino.restaurantId);
         } else if (restaurantList.length === 1) {
           // Fallback: if only one restaurant, select it
-          setSelectedRestaurant(restaurantList[0]);
+          setSelectedRestaurant(restaurantList[0].restaurantId);
         }
       }
     } catch (err) {
@@ -756,7 +756,13 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                     <strong>Acidity:</strong> {wine.acidity}
                   </span>
                   <span className="detail">
+                    <strong>Tannins:</strong> {wine.tannins}
+                  </span>
+                  <span className="detail">
                     <strong>Body:</strong> {wine.bodyWeight}
+                  </span>
+                  <span className="detail">
+                    <strong>Sweetness:</strong> {wine.sweetnessLevel}
                   </span>
                 </div>
                 {wine.flavorProfile && wine.flavorProfile.length > 0 && (

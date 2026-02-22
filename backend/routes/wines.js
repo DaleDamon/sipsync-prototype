@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
+const { adminAuth } = require('../middleware/adminAuth');
 
 // POST /api/wines/restaurant/:restaurantId/add
 // Add a wine to a restaurant's wine list
@@ -184,6 +185,62 @@ router.get('/:wineId', async (req, res) => {
   } catch (error) {
     console.error('Error getting wine:', error);
     res.status(500).json({ error: 'Failed to get wine' });
+  }
+});
+
+// POST /api/wines/restaurant/:restaurantId/batch
+// Batch add/update/delete wines (admin only)
+router.post('/restaurant/:restaurantId/batch', adminAuth, async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { operations } = req.body;
+
+    if (!operations || !Array.isArray(operations)) {
+      return res.status(400).json({ error: 'operations array is required' });
+    }
+
+    const batch = db.batch();
+    const winesRef = db.collection('restaurants').doc(restaurantId).collection('wines');
+    let added = 0, updated = 0, deleted = 0;
+
+    for (const op of operations) {
+      if (op.action === 'add' && op.wine) {
+        const docRef = winesRef.doc();
+        batch.set(docRef, {
+          ...op.wine,
+          price: parseFloat(op.wine.price) || 0,
+          flavorProfile: op.wine.flavorProfile || [],
+          inventoryStatus: op.wine.inventoryStatus || 'available',
+          createdAt: new Date()
+        });
+        added++;
+      } else if (op.action === 'update' && op.wineId && op.wine) {
+        const docRef = winesRef.doc(op.wineId);
+        batch.update(docRef, {
+          ...op.wine,
+          price: parseFloat(op.wine.price) || 0,
+          updatedAt: new Date()
+        });
+        updated++;
+      } else if (op.action === 'delete' && op.wineId) {
+        const docRef = winesRef.doc(op.wineId);
+        batch.delete(docRef);
+        deleted++;
+      }
+    }
+
+    await batch.commit();
+
+    res.json({
+      message: 'Batch operation completed',
+      added,
+      updated,
+      deleted,
+      total: added + updated + deleted
+    });
+  } catch (error) {
+    console.error('Error in batch operation:', error);
+    res.status(500).json({ error: 'Batch operation failed' });
   }
 });
 

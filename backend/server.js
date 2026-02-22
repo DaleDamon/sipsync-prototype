@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -31,6 +31,10 @@ const foodItemsRoutes = require('./routes/foodItems');
 console.log('[SERVER.JS] Food items routes imported');
 const analyticsRoutes = require('./routes/analytics');
 console.log('[SERVER.JS] Analytics routes imported');
+const adminRoutes = require('./routes/admin');
+console.log('[SERVER.JS] Admin routes imported');
+const aiRoutes = require('./routes/ai');
+console.log('[SERVER.JS] AI routes imported');
 
 // Authentication routes
 console.log('[SERVER.JS] Registering auth routes at /api/auth');
@@ -55,6 +59,14 @@ app.use('/api/food-items', foodItemsRoutes);
 // Analytics routes
 console.log('[SERVER.JS] Registering analytics routes at /api/analytics');
 app.use('/api/analytics', analyticsRoutes);
+
+// Admin routes
+console.log('[SERVER.JS] Registering admin routes at /api/admin');
+app.use('/api/admin', adminRoutes);
+
+// AI routes
+console.log('[SERVER.JS] Registering AI routes at /api/ai');
+app.use('/api/ai', aiRoutes);
 
 // Test route after routers
 app.get('/api/health', (req, res) => {

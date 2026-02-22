@@ -19,10 +19,8 @@ router.get('/popular-wines', async (req, res) => {
 
       pairingHistorySnapshot.forEach((pairingDoc) => {
         const pairing = pairingDoc.data();
-        const { wineName } = pairing;
+        const { wineName, restaurantName } = pairing;
 
-        // Use the stored wineName (which is already the concatenated display name)
-        // or fall back to reconstructing if needed
         const displayName = wineName || 'Unnamed Wine';
         const key = displayName;
 
@@ -31,20 +29,22 @@ router.get('/popular-wines', async (req, res) => {
             count: 0,
             displayName,
             wineName,
+            restaurantName: restaurantName || '',
           };
         }
         wineSelectionCount[key].count += 1;
       });
     }
 
-    // Sort by selection count and return top 10
+    // Sort by selection count and return top 20
     const popularWines = Object.values(wineSelectionCount)
       .sort((a, b) => b.count - a.count)
-      .slice(0, 10)
+      .slice(0, 20)
       .map((wine) => {
         return {
           wineName: wine.displayName,
           selectionCount: wine.count,
+          restaurantName: wine.restaurantName,
         };
       });
 

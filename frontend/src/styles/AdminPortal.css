@@ -1,0 +1,368 @@
+.admin-portal {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.admin-header h2 {
+  color: #8b0000;
+  font-size: 24px;
+  margin: 0;
+}
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-email {
+  color: #666;
+  font-size: 13px;
+}
+
+.admin-logout-btn {
+  padding: 6px 14px;
+  background: #999;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.admin-logout-btn:hover {
+  background: #777;
+}
+
+/* Restaurant Selector */
+.restaurant-selector {
+  margin-bottom: 24px;
+}
+
+.restaurant-selector label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+  font-size: 14px;
+}
+
+.restaurant-selector select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 300px;
+  background: white;
+}
+
+.restaurant-selector select:focus {
+  outline: none;
+  border-color: #8b0000;
+}
+
+/* Upload Method Cards */
+.upload-section {
+  margin-bottom: 32px;
+}
+
+.upload-section h3 {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.upload-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.upload-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-card:hover {
+  border-color: #8b0000;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.1);
+}
+
+.upload-card-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.upload-card h4 {
+  color: #333;
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.upload-card p {
+  color: #666;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #8b0000;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Upload History */
+.upload-history {
+  margin-top: 32px;
+}
+
+.upload-history h3 {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+}
+
+.history-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.history-empty {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-size: 14px;
+}
+
+/* Admin Nav */
+.admin-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.admin-nav-btn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.admin-nav-btn:hover {
+  background: #f5f5f5;
+}
+
+.admin-nav-btn.active {
+  background: #8b0000;
+  color: white;
+  border-color: #8b0000;
+}
+
+/* Back button */
+.back-to-dashboard {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.back-to-dashboard:hover {
+  background: #f5f5f5;
+}
+
+/* Error / Success messages */
+.admin-error-msg {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-success-msg {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Manual Edit Button */
+.edit-winelist-btn {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #8b0000 0%, #a00000 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.2);
+}
+
+.edit-winelist-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+  background: linear-gradient(135deg, #a00000 0%, #b00000 100%);
+}
+
+/* Manual Edit View */
+.manual-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.manual-edit-header h3 {
+  color: #8b0000;
+  font-size: 22px;
+  margin: 0;
+}
+
+.manual-edit-header .back-to-dashboard {
+  padding: 10px 16px;
+  background: #666;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.manual-edit-header .back-to-dashboard:hover {
+  background: #555;
+}
+
+/* Add Restaurant Button */
+.add-restaurant-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: #006400;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 100, 0, 0.15);
+}
+
+.add-restaurant-btn:hover {
+  background: #004d00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 100, 0, 0.25);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .upload-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .restaurant-selector select {
+    min-width: 100%;
+  }
+}

@@ -109,6 +109,9 @@ function Analytics({ user }) {
                   <div className="wine-header-analytics">
                     <h4>{displayName}</h4>
                   </div>
+                  {wine.restaurantName && (
+                    <p className="wine-restaurant">📍 {wine.restaurantName}</p>
+                  )}
                   <p className="match-count">
                     ❤️ {count} selection{count !== 1 ? 's' : ''}
                   </p>

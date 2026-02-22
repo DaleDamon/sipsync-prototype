@@ -7,6 +7,7 @@ import RestaurantMap from './components/RestaurantMap';
 import QRScanner from './components/QRScanner';
 import UserProfile from './components/UserProfile';
 import WineQuiz from './components/WineQuiz';
+import AdminPortal from './components/AdminPortal';
 import { API_URL } from './config';
 
 function App() {
@@ -147,6 +148,12 @@ function App() {
             >
               Scan
             </button>
+            <button
+              className={`nav-btn ${!showQuiz && currentScreen === 'admin' ? 'active' : ''}`}
+              onClick={() => { setShowQuiz(false); setCurrentScreen('admin'); }}
+            >
+              Admin
+            </button>
             <button className="nav-btn logout" onClick={handleLogout}>
               Logout
             </button>
@@ -167,6 +174,8 @@ function App() {
           <Analytics user={user} />
         ) : currentScreen === 'profile' ? (
           <UserProfile user={user} onRetakeQuiz={() => setShowQuiz(true)} />
+        ) : currentScreen === 'admin' ? (
+          <AdminPortal />
         ) : null}
       </main>
 

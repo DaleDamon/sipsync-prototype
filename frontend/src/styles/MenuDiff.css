@@ -1,0 +1,299 @@
+.menu-diff {
+  padding: 20px;
+}
+
+.diff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.diff-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.diff-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.apply-btn {
+  padding: 10px 24px;
+  background: #722F37;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.apply-btn:hover {
+  background: #5a252c;
+}
+
+.apply-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Summary bar */
+.diff-summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.diff-summary-item {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.diff-summary-item.added {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.diff-summary-item.removed {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.diff-summary-item.changed {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.diff-summary-item.unchanged {
+  background: #f0f0f0;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+/* Diff sections */
+.diff-section {
+  margin-bottom: 20px;
+}
+
+.diff-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.diff-section-header.added {
+  background: #d4edda;
+  color: #155724;
+}
+
+.diff-section-header.removed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.diff-section-header.changed {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.diff-section-header.unchanged {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.diff-section-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.diff-section-toggle {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Diff table */
+.diff-table-container {
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  overflow-x: auto;
+}
+
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.diff-table th {
+  background: #f8f8f8;
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #666;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.diff-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+/* Row type styles */
+.diff-table tr.added-row {
+  background: #f0fff0;
+}
+
+.diff-table tr.removed-row {
+  background: #fff5f5;
+}
+
+.diff-table tr.changed-row {
+  background: #fffef0;
+}
+
+.diff-table tr:hover {
+  filter: brightness(0.97);
+}
+
+/* Include/exclude checkbox */
+.diff-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #722F37;
+}
+
+/* Field-level diff */
+.field-diff {
+  display: inline;
+}
+
+.field-old {
+  text-decoration: line-through;
+  color: #dc3545;
+  margin-right: 6px;
+  font-size: 0.8rem;
+}
+
+.field-new {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.field-arrow {
+  color: #999;
+  margin: 0 4px;
+  font-size: 0.75rem;
+}
+
+/* Wine info display */
+.wine-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wine-main {
+  font-weight: 600;
+  color: #333;
+}
+
+.wine-detail {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Flavor chips in diff */
+.diff-flavors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.diff-flavor {
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  background: #f0f0f0;
+  color: #555;
+}
+
+.diff-flavor.flavor-added {
+  background: #d4edda;
+  color: #155724;
+}
+
+.diff-flavor.flavor-removed {
+  background: #f8d7da;
+  color: #721c24;
+  text-decoration: line-through;
+}
+
+/* No changes message */
+.no-changes {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1rem;
+}
+
+.no-changes h4 {
+  margin: 0 0 8px;
+  color: #333;
+}
+
+/* Loading overlay */
+.diff-loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.diff-loading .processing-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f0f0f0;
+  border-top-color: #722F37;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .menu-diff {
+    padding: 10px;
+  }
+
+  .diff-summary {
+    flex-direction: column;
+  }
+
+  .diff-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

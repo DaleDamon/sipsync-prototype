@@ -292,6 +292,12 @@
   margin: 10px 0;
 }
 
+.wine-restaurant {
+  color: #888;
+  font-size: 12px;
+  margin: 0 0 6px 0;
+}
+
 .match-count {
   color: #666;
   font-size: 13px;

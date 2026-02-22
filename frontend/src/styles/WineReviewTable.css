@@ -1,0 +1,305 @@
+.wine-review-table {
+  padding: 20px;
+}
+
+.wine-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wine-review-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.wine-review-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-row-btn {
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.add-row-btn:hover {
+  background: #e0e0e0;
+}
+
+.confirm-btn {
+  padding: 10px 24px;
+  background: #722F37;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.confirm-btn:hover {
+  background: #5a252c;
+}
+
+.confirm-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Validation summary */
+.validation-summary {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  color: #856404;
+  font-size: 0.85rem;
+}
+
+/* Confidence summary */
+.confidence-summary {
+  background: #fff8e1;
+  border: 1px solid #ffcc02;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  color: #7a6400;
+  font-size: 0.85rem;
+}
+
+/* Low-confidence cell highlight */
+.review-table td.low-confidence {
+  background: #fff8e1;
+  border-left: 3px solid #ffb300;
+}
+
+.review-table td.low-confidence select {
+  background: #fffbef;
+}
+
+/* Table container */
+.review-table-container {
+  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  min-width: 1200px;
+}
+
+.review-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.review-table th {
+  background: #722F37;
+  color: white;
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.review-table th:hover {
+  background: #5a252c;
+}
+
+.review-table th.sort-active {
+  background: #5a252c;
+}
+
+.review-table th .sort-arrow {
+  margin-left: 4px;
+  font-size: 0.7rem;
+}
+
+.review-table td {
+  padding: 4px 4px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.review-table tbody tr:hover {
+  background: #fdf5f6;
+}
+
+.review-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.review-table tbody tr:nth-child(even):hover {
+  background: #fdf5f6;
+}
+
+/* Input fields */
+.review-table input[type="text"],
+.review-table input[type="number"] {
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  box-sizing: border-box;
+  background: white;
+}
+
+.review-table input[type="text"]:focus,
+.review-table input[type="number"]:focus,
+.review-table select:focus {
+  outline: none;
+  border-color: #722F37;
+  box-shadow: 0 0 0 2px rgba(114, 47, 55, 0.15);
+}
+
+.review-table select {
+  width: 100%;
+  padding: 5px 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  background: white;
+  cursor: pointer;
+}
+
+/* Invalid field highlighting */
+.review-table input.invalid,
+.review-table select.invalid {
+  border-color: #dc3545;
+  background: #fff5f5;
+}
+
+/* Column widths */
+.col-actions { width: 60px; }
+.col-year { width: 60px; }
+.col-producer { width: 140px; }
+.col-varietal { width: 140px; }
+.col-region { width: 120px; }
+.col-type { width: 85px; }
+.col-price { width: 65px; }
+.col-acidity { width: 80px; }
+.col-tannins { width: 80px; }
+.col-body { width: 80px; }
+.col-sweetness { width: 80px; }
+.col-flavors { width: 200px; }
+
+/* Row actions */
+.row-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.row-action-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.row-action-btn.duplicate {
+  background: #e8f4fd;
+  color: #0d6efd;
+}
+
+.row-action-btn.duplicate:hover {
+  background: #cce5ff;
+}
+
+.row-action-btn.delete {
+  background: #fde8e8;
+  color: #dc3545;
+}
+
+.row-action-btn.delete:hover {
+  background: #f5c6cb;
+}
+
+/* Flavor chips */
+.flavor-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.flavor-chip {
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: #f8f8f8;
+  color: #666;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.flavor-chip:hover {
+  border-color: #722F37;
+}
+
+.flavor-chip.selected {
+  background: #722F37;
+  color: white;
+  border-color: #722F37;
+}
+
+/* Footer */
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #eee;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .wine-review-table {
+    padding: 10px;
+  }
+
+  .wine-review-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .review-table {
+    font-size: 0.75rem;
+  }
+}

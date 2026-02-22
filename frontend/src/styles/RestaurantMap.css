@@ -74,6 +74,22 @@
   color: #666;
   font-size: 14px;
   margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.restaurant-popup .contact-info {
+  color: #555;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.restaurant-popup .contact-info a {
+  color: #8b0000;
+  text-decoration: none;
+}
+
+.restaurant-popup .contact-info a:hover {
+  text-decoration: underline;
 }
 
 .restaurant-popup .wine-count {
