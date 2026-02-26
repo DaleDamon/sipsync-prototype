@@ -121,7 +121,14 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [activeInfoModal, setActiveInfoModal] = useState(null); // 'acidity', 'tannins', 'body', 'sweetness', or null
   const [confirmationModal, setConfirmationModal] = useState(null); // {wineName, show} for wine selection confirmation
 
+  // Search mode state
+  const [searchMode, setSearchMode] = useState('matching'); // 'matching' or 'search'
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
   const debounceTimer = useRef(null);
+  const searchDebounceTimer = useRef(null);
 
   // Helper function to get display name for wines
   const getWineDisplayName = (wine) => {
@@ -365,6 +372,76 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     }
   };
 
+  // Search mode functions
+  const handleSearchKeywordChange = (keyword) => {
+    setSearchKeyword(keyword);
+
+    // Clear previous timer
+    if (searchDebounceTimer.current) {
+      clearTimeout(searchDebounceTimer.current);
+    }
+
+    // Don't search if less than 2 characters
+    if (keyword.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Debounce for 300ms
+    searchDebounceTimer.current = setTimeout(() => {
+      performCrossRestaurantSearch(keyword);
+    }, 300);
+  };
+
+  const performCrossRestaurantSearch = async (keyword) => {
+    setSearchLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(
+        `${API_URL}/wines/search?keyword=${encodeURIComponent(keyword)}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(`[SEARCH] Found ${data.totalWines} wines across ${data.results?.length} restaurants`);
+        setSearchResults(data.results || []);
+      } else {
+        setError(data.error || 'Search failed');
+        setSearchResults([]);
+      }
+    } catch (err) {
+      setError('Network error: ' + err.message);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const detectDuplicateWines = (results) => {
+    const wineKeyMap = {}; // matchKey -> array of {restaurantName, restaurantId, price}
+
+    results.forEach(restaurant => {
+      restaurant.wines.forEach(wine => {
+        if (!wineKeyMap[wine.matchKey]) {
+          wineKeyMap[wine.matchKey] = [];
+        }
+        wineKeyMap[wine.matchKey].push({
+          restaurantName: restaurant.restaurantName,
+          restaurantId: restaurant.restaurantId,
+          price: wine.price
+        });
+      });
+    });
+
+    // Filter to only wines that appear in 2+ restaurants
+    const duplicates = Object.keys(wineKeyMap).filter(
+      key => wineKeyMap[key].length > 1
+    );
+
+    return { wineKeyMap, duplicates };
+  };
+
   const handleFindMatches = useCallback(async () => {
     if (!selectedRestaurant) {
       setError('Please select a restaurant');
@@ -459,6 +536,91 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const wineTypes = ['red', 'white', 'rosé', 'sparkling', 'dessert'];
   const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral', 'chocolate', 'earthy', 'tropical', 'herbal', 'honey', 'pear', 'biscuit'];
 
+  // Render search results grouped by restaurant
+  const renderSearchResults = () => {
+    if (searchKeyword.trim().length < 2) {
+      return <p className="empty-state">Enter at least 2 characters to search across all restaurants</p>;
+    }
+
+    if (searchResults.length === 0 && !searchLoading) {
+      return <p className="empty-state">No wines found matching "{searchKeyword}"</p>;
+    }
+
+    const { wineKeyMap, duplicates } = detectDuplicateWines(searchResults);
+
+    return (
+      <div className="restaurant-groups">
+        {searchResults.map(restaurant => (
+          <div key={restaurant.restaurantId} className="restaurant-group">
+            <div className="restaurant-header">
+              <h4>{restaurant.restaurantName}</h4>
+              <span className="restaurant-city">{restaurant.restaurantCity}</span>
+              <span className="wine-count">{restaurant.wines.length} {restaurant.wines.length === 1 ? 'wine' : 'wines'}</span>
+            </div>
+            <div className="wine-list">
+              {restaurant.wines.map(wine => (
+                <div
+                  key={wine.wineId}
+                  className={`wine-card search-result ${duplicates.includes(wine.matchKey) ? 'has-duplicate' : ''}`}
+                >
+                  <div className="wine-header">
+                    <h4>
+                      {wine.year && `${wine.year} `}
+                      {wine.producer} {wine.varietal}
+                    </h4>
+                  </div>
+                  {wine.region && (
+                    <p className="wine-region">
+                      <span className="region-icon">📍</span>
+                      {wine.region}
+                    </p>
+                  )}
+                  <p className="wine-type">{wine.type}</p>
+                  <p className="wine-price">${wine.price}</p>
+
+                  {duplicates.includes(wine.matchKey) && (
+                    <div className="price-comparison-badge">
+                      <span className="badge-icon">🏷️</span>
+                      <span className="badge-text">
+                        Available at {wineKeyMap[wine.matchKey].length} restaurants
+                      </span>
+                      <div className="price-list">
+                        {wineKeyMap[wine.matchKey]
+                          .sort((a, b) => a.price - b.price)
+                          .map((loc, i) => (
+                            <div key={i} className="price-item">
+                              <span>{loc.restaurantName}: ${loc.price}</span>
+                              {i === 0 && <span className="best-price">Lowest</span>}
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="wine-details">
+                    <span className="detail"><strong>Acidity:</strong> {wine.acidity}</span>
+                    <span className="detail"><strong>Tannins:</strong> {wine.tannins}</span>
+                    <span className="detail"><strong>Body:</strong> {wine.bodyWeight}</span>
+                    <span className="detail"><strong>Sweetness:</strong> {wine.sweetnessLevel}</span>
+                  </div>
+
+                  {wine.flavorProfile && wine.flavorProfile.length > 0 && (
+                    <div className="flavor-list">
+                      {wine.flavorProfile.map((flavor) => (
+                        <span key={flavor} className="flavor-badge">{flavor}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="discovery-container">
       <h2>Find Your Perfect Wine</h2>
@@ -532,8 +694,35 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         </div>
       )}
 
-      {/* Preferences Section at Top */}
-      <div className="preferences-section">
+      {/* Search Mode Toggle */}
+      <div className="search-mode-toggle">
+        <button
+          className={`mode-btn ${searchMode === 'matching' ? 'active' : ''}`}
+          onClick={() => {
+            setSearchMode('matching');
+            setSearchKeyword('');
+            setSearchResults([]);
+            setError('');
+          }}
+        >
+          Find Matches
+        </button>
+        <button
+          className={`mode-btn ${searchMode === 'search' ? 'active' : ''}`}
+          onClick={() => {
+            setSearchMode('search');
+            setError('');
+          }}
+        >
+          Search Wines
+        </button>
+      </div>
+
+      {/* Conditional rendering based on search mode */}
+      {searchMode === 'matching' ? (
+        <>
+          {/* Preferences Section at Top */}
+          <div className="preferences-section">
         <div className="pref-row">
           <div className="pref-item">
             <label>Select Restaurant</label>
@@ -741,11 +930,42 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         {loading && <p className="loading-indicator">Searching...</p>}
         {saveStatus === 'saved' && <p className="save-indicator">Preferences saved!</p>}
       </div>
+      </>
+      ) : (
+        /* Search Mode UI */
+        <div className="search-section">
+          <div className="search-input-container">
+            <input
+              type="text"
+              className="wine-search-input"
+              placeholder="Search by producer, varietal, or region..."
+              value={searchKeyword}
+              onChange={(e) => handleSearchKeywordChange(e.target.value)}
+              autoFocus
+            />
+            {searchKeyword && (
+              <button
+                className="clear-search-btn"
+                onClick={() => {
+                  setSearchKeyword('');
+                  setSearchResults([]);
+                }}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {searchLoading && <p className="loading-indicator">Searching across all restaurants...</p>}
+        </div>
+      )}
 
       {/* Results Section Below */}
       <div className="results-panel">
-        <h3>Matching Wines</h3>
-        {matches.length > 0 ? (
+        {searchMode === 'matching' ? (
+          <>
+            <h3>Matching Wines</h3>
+            {matches.length > 0 ? (
           <div className="wine-list">
             {matches.map((wine) => (
               <div key={wine.wineId} className="wine-card">
@@ -800,6 +1020,13 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           <p className="empty-state">
             {selectedRestaurant ? 'Adjust your preferences to find wines' : 'Select a restaurant to get started'}
           </p>
+        )}
+          </>
+        ) : (
+          <>
+            <h3>Search Results</h3>
+            {renderSearchResults()}
+          </>
         )}
       </div>
 

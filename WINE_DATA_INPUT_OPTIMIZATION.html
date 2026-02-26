@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SipSync - Wine Data Input Optimization</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #333;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 30px;
+      background: #fff;
+    }
+    h1 {
+      color: #8b0000;
+      font-size: 28px;
+      margin-bottom: 8px;
+      border-bottom: 3px solid #8b0000;
+      padding-bottom: 12px;
+    }
+    h2 {
+      color: #8b0000;
+      font-size: 22px;
+      margin: 32px 0 16px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    h3 {
+      color: #555;
+      font-size: 15px;
+      margin: 16px 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    p { margin: 8px 0; font-size: 14px; }
+    strong { color: #333; }
+    em { color: #666; font-size: 13px; }
+    ul, ol { margin: 8px 0 8px 24px; font-size: 14px; }
+    li { margin: 4px 0; }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: #8b0000;
+    }
+    pre {
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      overflow-x: auto;
+      margin: 12px 0;
+      line-height: 1.5;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #f0f0f0;
+      margin: 32px 0;
+    }
+    .context-box {
+      background: #fff8f8;
+      border-left: 4px solid #8b0000;
+      padding: 16px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .context-box p { margin: 6px 0; }
+    .pain-points {
+      background: #fef9e7;
+      border: 1px solid #f0e0a0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .pain-points ul { list-style: none; margin-left: 0; }
+    .pain-points li { padding: 4px 0; }
+    .pain-points li::before { content: "! "; color: #c0850a; font-weight: bold; margin-right: 4px; }
+    .idea-card {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 24px;
+      margin: 24px 0;
+      page-break-inside: avoid;
+    }
+    .idea-card h2 {
+      margin-top: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+      font-size: 20px;
+    }
+    .idea-number {
+      display: inline-block;
+      background: #8b0000;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 28px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .how-it-works {
+      font-size: 14px;
+      color: #555;
+      margin: 8px 0 16px 0;
+      font-style: italic;
+    }
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .pros, .cons {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .pros {
+      background: #f0faf0;
+      border: 1px solid #c0e0c0;
+    }
+    .cons {
+      background: #fef5f5;
+      border: 1px solid #e0c0c0;
+    }
+    .pros h3 { color: #2d7a2d; }
+    .cons h3 { color: #a03030; }
+    .pros ul, .cons ul { margin-left: 16px; }
+    .pros li { color: #3a6a3a; }
+    .cons li { color: #704040; }
+    .effort-badges {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-dev { background: #e8f0fe; color: #1a56db; }
+    .badge-ops { background: #fef3e2; color: #b45309; }
+    .badge-low { background: #def7ec; color: #057a55; }
+    .badge-med { background: #fef3e2; color: #b45309; }
+    .badge-high { background: #fde8e8; color: #c81e1e; }
+
+    /* Comparison table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    .comparison-table th {
+      background: #8b0000;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .comparison-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .comparison-table tr:nth-child(even) { background: #fafafa; }
+    .comparison-table tr:hover { background: #fff5f5; }
+    .highlight { font-weight: bold; color: #8b0000; }
+
+    /* Strategy section */
+    .strategy {
+      background: linear-gradient(135deg, #fff8f8, #fef5f0);
+      border: 2px solid #8b0000;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+    .strategy h2 {
+      color: #8b0000;
+      margin-top: 0;
+      border-bottom: none;
+    }
+    .phase {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #8b0000;
+    }
+    .phase-label {
+      font-weight: bold;
+      color: #8b0000;
+      font-size: 14px;
+    }
+    .phase p { margin: 4px 0; font-size: 14px; }
+
+    /* Print styles */
+    @media print {
+      body { padding: 20px; max-width: 100%; }
+      .idea-card { page-break-inside: avoid; break-inside: avoid; }
+      .strategy { page-break-inside: avoid; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Wine Data Input Optimization</h1>
+  <p style="color: #888; font-size: 13px; margin-bottom: 24px;">SipSync Internal Brainstorming Document &bull; February 2026</p>
+
+  <div class="context-box">
+    <p><strong>The Problem:</strong> Manually inputting Quartino's 53 wines into CSV format required filling in 11 fields per wine &mdash; roughly <strong>580 manual data entries</strong> for a single restaurant. The hardest part is the <strong>sensory profile</strong> (acidity, tannins, body, sweetness, flavor notes), which requires wine knowledge and can't be found on a typical restaurant menu.</p>
+    <p>For SipSync to scale to many restaurants and handle periodic menu changes, this process needs to be dramatically faster.</p>
+  </div>
+
+  <div class="pain-points">
+    <h3 style="color: #b8860b; margin-bottom: 8px;">Current Pain Points</h3>
+    <ul>
+      <li><strong>53 wines &times; 11 fields = ~580 manual data entries</strong> for a single restaurant</li>
+      <li>Basic info (producer, varietal, price) is available on menus, but sensory data is not</li>
+      <li>Restaurants update wine lists periodically, requiring re-entry</li>
+      <li>No bulk upload &mdash; wines are added one at a time via API</li>
+      <li>Sensory profile requires wine expertise to fill accurately</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- IDEA 1 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">1</span> Photo/PDF Menu Upload with AI Parsing</h2>
+    <p class="how-it-works">Snap a photo of a restaurant's wine menu (or upload a PDF). Claude's vision API processes the image directly &mdash; no separate OCR step needed &mdash; and parses it into structured wine data with AI-estimated sensory profiles.</p>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>User takes a photo of the wine list or uploads a PDF/image</li>
+      <li>Claude's vision API processes the image directly</li>
+      <li>Claude parses the menu into structured JSON with sensory estimates based on wine knowledge</li>
+      <li>AI returns structured JSON for all wines</li>
+      <li>User reviews/edits in a confirmation UI, then submits</li>
+    </ol>
+
+    <h3>What You'd Build</h3>
+    <ul>
+      <li>New backend endpoint: <code>POST /api/wines/restaurant/:id/parse-menu</code></li>
+      <li>Image upload handling (multer or similar)</li>
+      <li>Claude API integration for parsing + sensory estimation</li>
+      <li>Simple review/edit UI before final submission</li>
+    </ul>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li>Dramatically faster: photo &rarr; structured data in seconds</li>
+          <li>Claude has extensive wine knowledge for sensory estimation</li>
+          <li>Handles messy real-world menu formats</li>
+          <li>Works with any restaurant &mdash; just photograph their menu</li>
+          <li>No separate OCR step needed</li>
+          <li>Easiest for non-technical restaurant partners</li>
+          <li>Handles multi-language menus (Italian, French)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li>Claude API costs (~$0.01-0.05 per menu)</li>
+          <li>Sensory estimates are approximations</li>
+          <li>Poor photo quality reduces accuracy</li>
+          <li>Needs a review step &mdash; can't be 100% hands-off</li>
+          <li>Multi-page menus need multiple photos</li>
+          <li>Creative menu formatting can be hard to parse</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-med">Dev Effort: Medium (2-3 days)</span>
+      <span class="badge badge-ops badge-low">Ops Effort: Low</span>
+    </div>
+  </div>
+
+  <!-- IDEA 2 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">2</span> AI-Powered Sensory Auto-Fill (Smart Defaults)</h2>
+    <p class="how-it-works">Only require the "easy" fields (producer, varietal, region, type, price) and let AI automatically fill in the sensory profile. The user still enters basic info, but the tedious wine-knowledge fields are auto-generated.</p>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>User enters or pastes basic wine info (producer, varietal, region, type, price)</li>
+      <li>Backend sends wine details to Claude API for sensory estimation</li>
+      <li>AI returns: acidity, tannins, body, sweetness, and flavor profile</li>
+      <li>Fields auto-populated &mdash; user can adjust if needed</li>
+    </ol>
+
+    <h3>What You'd Build</h3>
+    <ul>
+      <li>New backend endpoint: <code>POST /api/wines/auto-fill-sensory</code></li>
+      <li>Claude API call with wine details &rarr; sensory profile</li>
+      <li>Frontend: "Auto-fill" button next to sensory fields</li>
+      <li>Batch mode support for CSV imports</li>
+    </ul>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li>Cuts data entry in half (5-6 fields instead of 11)</li>
+          <li>High accuracy &mdash; Claude knows wine characteristics by varietal and region</li>
+          <li>Can be applied retroactively to improve existing data</li>
+          <li>Simple to implement &mdash; one API call (or batch many)</li>
+          <li>User retains control to override</li>
+          <li>Cheapest option &mdash; minimal API cost</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li>Still requires manual entry of basic fields</li>
+          <li>API cost per wine (~$0.005-0.01 each)</li>
+          <li>Blends or obscure wines may get less accurate estimates</li>
+          <li>Doesn't solve "getting basic menu data" problem</li>
+          <li>House/private-label wines harder to estimate</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-low">Dev Effort: Low (1 day)</span>
+      <span class="badge badge-ops badge-med">Ops Effort: Medium</span>
+    </div>
+  </div>
+
+  <!-- IDEA 3 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">3</span> Wine Database API Integration</h2>
+    <p class="how-it-works">Connect to existing wine databases (Vivino, Wine-Searcher, CellarTracker) that already have detailed wine information. Given a producer and varietal, auto-populate region, sensory profile, and other details.</p>
+
+    <h3>Potential Data Sources</h3>
+    <ul>
+      <li><strong>Vivino API</strong> &mdash; Largest consumer wine database with ratings and flavor profiles</li>
+      <li><strong>Wine-Searcher API</strong> &mdash; Professional wine pricing/availability database</li>
+      <li><strong>CellarTracker</strong> &mdash; Community-sourced tasting notes (40M+ reviews)</li>
+      <li><strong>Open Wine Data</strong> &mdash; Open-source wine datasets on GitHub/Kaggle</li>
+    </ul>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>User enters producer + varietal (or scans a barcode)</li>
+      <li>Backend queries wine database API</li>
+      <li>Auto-populates: region, type, sensory characteristics, typical price range</li>
+      <li>User confirms and adjusts restaurant-specific price</li>
+    </ol>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li>Data from real tasting notes and expert reviews</li>
+          <li>Barcode scanning possible for bottled wines</li>
+          <li>Could auto-suggest wines as user types</li>
+          <li>Some databases include food pairing data</li>
+          <li>One-time integration, works for all restaurants</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li><strong>Most wine APIs are expensive or restricted</strong> (Vivino: no public API; Wine-Searcher: ~$500+/yr)</li>
+          <li>Restaurant wines differ from retail (house pours, exclusives)</li>
+          <li>Data format mismatch with SipSync's schema</li>
+          <li>Dependency on third-party service availability</li>
+          <li>Many Quartino wines (Antica Osteria, Rapido, Convivale) are restaurant-exclusive &mdash; unlikely to be in databases</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-high">Dev Effort: Medium-High (3-5 days + API costs)</span>
+      <span class="badge badge-ops badge-low">Ops Effort: Low (but gaps need manual fill)</span>
+    </div>
+  </div>
+
+  <!-- IDEA 4 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">4</span> Restaurant Admin Portal with Smart CSV Upload</h2>
+    <p class="how-it-works">Build a web-based admin interface where restaurant partners (or you) can upload a CSV with just the basic fields. The system handles parsing, validation, AI auto-fill, preview, and batch submission in one smooth flow.</p>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>Restaurant exports wine list from POS or types it into a spreadsheet</li>
+      <li>Upload CSV with just: producer, varietal, type, price (minimum fields)</li>
+      <li>System parses CSV, validates data, shows preview table</li>
+      <li>"Auto-fill missing fields" button calls AI to populate sensory data, region, year</li>
+      <li>Restaurant reviews and edits in an interactive table</li>
+      <li>One click to publish all wines</li>
+    </ol>
+
+    <h3>What You'd Build</h3>
+    <ul>
+      <li>Admin page at <code>/admin/upload</code> (password-protected)</li>
+      <li>CSV parser (Papa Parse library)</li>
+      <li>Editable data table with inline editing</li>
+      <li>Bulk AI auto-fill integration (Idea 2 built in)</li>
+      <li>Batch API submission (all wines at once)</li>
+      <li>Diff view for menu updates ("3 wines added, 2 removed, 1 price changed")</li>
+    </ul>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li>Complete end-to-end solution for onboarding</li>
+          <li>Restaurant partners could self-serve</li>
+          <li>CSV upload + AI auto-fill = best of both worlds</li>
+          <li>Diff view makes menu updates easy</li>
+          <li>Validation catches errors before submission</li>
+          <li>Professional look for partner restaurants</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li>Most significant development effort</li>
+          <li>Restaurants still need to provide basic wine data</li>
+          <li>Need to handle CSV format variations</li>
+          <li>Admin UI needs testing and maintenance</li>
+          <li>Security considerations for admin access</li>
+          <li>Restaurants may not want to do the work themselves</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-high">Dev Effort: High (4-7 days)</span>
+      <span class="badge badge-ops badge-low">Ops Effort: Very Low (self-serve)</span>
+    </div>
+  </div>
+
+  <!-- IDEA 5 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">5</span> Web Scraping Restaurant Wine Menus</h2>
+    <p class="how-it-works">Many restaurants publish wine menus on their website, Yelp, or OpenTable. A web scraper could pull this data automatically and parse it into the SipSync format with AI-assisted sensory estimation.</p>
+
+    <h3>Potential Sources to Scrape</h3>
+    <ul>
+      <li>Restaurant's own website (wine/drinks menu page)</li>
+      <li>Yelp menu pages</li>
+      <li>OpenTable menu listings</li>
+      <li>Google Maps menu data</li>
+      <li>Toast/Square online ordering menus</li>
+    </ul>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>Enter restaurant URL or search by name</li>
+      <li>Scraper finds and extracts wine menu data</li>
+      <li>AI parser structures into SipSync format (with sensory auto-fill)</li>
+      <li>User reviews and submits</li>
+    </ol>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li>Fully automated for restaurants with online menus</li>
+          <li>No restaurant cooperation needed</li>
+          <li>Can be scheduled to catch menu changes</li>
+          <li>Free &mdash; no API subscription costs</li>
+          <li>Could build a library of pre-scraped restaurants</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li><strong>Most wine menus are PDFs or images</strong>, not structured HTML</li>
+          <li>Every website has a different layout &mdash; scrapers break constantly</li>
+          <li>Legal/ethical gray area (ToS, robots.txt)</li>
+          <li>Many restaurants don't have wine lists online</li>
+          <li>Third-party platforms often incomplete/outdated</li>
+          <li>Maintenance burden: scrapers break when websites change</li>
+          <li>Quartino's menu is a PDF &mdash; still needs OCR + AI (overlaps with Idea 1)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-high">Dev Effort: High (5+ days + ongoing)</span>
+      <span class="badge badge-ops badge-med">Ops Effort: Medium (monitoring needed)</span>
+    </div>
+  </div>
+
+  <!-- IDEA 6 -->
+  <div class="idea-card">
+    <h2><span class="idea-number">6</span> Hybrid "Quick Input" Mode &mdash; Paste &amp; Parse</h2>
+    <p class="how-it-works">Instead of filling out a CSV with 11 columns, paste a raw wine list in any format (copied from a website, typed from a menu, dictated) and let AI parse it into fully structured wine records with sensory profiles.</p>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>User copies wine list text from anywhere (website, email, typed from menu, dictated)</li>
+      <li>Pastes into a text box in the app</li>
+      <li>Example input:</li>
+    </ol>
+    <pre>Whites:
+Anterra Pinot Grigio Sicily $15
+Heinz Eifel Riesling Mosel Germany $16.50
+La Scolca Gavi Piedmont $18
+
+Reds:
+Avanti Chianti Tuscany $15
+Sicilian Gold Nero d'Avola $16.50
+Cune Crianza Rioja Spain $18</pre>
+    <ol start="4">
+      <li>Clicks "Parse" &mdash; AI structures the messy text into proper wine records with full sensory profiles</li>
+      <li>User reviews in table format, makes corrections, submits</li>
+    </ol>
+
+    <h3>What You'd Build</h3>
+    <ul>
+      <li>Simple text area input + "Parse with AI" button</li>
+      <li>Claude API call to parse unstructured text &rarr; structured JSON with sensory data</li>
+      <li>Review/edit table</li>
+      <li>Batch submission to existing wine API</li>
+    </ul>
+
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Pros</h3>
+        <ul>
+          <li><strong>Lowest friction possible</strong> &mdash; paste any format, AI figures it out</li>
+          <li>Handles abbreviations and inconsistent formatting</li>
+          <li>Works with text from any source</li>
+          <li>AI fills in everything: full varietal names, regions, sensory data</li>
+          <li>Can handle "Caymus Cab" &rarr; "Caymus, Cabernet Sauvignon, Napa Valley"</li>
+          <li>Very fast to implement</li>
+          <li>Combines well with phone dictation</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Cons</h3>
+        <ul>
+          <li>Accuracy depends on input quality</li>
+          <li>AI may misinterpret ambiguous entries</li>
+          <li>Still requires a review step</li>
+          <li>Doesn't automate initial data gathering</li>
+          <li>Claude API cost (~$0.02-0.05 per list)</li>
+          <li>Less structured than CSV for corrections at scale</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="effort-badges">
+      <span class="badge badge-dev badge-low">Dev Effort: Low-Medium (1-2 days)</span>
+      <span class="badge badge-ops badge-low">Ops Effort: Low</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- COMPARISON TABLE -->
+  <h2>Comparison Matrix</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Approach</th>
+        <th>Speed Gain</th>
+        <th>Accuracy</th>
+        <th>Dev Effort</th>
+        <th>Ongoing Cost</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. Photo/PDF + AI</td>
+        <td class="highlight">10x</td>
+        <td>Good (85-90%)</td>
+        <td>Medium</td>
+        <td>~$0.05/menu</td>
+        <td>Physical menu onboarding</td>
+      </tr>
+      <tr>
+        <td>2. AI Sensory Auto-Fill</td>
+        <td class="highlight">2-3x</td>
+        <td>High (90%+)</td>
+        <td><strong>Low</strong></td>
+        <td>Minimal</td>
+        <td>Improving CSV workflow</td>
+      </tr>
+      <tr>
+        <td>3. Wine Database API</td>
+        <td>3-5x</td>
+        <td>Very High (95%+)</td>
+        <td>Medium-High</td>
+        <td>$500+/yr</td>
+        <td>Well-known wines</td>
+      </tr>
+      <tr>
+        <td>4. Admin Portal + CSV</td>
+        <td>5x</td>
+        <td>High (verified)</td>
+        <td>High</td>
+        <td>None</td>
+        <td>Self-serve onboarding</td>
+      </tr>
+      <tr>
+        <td>5. Web Scraping</td>
+        <td>Variable</td>
+        <td>Medium (75-85%)</td>
+        <td>High</td>
+        <td>Maintenance</td>
+        <td>Online menus</td>
+      </tr>
+      <tr>
+        <td>6. Paste &amp; Parse</td>
+        <td class="highlight">5-8x</td>
+        <td>Good (85-90%)</td>
+        <td><strong>Low-Medium</strong></td>
+        <td>~$0.03/list</td>
+        <td>Any text source</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <!-- RECOMMENDED STRATEGY -->
+  <div class="strategy">
+    <h2>Recommended Phased Strategy</h2>
+
+    <div class="phase">
+      <span class="phase-label">Phase 1 &mdash; Quick Win</span>
+      <p>Implement <strong>Idea 2 + Idea 6</strong> together. Build a "Paste &amp; Parse" text box that sends raw wine list text to Claude API, which returns fully structured data including sensory profiles. This alone would have turned the Quartino task from hours to minutes.</p>
+    </div>
+
+    <div class="phase">
+      <span class="phase-label">Phase 2 &mdash; In-Person Scaling</span>
+      <p>Add <strong>Idea 1 (Photo/PDF + AI)</strong> for onboarding restaurants in person &mdash; just photograph their menu and go.</p>
+    </div>
+
+    <div class="phase">
+      <span class="phase-label">Phase 3 &mdash; Partner Self-Serve</span>
+      <p>Build <strong>Idea 4 (Admin Portal)</strong> when you have enough restaurants that your personal involvement doesn't scale. Bake in Ideas 1, 2, and 6 as input methods within the portal.</p>
+    </div>
+  </div>
+
+</body>
+</html>

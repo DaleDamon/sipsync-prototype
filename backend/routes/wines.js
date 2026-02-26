@@ -171,6 +171,103 @@ router.get('/restaurant/:restaurantId', async (req, res) => {
   }
 });
 
+// GET /api/wines/search
+// Search for wines across all restaurants by keyword
+router.get('/search', async (req, res) => {
+  try {
+    const { keyword } = req.query;
+
+    // Validate keyword parameter
+    if (!keyword || keyword.trim().length < 2) {
+      return res.status(400).json({
+        error: 'Keyword is required and must be at least 2 characters'
+      });
+    }
+
+    const searchTerm = keyword.trim().toLowerCase();
+    const results = [];
+    let totalWines = 0;
+
+    // Get all restaurants
+    const restaurantsSnapshot = await db.collection('restaurants').get();
+
+    // Iterate through each restaurant and search their wines
+    for (const restaurantDoc of restaurantsSnapshot.docs) {
+      const restaurantData = restaurantDoc.data();
+      const restaurantId = restaurantDoc.id;
+
+      // Get wines for this restaurant
+      const winesSnapshot = await db
+        .collection('restaurants')
+        .doc(restaurantId)
+        .collection('wines')
+        .get();
+
+      const matchedWines = [];
+
+      // Filter wines by keyword (producer, varietal, region)
+      winesSnapshot.forEach((wineDoc) => {
+        const wine = wineDoc.data();
+
+        // Search in producer, varietal, and region fields
+        const producer = (wine.producer || '').toLowerCase();
+        const varietal = (wine.varietal || '').toLowerCase();
+        const region = (wine.region || '').toLowerCase();
+
+        if (
+          producer.includes(searchTerm) ||
+          varietal.includes(searchTerm) ||
+          region.includes(searchTerm)
+        ) {
+          // Generate matchKey for duplicate detection (normalize wine identifier)
+          const year = wine.year || '';
+          const matchKey = `${producer}-${varietal}-${year}`.trim();
+
+          matchedWines.push({
+            wineId: wineDoc.id,
+            year: wine.year || '',
+            producer: wine.producer || '',
+            varietal: wine.varietal || '',
+            region: wine.region || '',
+            type: wine.type || '',
+            price: wine.price || 0,
+            acidity: wine.acidity || '',
+            tannins: wine.tannins || '',
+            bodyWeight: wine.bodyWeight || '',
+            sweetnessLevel: wine.sweetnessLevel || '',
+            flavorProfile: wine.flavorProfile || [],
+            matchKey
+          });
+        }
+      });
+
+      // Only include restaurants that have matching wines
+      if (matchedWines.length > 0) {
+        results.push({
+          restaurantId,
+          restaurantName: restaurantData.name || 'Unnamed Restaurant',
+          restaurantCity: restaurantData.city || '',
+          wines: matchedWines
+        });
+        totalWines += matchedWines.length;
+      }
+    }
+
+    // Sort results by restaurant name
+    results.sort((a, b) => a.restaurantName.localeCompare(b.restaurantName));
+
+    res.json({
+      results,
+      totalWines,
+      searchTerm: keyword
+    });
+
+  } catch (error) {
+    console.error('Error searching wines:', error);
+    res.status(500).json({ error: 'Wine search failed' });
+  }
+});
+
 // GET /api/wines/:wineId
 // Get a specific wine
 router.get('/:wineId', async (req, res) => {

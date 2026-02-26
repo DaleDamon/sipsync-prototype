@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SipSync - Admin Portal Implementation Breakdown & AI Cost Analysis</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #333;
+      line-height: 1.6;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 30px;
+      background: #fff;
+    }
+    h1 {
+      color: #8b0000;
+      font-size: 28px;
+      margin-bottom: 4px;
+      border-bottom: 3px solid #8b0000;
+      padding-bottom: 12px;
+    }
+    .subtitle { color: #888; font-size: 13px; margin-bottom: 28px; }
+    h2 {
+      color: #8b0000;
+      font-size: 21px;
+      margin: 30px 0 14px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    h3 {
+      color: #555;
+      font-size: 15px;
+      margin: 18px 0 8px 0;
+    }
+    p { margin: 8px 0; font-size: 14px; }
+    strong { color: #333; }
+    ul, ol { margin: 8px 0 8px 24px; font-size: 14px; }
+    li { margin: 4px 0; }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: #8b0000;
+    }
+    hr { border: none; border-top: 2px solid #f0f0f0; margin: 28px 0; }
+
+    /* Flow diagram */
+    .flow-box {
+      background: linear-gradient(135deg, #fff8f8, #fef5f0);
+      border: 2px solid #8b0000;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      font-weight: 600;
+      color: #8b0000;
+    }
+    .flow-step {
+      background: white;
+      border: 1px solid #dcc;
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+    .flow-arrow { font-size: 18px; color: #caa; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+    th {
+      background: #8b0000;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    tr:nth-child(even) { background: #fafafa; }
+    tr:hover { background: #fff5f5; }
+    .total-row { font-weight: bold; background: #fff0f0 !important; }
+    .highlight { font-weight: bold; color: #8b0000; }
+
+    /* Cards */
+    .feature-card {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 24px;
+      margin: 20px 0;
+      page-break-inside: avoid;
+    }
+    .feature-card h2 {
+      margin-top: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .feature-num {
+      display: inline-block;
+      background: #8b0000;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 28px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .depends-note {
+      background: #fef9e7;
+      border-left: 3px solid #f0c040;
+      padding: 8px 14px;
+      font-size: 13px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .ai-note {
+      background: #e8f4fd;
+      border-left: 3px solid #3b82f6;
+      padding: 8px 14px;
+      font-size: 13px;
+      margin: 12px 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Context box */
+    .context-box {
+      background: #fff8f8;
+      border-left: 4px solid #8b0000;
+      padding: 16px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* Effort summary */
+    .effort-summary {
+      background: linear-gradient(135deg, #f0faf0, #e8f5e8);
+      border: 1px solid #b0d8b0;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    /* Option cards */
+    .option-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 14px 0;
+      page-break-inside: avoid;
+    }
+    .option-card.recommended {
+      border-color: #8b0000;
+      background: #fff8f8;
+    }
+    .option-label {
+      font-weight: bold;
+      font-size: 15px;
+      color: #8b0000;
+      margin-bottom: 6px;
+    }
+    .rec-badge {
+      display: inline-block;
+      background: #8b0000;
+      color: white;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .option-details { font-size: 13px; margin: 4px 0; }
+    .option-details ul { margin: 4px 0 4px 20px; }
+
+    /* Phase cards */
+    .phase-card {
+      border-left: 4px solid #8b0000;
+      background: white;
+      padding: 14px 18px;
+      margin: 14px 0;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .phase-label {
+      font-weight: bold;
+      color: #8b0000;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    .phase-card ol { margin: 6px 0 6px 20px; font-size: 13px; }
+    .deliverable {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #2d7a2d;
+      font-weight: 600;
+    }
+
+    /* Token explainer */
+    .token-box {
+      background: #f8f8ff;
+      border: 1px solid #d0d0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .token-box h3 { color: #444; margin-bottom: 8px; }
+
+    /* Print */
+    @media print {
+      body { padding: 20px; max-width: 100%; }
+      .feature-card, .option-card, .phase-card { page-break-inside: avoid; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Restaurant Admin Portal</h1>
+  <p class="subtitle">Implementation Breakdown &amp; AI Cost Analysis &bull; SipSync &bull; February 2026</p>
+
+  <div class="context-box">
+    <p><strong>Goal:</strong> Build a self-serve admin portal where restaurant partners upload their wine menus via CSV, PDF, or photo. AI automatically fills in the sensory profile (acidity, tannins, body, sweetness, flavors) so restaurants only provide what they already know &mdash; their wine list.</p>
+  </div>
+
+  <!-- WORKFLOW -->
+  <h2>Restaurant Operator Workflow</h2>
+  <div class="flow-box">
+    <div class="flow-steps">
+      <span class="flow-step">Log In</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Choose Upload Method</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">AI Parses &amp; Fills Data</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Review &amp; Edit</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Publish</span>
+    </div>
+  </div>
+
+  <h3>Step-by-step from the restaurant's perspective:</h3>
+  <ol>
+    <li><strong>Log in</strong> to their admin dashboard (simple email/password or magic link)</li>
+    <li><strong>Choose how to upload</strong> their wine list:
+      <ul style="list-style: none; margin-top: 4px;">
+        <li>&bull; "Upload Spreadsheet" (CSV/Excel)</li>
+        <li>&bull; "Upload PDF Menu"</li>
+        <li>&bull; "Take a Photo of Menu"</li>
+      </ul>
+    </li>
+    <li><strong>Wait 10-30 seconds</strong> while AI processes</li>
+    <li><strong>Review</strong> a pre-filled table with all wines parsed and sensory profiles estimated</li>
+    <li><strong>Edit</strong> any corrections inline (change a price, fix a misspelling)</li>
+    <li><strong>Publish</strong> with one click &rarr; wines go live on SipSync</li>
+  </ol>
+
+  <h3>For menu updates:</h3>
+  <ol>
+    <li>Upload new menu using any method</li>
+    <li>System shows a <strong>diff view</strong>: "4 wines added, 2 removed, 1 price changed"</li>
+    <li>Confirm changes &rarr; live</li>
+  </ol>
+
+  <hr>
+
+  <!-- FEATURE 1 -->
+  <h2>Feature Breakdown</h2>
+
+  <div class="feature-card">
+    <h2><span class="feature-num">1</span> CSV Upload + AI Sensory Auto-Fill</h2>
+    <p>Restaurant uploads a CSV with basic fields (producer, varietal, type, price). AI fills in acidity, tannins, body, sweetness, flavor profile, and region.</p>
+
+    <table>
+      <thead>
+        <tr><th>Task</th><th>Description</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CSV parser integration</td><td>Add Papa Parse library to frontend</td><td>2 hrs</td></tr>
+        <tr><td>Upload UI</td><td>File picker, drag-and-drop zone, format instructions</td><td>4 hrs</td></tr>
+        <tr><td>CSV validation</td><td>Check required columns exist, validate types/prices</td><td>3 hrs</td></tr>
+        <tr><td>AI auto-fill endpoint</td><td><code>POST /api/wines/ai/auto-fill</code> &mdash; batch wines to LLM</td><td>4 hrs</td></tr>
+        <tr><td>Review/edit table</td><td>Interactive table with inline editing, row delete, add row</td><td>8 hrs</td></tr>
+        <tr><td>Batch submission</td><td><code>POST /api/wines/restaurant/:id/batch</code></td><td>3 hrs</td></tr>
+        <tr><td>Error handling</td><td>Validation errors per row, retry failed rows</td><td>3 hrs</td></tr>
+        <tr class="total-row"><td><strong>Total</strong></td><td></td><td><strong>~27 hrs (3-4 days)</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="ai-note">
+      <strong>AI usage:</strong> 1 API call with all wines batched together (not per-wine). A 50-wine menu = single request.
+    </div>
+  </div>
+
+  <!-- FEATURE 2 -->
+  <div class="feature-card">
+    <h2><span class="feature-num">2</span> PDF Upload + AI Parsing</h2>
+    <p>Restaurant uploads a PDF of their wine menu. AI reads the PDF, extracts wine data, AND fills sensory profiles in one step.</p>
+
+    <table>
+      <thead>
+        <tr><th>Task</th><th>Description</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>PDF upload UI</td><td>File picker accepting .pdf files</td><td>1 hr</td></tr>
+        <tr><td>PDF-to-image conversion</td><td>Convert PDF pages to images server-side (pdf-lib or pdf2pic)</td><td>4 hrs</td></tr>
+        <tr><td>AI vision endpoint</td><td><code>POST /api/wines/ai/parse-menu</code> &mdash; images to LLM vision API</td><td>4 hrs</td></tr>
+        <tr><td>Multi-page handling</td><td>Process each page, merge results, deduplicate</td><td>3 hrs</td></tr>
+        <tr><td>Loading/progress UI</td><td>"Processing page 1 of 3..." feedback</td><td>2 hrs</td></tr>
+        <tr class="total-row"><td><strong>Total</strong></td><td></td><td><strong>~14 hrs (2 days)</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="depends-note">
+      <strong>Depends on:</strong> Feature 1's review table and batch submission (shared components).
+    </div>
+    <div class="ai-note">
+      <strong>AI usage:</strong> 1 API call per PDF page (typically 1-3 pages for a wine list).
+    </div>
+  </div>
+
+  <!-- FEATURE 3 -->
+  <div class="feature-card">
+    <h2><span class="feature-num">3</span> Photo Upload + AI Parsing</h2>
+    <p>Restaurant takes a photo of their printed wine menu and uploads it. AI reads the image and extracts + fills all wine data.</p>
+
+    <table>
+      <thead>
+        <tr><th>Task</th><th>Description</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Photo upload UI</td><td>File picker accepting images, camera capture on mobile</td><td>2 hrs</td></tr>
+        <tr><td>Image optimization</td><td>Resize/compress before upload to reduce costs &amp; latency</td><td>2 hrs</td></tr>
+        <tr><td>Multi-photo support</td><td>"Add another page" for multi-page menus</td><td>2 hrs</td></tr>
+        <tr><td>AI vision endpoint</td><td>Same endpoint as PDF (reuse Feature 2's backend)</td><td>0 hrs</td></tr>
+        <tr><td>Photo quality guidance</td><td>UI tips: "Good lighting, flat surface, avoid glare"</td><td>1 hr</td></tr>
+        <tr class="total-row"><td><strong>Total</strong></td><td></td><td><strong>~7 hrs (1 day)</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="depends-note">
+      <strong>Depends on:</strong> Feature 2's vision endpoint (identical backend) + Feature 1's review table.
+    </div>
+    <div class="ai-note">
+      <strong>AI usage:</strong> 1 API call per photo (typically 1-3 photos).
+    </div>
+  </div>
+
+  <!-- SHARED -->
+  <div class="feature-card">
+    <h2><span class="feature-num" style="background: #555;">&bull;</span> Shared Infrastructure (All Features)</h2>
+
+    <table>
+      <thead>
+        <tr><th>Task</th><th>Description</th><th>Effort</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Admin authentication</td><td>Restaurant login system (separate from consumer auth)</td><td>6 hrs</td></tr>
+        <tr><td>Admin dashboard page</td><td>Navigation, restaurant selector, upload history</td><td>4 hrs</td></tr>
+        <tr><td>Restaurant-admin linking</td><td>Associate admin accounts with restaurant IDs in Firebase</td><td>2 hrs</td></tr>
+        <tr><td>Menu diff view</td><td>Compare new upload vs existing wines (adds/removes/changes)</td><td>6 hrs</td></tr>
+        <tr><td>Batch wine API</td><td>Backend to add/update/delete multiple wines atomically</td><td>4 hrs</td></tr>
+        <tr><td>AI prompt engineering</td><td>Craft and test LLM prompt for accurate wine parsing</td><td>4 hrs</td></tr>
+        <tr class="total-row"><td><strong>Total</strong></td><td></td><td><strong>~26 hrs (3-4 days)</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EFFORT SUMMARY -->
+  <div class="effort-summary">
+    <h2 style="color: #2d7a2d; margin-top: 0; border: none;">Total Effort Summary</h2>
+    <table>
+      <thead>
+        <tr><th>Scope</th><th>Effort</th><th>Calendar Time</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Shared infrastructure</td><td>~26 hrs</td><td>3-4 days</td></tr>
+        <tr><td>Feature 1: CSV upload</td><td>~27 hrs</td><td>3-4 days</td></tr>
+        <tr><td>Feature 2: PDF upload</td><td>~14 hrs</td><td>2 days</td></tr>
+        <tr><td>Feature 3: Photo upload</td><td>~7 hrs</td><td>1 day</td></tr>
+        <tr><td>Testing &amp; polish</td><td>~10 hrs</td><td>1-2 days</td></tr>
+        <tr class="total-row"><td><strong>All 3 features</strong></td><td><strong>~84 hrs</strong></td><td><strong>~10-12 days</strong></td></tr>
+        <tr><td>MVP (CSV only)</td><td>~53 hrs</td><td>~7 days</td></tr>
+        <tr><td>CSV + PDF</td><td>~67 hrs</td><td>~9 days</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <!-- AI COST ANALYSIS -->
+  <h2>AI / LLM Cost Analysis</h2>
+
+  <div class="token-box">
+    <h3>How Token Pricing Works</h3>
+    <p>LLMs charge per <strong>token</strong> (roughly 1 token &asymp; 0.75 words). You pay for:</p>
+    <ul>
+      <li><strong>Input tokens:</strong> Your prompt + any data/images you send</li>
+      <li><strong>Output tokens:</strong> The AI's response (usually 3-5x more expensive than input)</li>
+      <li><strong>Image tokens:</strong> For vision, images are converted to tokens: <code>(width &times; height) / 750</code></li>
+    </ul>
+    <p style="margin-top: 10px;">A typical wine menu photo (~1568&times;1568px after resize) = <strong>~3,300 input tokens</strong>.<br>
+    A 50-wine menu output (structured JSON + sensory data) = <strong>~7,500 output tokens</strong>.</p>
+  </div>
+
+  <h3>LLM Provider Comparison (Per Million Tokens)</h3>
+  <table>
+    <thead>
+      <tr><th>Provider / Model</th><th>Input Cost</th><th>Output Cost</th><th>Vision?</th><th>Quality</th><th>Speed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Gemini 2.5 Flash</strong></td><td>$0.30</td><td>$1.20</td><td>Yes</td><td>Good</td><td>Very Fast</td></tr>
+      <tr><td><strong>Gemini 3 Flash</strong></td><td>$0.50</td><td>$3.00</td><td>Yes</td><td>Good+</td><td>Very Fast</td></tr>
+      <tr><td><strong>GPT-4o mini</strong></td><td>$0.15</td><td>$0.60</td><td>Yes*</td><td>Good</td><td>Fast</td></tr>
+      <tr><td><strong>Claude Haiku 4.5</strong></td><td>$1.00</td><td>$5.00</td><td>Yes</td><td>Good+</td><td>Fast</td></tr>
+      <tr><td><strong>Gemini 2.5 Pro</strong></td><td>$1.25</td><td>$10.00</td><td>Yes</td><td>Very Good</td><td>Medium</td></tr>
+      <tr><td><strong>GPT-4o</strong></td><td>$2.50</td><td>$10.00</td><td>Yes</td><td>Excellent</td><td>Medium</td></tr>
+      <tr><td><strong>Claude Sonnet 4.5</strong></td><td>$3.00</td><td>$15.00</td><td>Yes</td><td>Excellent</td><td>Medium</td></tr>
+      <tr><td><strong>Claude Opus 4.6</strong></td><td>$5.00</td><td>$25.00</td><td>Yes</td><td>Best</td><td>Slower</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 12px; color: #888;">*GPT-4o mini charges $10/MTok for image input tokens specifically, vs $0.15 for text input.</p>
+
+  <h3>Real-World Cost Per Restaurant Menu Upload</h3>
+  <p><strong>Scenario: 50-wine menu, 3 PDF/photo pages</strong></p>
+  <table>
+    <thead>
+      <tr><th>Model</th><th>CSV Auto-Fill</th><th>PDF/Photo (per page)</th><th>Full Menu (3 pages)</th><th>Quality</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Gemini 2.5 Flash</strong></td><td>$0.01</td><td>$0.01</td><td class="highlight">$0.03</td><td>Good &mdash; may miss some wines</td></tr>
+      <tr><td><strong>GPT-4o mini</strong></td><td>$0.005</td><td>$0.04</td><td>$0.11</td><td>Good &mdash; occasional parsing errors</td></tr>
+      <tr><td><strong>Claude Haiku 4.5</strong></td><td>$0.04</td><td>$0.04</td><td>$0.12</td><td>Good+ &mdash; reliable structured output</td></tr>
+      <tr><td><strong>Gemini 2.5 Pro</strong></td><td>$0.08</td><td>$0.08</td><td>$0.24</td><td>Very Good &mdash; strong parsing</td></tr>
+      <tr><td><strong>GPT-4o</strong></td><td>$0.08</td><td>$0.10</td><td>$0.30</td><td>Excellent &mdash; strong vision</td></tr>
+      <tr><td><strong>Claude Sonnet 4.5</strong></td><td>$0.12</td><td>$0.12</td><td>$0.37</td><td>Excellent &mdash; best wine knowledge</td></tr>
+      <tr><td><strong>Claude Opus 4.6</strong></td><td>$0.21</td><td>$0.21</td><td>$0.62</td><td>Best &mdash; overkill for this task</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Annual Cost at Scale</h3>
+  <p><strong>Scenario: 100 restaurants, quarterly menu updates = 400 uploads/year</strong></p>
+  <table>
+    <thead>
+      <tr><th>Model</th><th>Annual Cost</th><th>Quality Trade-off</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Gemini 2.5 Flash</td><td class="highlight">~$12/yr</td><td>May need more manual corrections</td></tr>
+      <tr><td>GPT-4o mini</td><td>~$44/yr</td><td>Solid for CSV, weaker on messy photos</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>~$48/yr</td><td>Great balance of cost and accuracy</td></tr>
+      <tr><td>GPT-4o</td><td>~$120/yr</td><td>Strong all-around</td></tr>
+      <tr><td>Claude Sonnet 4.5</td><td>~$148/yr</td><td>Best accuracy, rarely needs corrections</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <!-- RECOMMENDED OPTIONS -->
+  <h2>Recommended Tier Strategies</h2>
+
+  <div class="option-card">
+    <div class="option-label">Option A: Single Model (Simplest)</div>
+    <div class="option-details">
+      <p>Use <strong>Claude Haiku 4.5</strong> for everything.</p>
+      <ul>
+        <li>~$0.04-0.12 per menu upload</li>
+        <li>~$48/yr at 100 restaurants</li>
+        <li>Good accuracy, fast, simple integration (one API key)</li>
+        <li>Best if you want minimal complexity</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="option-card recommended">
+    <div class="option-label">Option B: Two-Tier (Best Value) <span class="rec-badge">RECOMMENDED</span></div>
+    <div class="option-details">
+      <ul>
+        <li><strong>Claude Haiku 4.5</strong> for CSV auto-fill (text-only, simpler task) &rarr; ~$0.04/menu</li>
+        <li><strong>Claude Sonnet 4.5</strong> for PDF/photo parsing (needs stronger vision + wine knowledge) &rarr; ~$0.12/page</li>
+        <li>~$100/yr at 100 restaurants</li>
+        <li>Better accuracy on the harder task while saving on the easy task</li>
+        <li>Same API key, same SDK &mdash; just different model parameter</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="option-card">
+    <div class="option-label">Option C: Budget-First</div>
+    <div class="option-details">
+      <p>Use <strong>Gemini 2.5 Flash</strong> for everything.</p>
+      <ul>
+        <li>~$0.01-0.03 per menu upload</li>
+        <li>~$12/yr at 100 restaurants</li>
+        <li>Cheapest option, but may produce more parsing errors</li>
+        <li>Different API integration (Google instead of Anthropic)</li>
+        <li>Gemini Flash has a free tier for low volume</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="option-card">
+    <div class="option-label">Option D: Premium Accuracy</div>
+    <div class="option-details">
+      <p>Use <strong>Claude Sonnet 4.5</strong> for everything.</p>
+      <ul>
+        <li>~$0.12-0.37 per menu upload</li>
+        <li>~$148/yr at 100 restaurants</li>
+        <li>Highest accuracy, fewest manual corrections needed</li>
+        <li>Strongest wine domain knowledge of any LLM</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- INTEGRATION COMPARISON -->
+  <h2>Integration Considerations by Provider</h2>
+  <table>
+    <thead>
+      <tr><th>Factor</th><th>Claude (Anthropic)</th><th>GPT-4o (OpenAI)</th><th>Gemini (Google)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>You already use</strong></td><td>Claude Code (this tool)</td><td>&mdash;</td><td>Firebase (backend)</td></tr>
+      <tr><td><strong>Wine knowledge</strong></td><td class="highlight">Excellent</td><td>Very Good</td><td>Good</td></tr>
+      <tr><td><strong>Vision quality</strong></td><td>Very Good</td><td class="highlight">Excellent</td><td>Good</td></tr>
+      <tr><td><strong>Structured JSON output</strong></td><td class="highlight">Excellent (native)</td><td>Good (JSON mode)</td><td>Good</td></tr>
+      <tr><td><strong>Node.js SDK</strong></td><td>@anthropic-ai/sdk</td><td>openai</td><td>@google/generative-ai</td></tr>
+      <tr><td><strong>Batch discount</strong></td><td>50% off</td><td>50% off</td><td>&mdash;</td></tr>
+      <tr><td><strong>Free tier</strong></td><td>&mdash;</td><td>&mdash;</td><td>Flash has free tier</td></tr>
+      <tr><td><strong>Latency</strong></td><td>~3-8 sec</td><td>~3-8 sec</td><td>~2-5 sec</td></tr>
+    </tbody>
+  </table>
+
+  <div class="context-box">
+    <p><strong>Bottom line:</strong> Go with <strong>Claude (Option B: Haiku + Sonnet)</strong>. You're already in the Anthropic ecosystem, Claude has the strongest wine domain knowledge for sensory estimation, and the two-tier approach keeps costs under $100/yr even at 100 restaurants. Same API key, same SDK &mdash; you just pass a different model name.</p>
+  </div>
+
+  <hr>
+
+  <!-- BUILD ORDER -->
+  <h2>Suggested Build Order</h2>
+
+  <div class="phase-card">
+    <div class="phase-label">Phase 1: Foundation + CSV (Week 1)</div>
+    <ol>
+      <li>Admin auth + dashboard skeleton</li>
+      <li>CSV upload with Papa Parse</li>
+      <li>AI auto-fill endpoint (Claude Haiku for sensory data)</li>
+      <li>Review/edit table</li>
+      <li>Batch submission API</li>
+    </ol>
+    <div class="deliverable">&rarr; Restaurants can upload CSV, get AI-filled sensory data, review, and publish</div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-label">Phase 2: PDF Upload (Week 2, first half)</div>
+    <ol>
+      <li>PDF upload + page-to-image conversion</li>
+      <li>AI vision endpoint (Claude Sonnet for parsing)</li>
+      <li>Multi-page handling + merge</li>
+    </ol>
+    <div class="deliverable">&rarr; Restaurants can upload PDF menus</div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-label">Phase 3: Photo Upload (Week 2, second half)</div>
+    <ol>
+      <li>Photo upload UI with camera capture</li>
+      <li>Image optimization</li>
+      <li>Multi-photo support</li>
+      <li>Reuse PDF vision endpoint</li>
+    </ol>
+    <div class="deliverable">&rarr; Restaurants can photograph their menus</div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-label">Phase 4: Polish (Week 3, first half)</div>
+    <ol>
+      <li>Menu diff view (new vs existing wines)</li>
+      <li>Upload history</li>
+      <li>Error handling + retry logic</li>
+      <li>Mobile-responsive admin UI</li>
+    </ol>
+    <div class="deliverable">&rarr; Complete, polished admin portal</div>
+  </div>
+
+  <hr>
+
+  <!-- VERIFICATION -->
+  <h2>Verification Plan</h2>
+  <ol>
+    <li>Upload Quartino's CSV &rarr; verify AI sensory estimates match your manual entries</li>
+    <li>Upload a PDF wine menu &rarr; verify all wines extracted with correct fields</li>
+    <li>Take a phone photo of a printed menu &rarr; verify parsing accuracy</li>
+    <li>Test menu update flow: upload revised menu, verify diff view shows correct changes</li>
+    <li>Test on mobile: verify photo capture and upload works from phone browser</li>
+    <li>Monitor API costs in Anthropic dashboard after 10 test uploads</li>
+  </ol>
+
+  <hr>
+  <p style="font-size: 12px; color: #aaa; text-align: center; margin-top: 20px;">
+    Sources:
+    <a href="https://platform.claude.com/docs/en/about-claude/pricing" style="color: #aaa;">Claude API Pricing</a> &bull;
+    <a href="https://openai.com/api/pricing/" style="color: #aaa;">OpenAI Pricing</a> &bull;
+    <a href="https://ai.google.dev/gemini-api/docs/pricing" style="color: #aaa;">Gemini API Pricing</a> &bull;
+    <a href="https://platform.claude.com/docs/en/build-with-claude/vision" style="color: #aaa;">Claude Vision Docs</a>
+  </p>
+
+</body>
+</html>
