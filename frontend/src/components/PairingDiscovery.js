@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../styles/PairingDiscovery.css';
 import { API_URL } from '../config';
 
@@ -218,6 +218,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         clearTimeout(debounceTimer.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences, selectedRestaurant]);
 
   const fetchRestaurants = async () => {
@@ -364,7 +365,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     }
   };
 
-  const handleFindMatches = async () => {
+  const handleFindMatches = useCallback(async () => {
     if (!selectedRestaurant) {
       setError('Please select a restaurant');
       return;
@@ -372,6 +373,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
     setLoading(true);
     setError('');
+
+    console.log('[PAIRING] Searching with preferences:', preferences);
 
     try {
       const response = await fetch(`${API_URL}/pairings/find`, {
@@ -386,6 +389,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       const data = await response.json();
 
       if (response.ok) {
+        console.log('[PAIRING] Received', data.matches?.length, 'matches');
+        if (data.matches?.length > 0) {
+          console.log('[PAIRING] Top matches with EXACT scores:');
+          data.matches.slice(0, 5).forEach((wine, i) => {
+            const exactScore = wine.matchScore.toFixed(4);
+            const roundedPercent = Math.round(wine.matchScore * 100);
+            console.log(`  ${i + 1}. ${wine.producer} ${wine.varietal}`);
+            console.log(`     Score: ${exactScore} → ${roundedPercent}% (body: ${wine.bodyWeight})`);
+          });
+        }
         setMatches(data.matches || []);
         if (data.matches.length === 0) {
           setError('No wines match your preferences at this restaurant');
@@ -398,7 +411,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedRestaurant, preferences]);
 
   const savePairing = async (wine) => {
     if (!user || !user.userId) {
