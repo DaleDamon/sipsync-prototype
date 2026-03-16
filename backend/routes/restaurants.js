@@ -38,6 +38,57 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/restaurants/:restaurantId/last-updated - Get wine list last updated timestamp
+router.get('/:restaurantId/last-updated', async (req, res) => {
+  console.log('[RESTAURANTS GET /:restaurantId/last-updated] Route called');
+  try {
+    const { restaurantId } = req.params;
+
+    // Try uploadHistory first (primary source)
+    const historySnapshot = await db
+      .collection('restaurants')
+      .doc(restaurantId)
+      .collection('uploadHistory')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+
+    if (!historySnapshot.empty) {
+      const lastUpload = historySnapshot.docs[0].data();
+      console.log(`[RESTAURANTS GET /:restaurantId/last-updated] Found uploadHistory: ${lastUpload.createdAt}`);
+      return res.json({
+        lastUpdated: lastUpload.createdAt,
+        source: 'uploadHistory',
+        wineCount: lastUpload.wineCount
+      });
+    }
+
+    // Fallback: query wines collection
+    const winesSnapshot = await db
+      .collection('restaurants')
+      .doc(restaurantId)
+      .collection('wines')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+
+    if (!winesSnapshot.empty) {
+      const lastWine = winesSnapshot.docs[0].data();
+      console.log(`[RESTAURANTS GET /:restaurantId/last-updated] Found wine createdAt: ${lastWine.createdAt}`);
+      return res.json({
+        lastUpdated: lastWine.createdAt,
+        source: 'wines'
+      });
+    }
+
+    console.log(`[RESTAURANTS GET /:restaurantId/last-updated] No timestamp found`);
+    res.json({ lastUpdated: null, source: null });
+  } catch (error) {
+    console.error('[RESTAURANTS GET /:restaurantId/last-updated] Error:', error);
+    res.status(500).json({ error: 'Failed to fetch last updated date' });
+  }
+});
+
 // NEW: POST /api/restaurants - Create restaurant with address and geocoding
 router.post('/', adminAuth, async (req, res) => {
   try {

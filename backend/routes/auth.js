@@ -158,13 +158,18 @@ router.get('/user/:userId', async (req, res) => {
 router.put('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { name, savedPreferences } = req.body;
+    const { name, savedPreferences, customProfiles } = req.body;
 
     const userRef = db.collection('users').doc(userId);
     const updateData = {};
 
     if (name) updateData.name = name;
     if (savedPreferences) updateData.savedPreferences = savedPreferences;
+    if (customProfiles !== undefined) updateData.customProfiles = customProfiles;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.json({ message: 'Nothing to update', user: { userId } });
+    }
 
     await userRef.update(updateData);
 
@@ -556,7 +561,7 @@ router.post('/quiz/submit', async (req, res) => {
       sweetness: winningProfile.characteristics.sweetness,
       flavorNotes: winningProfile.characteristics.flavorNotes,
       dimensions: winningProfile.dimensions,
-      priceRange: { min: 20, max: 100 }
+      priceRange: { min: 0, max: 1000 }
     };
 
     try {

@@ -9,6 +9,7 @@ function RestaurantMap({ onRestaurantSelect }) {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Custom marker icon (traditional wine glass shaped)
   const customIcon = new L.Icon({
@@ -52,6 +53,13 @@ function RestaurantMap({ onRestaurantSelect }) {
     return false;
   });
 
+  // Filter by search query
+  const filteredRestaurants = restaurantsWithCoords.filter(restaurant => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return restaurant.name.toLowerCase().includes(query);
+  });
+
   // Helper function to get coordinates from either format
   const getCoords = (restaurant) => {
     if (restaurant.coordinates) {
@@ -67,9 +75,41 @@ function RestaurantMap({ onRestaurantSelect }) {
 
       {error && <div className="error-message">{error}</div>}
 
+      {/* Search Bar */}
+      {restaurantsWithCoords.length > 0 && (
+        <div className="map-search-container">
+          <input
+            type="text"
+            className="map-search-input"
+            placeholder="Search restaurants by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              className="map-search-clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+          <div className="map-search-count">
+            Showing {filteredRestaurants.length} of {restaurantsWithCoords.length} restaurants
+          </div>
+        </div>
+      )}
+
       {restaurantsWithCoords.length === 0 ? (
         <div className="no-restaurants">
           <p>No restaurants with location data available yet.</p>
+        </div>
+      ) : filteredRestaurants.length === 0 ? (
+        <div className="no-restaurants">
+          <p>No restaurants match your search "{searchQuery}"</p>
+          <button onClick={() => setSearchQuery('')} className="clear-search-btn">
+            Clear Search
+          </button>
         </div>
       ) : (
         <>
@@ -84,7 +124,7 @@ function RestaurantMap({ onRestaurantSelect }) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {restaurantsWithCoords.map((restaurant) => (
+              {filteredRestaurants.map((restaurant) => (
                 <Marker
                   key={restaurant.id}
                   position={getCoords(restaurant)}
@@ -130,9 +170,9 @@ function RestaurantMap({ onRestaurantSelect }) {
           </div>
 
           <div className="restaurants-list-sidebar">
-            <h3>Restaurants ({restaurantsWithCoords.length})</h3>
+            <h3>Restaurants ({filteredRestaurants.length})</h3>
             <div className="restaurants-list">
-              {restaurantsWithCoords.map((restaurant) => (
+              {filteredRestaurants.map((restaurant) => (
                 <div
                   key={restaurant.id}
                   className="restaurant-list-item"

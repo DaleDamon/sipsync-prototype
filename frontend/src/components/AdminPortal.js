@@ -7,10 +7,12 @@ import WineReviewTable from './WineReviewTable';
 import MenuDiff from './MenuDiff';
 import WineListFilter from './WineListFilter';
 import RestaurantForm from './RestaurantForm';
+import SearchableSelect from './SearchableSelect';
 
 function AdminPortal() {
   const [adminUser, setAdminUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
+  const [selectedUploadMethod, setSelectedUploadMethod] = useState('csv');
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
   const [wineCount, setWineCount] = useState(0);
@@ -115,6 +117,7 @@ function AdminPortal() {
   };
 
   const handleUploadMethodSelect = (method) => {
+    setSelectedUploadMethod(method);
     setCurrentView('upload');
   };
 
@@ -398,14 +401,15 @@ function AdminPortal() {
       {adminUser.role === 'superadmin' && restaurants.length > 0 && (
         <div className="restaurant-selector">
           <label>Select Restaurant</label>
-          <select
+          <SearchableSelect
+            options={restaurants.map(r => ({
+              label: `${r.name} — ${r.city || 'No city'}`,
+              value: r.id
+            }))}
             value={selectedRestaurant || ''}
-            onChange={(e) => setSelectedRestaurant(e.target.value)}
-          >
-            {restaurants.map(r => (
-              <option key={r.id} value={r.id}>{r.name} — {r.city || 'No city'}</option>
-            ))}
-          </select>
+            onChange={(val) => setSelectedRestaurant(val)}
+            placeholder="Search restaurants..."
+          />
         </div>
       )}
 
@@ -519,7 +523,7 @@ function AdminPortal() {
           <button className="back-to-dashboard" onClick={handleBackToDashboard}>
             Back to Dashboard
           </button>
-          <FileUpload adminToken={adminUser.token} onWinesParsed={handleWinesParsed} />
+          <FileUpload adminToken={adminUser.token} onWinesParsed={handleWinesParsed} initialMethod={selectedUploadMethod} />
         </>
       )}
 

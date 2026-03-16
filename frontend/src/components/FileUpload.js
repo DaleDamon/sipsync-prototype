@@ -5,8 +5,8 @@ import { API_URL } from '../config';
 
 const REQUIRED_COLUMNS = ['producer', 'varietal', 'type', 'price'];
 
-function FileUpload({ adminToken, onWinesParsed }) {
-  const [uploadMethod, setUploadMethod] = useState('csv');
+function FileUpload({ adminToken, onWinesParsed, initialMethod = 'csv' }) {
+  const [uploadMethod, setUploadMethod] = useState(initialMethod);
   const [file, setFile] = useState(null);
   const [csvData, setCsvData] = useState(null);
   const [csvColumns, setCsvColumns] = useState([]);

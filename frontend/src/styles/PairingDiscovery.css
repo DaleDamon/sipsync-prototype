@@ -1274,3 +1274,179 @@
   }
 }
 
+
+/* Wine List Last Updated Timestamp */
+.active-profile-badge {
+  background: #fdf6f6;
+  border-left: 3px solid #8b0000;
+  padding: 10px 15px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+}
+
+.profile-dropdown {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: #333;
+  cursor: pointer;
+}
+
+.profile-dropdown:focus {
+  outline: none;
+  border-color: #8b0000;
+  box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+}
+
+.wine-list-updated {
+  background: #f0f8ff;
+  border-left: 3px solid #4a90e2;
+  padding: 10px 15px;
+  margin: 15px 0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+}
+
+.updated-icon {
+  margin-right: 8px;
+}
+
+.wine-list-updated.loading {
+  background: #f9f9f9;
+  color: #999;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .wine-list-updated {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+
+/* Custom Profile Feature */
+.save-profile-modal {
+  background: #fdf6f6;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-name-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.profile-name-input:focus {
+  outline: none;
+  border-color: #8b0000;
+  box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+}
+
+.replace-profile-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.replace-profile-selector label {
+  font-size: 13px;
+  color: #666;
+}
+
+.replace-profile-selector select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+}
+
+.save-modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cancel-btn {
+  padding: 10px 18px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #f5f5f5;
+}
+
+.custom-profile-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.custom-profile-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #f9f6f6;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.custom-profile-name {
+  flex: 1;
+  font-size: 13px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-profile-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.custom-profile-icon-btn:hover {
+  opacity: 1;
+}
+
+.custom-profile-rename-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #8b0000;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.custom-profile-rename-input:focus {
+  outline: none;
+}

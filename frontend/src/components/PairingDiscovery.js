@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../styles/PairingDiscovery.css';
 import { API_URL } from '../config';
+import SearchableSelect from './SearchableSelect';
 
 function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [restaurants, setRestaurants] = useState([]);
@@ -25,16 +26,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'full',
       flavorNotes: ['oak', 'spice', 'cherry'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 150 },
+      priceRange: { min: 0, max: 1000 },
     },
     'medium-bodied-red-aficionado': {
       wineType: 'red',
       acidity: 'medium',
-      tannins: 'low',
+      tannins: 'medium',
       bodyWeight: 'medium',
       flavorNotes: ['cherry', 'berry', 'vanilla'],
-      sweetness: 'medium',
-      priceRange: { min: 0, max: 100 },
+      sweetness: 'dry',
+      priceRange: { min: 0, max: 1000 },
     },
     'spiced-red-connoisseur': {
       wineType: 'red',
@@ -43,7 +44,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'full',
       flavorNotes: ['spice', 'cherry', 'oak'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 120 },
+      priceRange: { min: 0, max: 1000 },
     },
     'light-bodied-red-devotee': {
       wineType: 'red',
@@ -52,16 +53,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'light',
       flavorNotes: ['berry', 'floral', 'citrus'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 80 },
+      priceRange: { min: 0, max: 1000 },
     },
-    'crisp-acidic-white-enthusiast': {
+    'crisp-&-acidic-white-enthusiast': {
       wineType: 'white',
       acidity: 'high',
       tannins: 'low',
       bodyWeight: 'light',
       flavorNotes: ['citrus', 'floral'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 80 },
+      priceRange: { min: 0, max: 1000 },
     },
     'full-bodied-white-aficionado': {
       wineType: 'white',
@@ -70,16 +71,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'full',
       flavorNotes: ['oak', 'vanilla'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 150 },
+      priceRange: { min: 0, max: 1000 },
     },
     'aromatic-white-connoisseur': {
       wineType: 'white',
       acidity: 'medium',
       tannins: 'low',
-      bodyWeight: 'medium',
+      bodyWeight: 'light',
       flavorNotes: ['floral', 'citrus', 'spice'],
       sweetness: 'medium',
-      priceRange: { min: 0, max: 100 },
+      priceRange: { min: 0, max: 1000 },
     },
     'fruit-forward-white-devotee': {
       wineType: 'white',
@@ -87,8 +88,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       tannins: 'low',
       bodyWeight: 'medium',
       flavorNotes: ['citrus', 'berry'],
-      sweetness: 'medium',
-      priceRange: { min: 0, max: 90 },
+      sweetness: 'dry',
+      priceRange: { min: 0, max: 1000 },
     },
     'sparkling-wine-enthusiast': {
       wineType: 'sparkling',
@@ -97,7 +98,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'light',
       flavorNotes: ['citrus', 'floral'],
       sweetness: 'dry',
-      priceRange: { min: 0, max: 100 },
+      priceRange: { min: 0, max: 1000 },
     },
     'dessert-wine-aficionado': {
       wineType: 'dessert',
@@ -106,7 +107,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       bodyWeight: 'medium',
       flavorNotes: ['berry', 'vanilla'],
       sweetness: 'sweet',
-      priceRange: { min: 0, max: 120 },
+      priceRange: { min: 0, max: 1000 },
     },
   };
 
@@ -118,6 +119,13 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [quizProfile, setQuizProfile] = useState(null); // User's quiz profile name
   const [hasQuiz, setHasQuiz] = useState(false); // Whether user has taken quiz
   const [showQuizBanner, setShowQuizBanner] = useState(false); // Whether to show quiz prompt banner
+  const [activeProfileName, setActiveProfileName] = useState(null); // Currently applied profile name
+  const [customProfiles, setCustomProfiles] = useState([]);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [newProfileName, setNewProfileName] = useState('');
+  const [replaceTargetId, setReplaceTargetId] = useState('');
+  const [editingProfileId, setEditingProfileId] = useState(null);
+  const [editingProfileName, setEditingProfileName] = useState('');
   const [activeInfoModal, setActiveInfoModal] = useState(null); // 'acidity', 'tannins', 'body', 'sweetness', or null
   const [confirmationModal, setConfirmationModal] = useState(null); // {wineName, show} for wine selection confirmation
 
@@ -126,6 +134,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  // Timestamp state
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [loadingTimestamp, setLoadingTimestamp] = useState(false);
 
   const debounceTimer = useRef(null);
   const searchDebounceTimer = useRef(null);
@@ -137,6 +149,21 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
     if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
     return parts.join(' ') || wine.name || 'Unnamed Wine';
+  };
+
+  // Helper function to format timestamp
+  const formatDate = (timestamp) => {
+    if (!timestamp) return '';
+    const date = timestamp._seconds
+      ? new Date(timestamp._seconds * 1000)
+      : timestamp.toDate
+      ? timestamp.toDate()
+      : new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
   // Helper function to get color based on match percentage
@@ -228,6 +255,15 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferences, selectedRestaurant]);
 
+  // Fetch wine list last updated timestamp when restaurant is selected
+  useEffect(() => {
+    if (selectedRestaurant) {
+      fetchLastUpdated(selectedRestaurant);
+    } else {
+      setLastUpdated(null);
+    }
+  }, [selectedRestaurant]);
+
   const fetchRestaurants = async () => {
     try {
       const response = await fetch(`${API_URL}/restaurants`);
@@ -252,13 +288,15 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
   const sliderValues = { 1: 'low', 2: 'medium', 3: 'high' };
   const sweetnessValues = { 1: 'dry', 2: 'medium', 3: 'sweet' };
+  const bodyWeightValues = { 1: 'light', 2: 'medium', 3: 'full' };
   const reverseSlider = { low: 1, medium: 2, high: 3 };
   const reverseSweetness = { dry: 1, medium: 2, sweet: 3 };
+  const reverseBodyWeight = { light: 1, medium: 2, full: 3 };
 
   const handleSliderChange = (key, value) => {
     setPreferences((prev) => ({
       ...prev,
-      [key]: sliderValues[value],
+      [key]: key === 'bodyWeight' ? bodyWeightValues[value] : sliderValues[value],
     }));
   };
 
@@ -289,6 +327,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     setPreferences(defaultPreferences);
     setMatches([]);
     setError('');
+    setActiveProfileName(null);
+    if (hasQuiz) setShowQuizBanner(true);
   };
 
   const loadUserPreferences = async () => {
@@ -311,12 +351,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         setShowQuizBanner(true); // Show banner prompting to take quiz
       }
 
+      // Load custom profiles
+      if (data.customProfiles) setCustomProfiles(data.customProfiles);
+
       // Load most recent saved preferences (manual adjustments from user)
       if (data.savedPreferences && data.savedPreferences.length > 0) {
         const savedPrefs = data.savedPreferences[0];
-        // Update outdated price minimum (was previously 15-25, now should be 0)
-        if (savedPrefs.priceRange && savedPrefs.priceRange.min > 0) {
+        // Normalize price range to baseline $0-$1000
+        if (savedPrefs.priceRange) {
           savedPrefs.priceRange.min = 0;
+          savedPrefs.priceRange.max = 1000;
         }
         setPreferences(savedPrefs);
       } else {
@@ -328,22 +372,62 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     }
   };
 
-  const applyQuizProfile = () => {
-    if (!quizProfile) return;
+  const profileOptions = [
+    { id: 'full-bodied-red-enthusiast',      label: 'Full-Bodied Red Enthusiast' },
+    { id: 'medium-bodied-red-aficionado',    label: 'Medium-Bodied Red Aficionado' },
+    { id: 'spiced-red-connoisseur',          label: 'Spiced Red Connoisseur' },
+    { id: 'light-bodied-red-devotee',        label: 'Light-Bodied Red Devotee' },
+    { id: 'crisp-&-acidic-white-enthusiast', label: 'Crisp & Acidic White Enthusiast' },
+    { id: 'full-bodied-white-aficionado',    label: 'Full-Bodied White Aficionado' },
+    { id: 'aromatic-white-connoisseur',      label: 'Aromatic White Connoisseur' },
+    { id: 'fruit-forward-white-devotee',     label: 'Fruit-Forward White Devotee' },
+    { id: 'sparkling-wine-enthusiast',       label: 'Sparkling Wine Enthusiast' },
+    { id: 'dessert-wine-aficionado',         label: 'Dessert Wine Aficionado' },
+  ];
 
-    // Get the profile ID from the quiz profile name (convert to lowercase with hyphens)
-    const profileId = quizProfile.toLowerCase().replace(/\s+/g, '-');
+  const applyProfileById = (profileId) => {
+    if (profileId.startsWith('custom-')) {
+      const customId = profileId.replace('custom-', '');
+      const profile = customProfiles.find(p => p.id === customId);
+      if (profile) {
+        setPreferences(profile.preferences);
+        setActiveProfileName(profile.name);
+        setShowQuizBanner(false);
+      }
+      return;
+    }
     const profilePreferences = quizProfilesMap[profileId];
-
-    if (profilePreferences) {
-      // Apply the quiz profile preferences
+    const option = profileOptions.find(p => p.id === profileId);
+    if (profilePreferences && option) {
       setPreferences(profilePreferences);
+      setActiveProfileName(option.label);
       setShowQuizBanner(false);
     }
   };
 
+  const applyQuizProfile = () => {
+    if (!quizProfile) return;
+    const profileId = quizProfile.toLowerCase().replace(/\s+/g, '-');
+    applyProfileById(profileId);
+  };
+
   const toggleInfoModal = (modalName) => {
     setActiveInfoModal(activeInfoModal === modalName ? null : modalName);
+  };
+
+  const fetchLastUpdated = async (restaurantId) => {
+    setLoadingTimestamp(true);
+    try {
+      const response = await fetch(`${API_URL}/restaurants/${restaurantId}/last-updated`);
+      if (response.ok) {
+        const data = await response.json();
+        setLastUpdated(data.lastUpdated);
+      }
+    } catch (error) {
+      console.error('Error fetching last updated:', error);
+    } finally {
+      setLoadingTimestamp(false);
+    }
   };
 
   const savePreferences = async () => {
@@ -369,6 +453,81 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     } catch (err) {
       setError('Failed to save preferences: ' + err.message);
       setSaveStatus('');
+    }
+  };
+
+  const saveCustomProfile = async () => {
+    if (!newProfileName.trim()) return;
+    if (!user || !user.userId) return;
+
+    const newProfile = {
+      id: Date.now().toString(),
+      name: newProfileName.trim(),
+      preferences: { ...preferences },
+    };
+
+    let updatedProfiles;
+    if (customProfiles.length < 3) {
+      updatedProfiles = [...customProfiles, newProfile];
+    } else {
+      updatedProfiles = customProfiles.map(p =>
+        p.id === replaceTargetId ? { ...newProfile, id: p.id } : p
+      );
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/user/${user.userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customProfiles: updatedProfiles }),
+      });
+      if (!response.ok) throw new Error('Failed to save');
+      setCustomProfiles(updatedProfiles);
+      setShowSaveModal(false);
+      setNewProfileName('');
+      setReplaceTargetId('');
+    } catch (err) {
+      setError('Failed to save custom profile: ' + err.message);
+    }
+  };
+
+  const deleteCustomProfile = async (profileId) => {
+    if (!user || !user.userId) return;
+    const deletedProfile = customProfiles.find(p => p.id === profileId);
+    const updated = customProfiles.filter(p => p.id !== profileId);
+    try {
+      const response = await fetch(`${API_URL}/auth/user/${user.userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customProfiles: updated }),
+      });
+      if (!response.ok) throw new Error('Failed to delete');
+      setCustomProfiles(updated);
+      if (activeProfileName === deletedProfile?.name) setActiveProfileName(null);
+    } catch (err) {
+      setError('Failed to delete custom profile: ' + err.message);
+    }
+  };
+
+  const renameCustomProfile = async (profileId) => {
+    if (!editingProfileName.trim() || !user || !user.userId) return;
+    const oldProfile = customProfiles.find(p => p.id === profileId);
+    const updated = customProfiles.map(p =>
+      p.id === profileId ? { ...p, name: editingProfileName.trim() } : p
+    );
+    try {
+      const response = await fetch(`${API_URL}/auth/user/${user.userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customProfiles: updated }),
+      });
+      if (!response.ok) throw new Error('Failed to rename');
+      setCustomProfiles(updated);
+      if (activeProfileName === oldProfile?.name) setActiveProfileName(editingProfileName.trim());
+      setEditingProfileId(null);
+      setEditingProfileName('');
+    } catch (err) {
+      setError('Failed to rename custom profile: ' + err.message);
     }
   };
 
@@ -621,6 +780,12 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     );
   };
 
+  // Transform restaurants to options format for SearchableSelect
+  const restaurantOptions = restaurants.map(r => ({
+    value: r.restaurantId,
+    label: `${r.name} (${r.city})`
+  }));
+
   return (
     <div className="discovery-container">
       <h2>Find Your Perfect Wine</h2>
@@ -723,22 +888,105 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         <>
           {/* Preferences Section at Top */}
           <div className="preferences-section">
+        {activeProfileName && (
+          <div className="active-profile-badge">
+            🍷 Active Profile: <strong>{activeProfileName}</strong>
+          </div>
+        )}
+
+        <div className="pref-row">
+          <div className="pref-item">
+            <label>Wine Profile</label>
+            <select
+              className="profile-dropdown"
+              value={
+                activeProfileName
+                  ? (profileOptions.find(p => p.label === activeProfileName)?.id ||
+                     customProfiles.find(p => p.name === activeProfileName)
+                       ? `custom-${customProfiles.find(p => p.name === activeProfileName)?.id}`
+                       : '')
+                  : ''
+              }
+              onChange={(e) => e.target.value && applyProfileById(e.target.value)}
+            >
+              <option value="">— Select a profile —</option>
+              {profileOptions.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.label}{quizProfile && p.label === quizProfile ? ' (Your Profile)' : ''}
+                </option>
+              ))}
+              {customProfiles.length > 0 && (
+                <optgroup label="My Profiles">
+                  {customProfiles.map(p => (
+                    <option key={p.id} value={`custom-${p.id}`}>{p.name}</option>
+                  ))}
+                </optgroup>
+              )}
+            </select>
+
+            {customProfiles.length > 0 && (
+              <div className="custom-profile-list">
+                {customProfiles.map(p => (
+                  <div key={p.id} className="custom-profile-item">
+                    {editingProfileId === p.id ? (
+                      <>
+                        <input
+                          className="custom-profile-rename-input"
+                          value={editingProfileName}
+                          onChange={e => setEditingProfileName(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && renameCustomProfile(p.id)}
+                          autoFocus
+                        />
+                        <button className="custom-profile-icon-btn" onClick={() => renameCustomProfile(p.id)} title="Save">✓</button>
+                        <button className="custom-profile-icon-btn" onClick={() => setEditingProfileId(null)} title="Cancel">✕</button>
+                      </>
+                    ) : (
+                      <>
+                        <span className="custom-profile-name">{p.name}</span>
+                        <button
+                          className="custom-profile-icon-btn"
+                          onClick={() => { setEditingProfileId(p.id); setEditingProfileName(p.name); }}
+                          title="Rename"
+                        >✏️</button>
+                        <button
+                          className="custom-profile-icon-btn"
+                          onClick={() => deleteCustomProfile(p.id)}
+                          title="Delete"
+                        >🗑️</button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="pref-row">
           <div className="pref-item">
             <label>Select Restaurant</label>
-            <select
+            <SearchableSelect
+              options={restaurantOptions}
               value={selectedRestaurant || ''}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-            >
-              <option value="">Choose a restaurant...</option>
-              {restaurants.map((rest) => (
-                <option key={rest.restaurantId} value={rest.restaurantId}>
-                  {rest.name} ({rest.city})
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedRestaurant}
+              placeholder="Choose a restaurant..."
+            />
           </div>
         </div>
+
+        {/* Wine List Last Updated Timestamp */}
+        {selectedRestaurant && lastUpdated && (
+          <div className="wine-list-updated">
+            <span className="updated-icon">📅</span>
+            <span>Wine list last updated: {formatDate(lastUpdated)}</span>
+          </div>
+        )}
+
+        {selectedRestaurant && loadingTimestamp && (
+          <div className="wine-list-updated loading">
+            <span>Loading update date...</span>
+          </div>
+        )}
 
         <div className="pref-row">
           <div className="pref-item">
@@ -827,7 +1075,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 type="range"
                 min="1"
                 max="3"
-                value={reverseSlider[preferences.bodyWeight]}
+                value={reverseBodyWeight[preferences.bodyWeight] || 2}
                 onChange={(e) => handleSliderChange('bodyWeight', e.target.value)}
                 className="slider"
               />
@@ -922,9 +1170,48 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
             Reset All
           </button>
 
-          <button className="save-btn" onClick={savePreferences} disabled={saveStatus === 'saving'}>
-            {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? '✓ Saved' : 'Save Preferences'}
+          <button className="save-btn" onClick={() => setShowSaveModal(true)}>
+            Create Personalized Preferences
           </button>
+
+          {showSaveModal && (
+            <div className="save-profile-modal">
+              <input
+                className="profile-name-input"
+                placeholder="Name your profile (e.g. My Weekend Wines)"
+                value={newProfileName}
+                onChange={e => setNewProfileName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && saveCustomProfile()}
+                autoFocus
+              />
+              {customProfiles.length >= 3 && (
+                <div className="replace-profile-selector">
+                  <label>Replace existing profile:</label>
+                  <select value={replaceTargetId} onChange={e => setReplaceTargetId(e.target.value)}>
+                    <option value="">— Choose profile to replace —</option>
+                    {customProfiles.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="save-modal-actions">
+                <button
+                  className="save-btn"
+                  onClick={saveCustomProfile}
+                  disabled={!newProfileName.trim() || (customProfiles.length >= 3 && !replaceTargetId)}
+                >
+                  Save
+                </button>
+                <button
+                  className="cancel-btn"
+                  onClick={() => { setShowSaveModal(false); setNewProfileName(''); setReplaceTargetId(''); }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {loading && <p className="loading-indicator">Searching...</p>}
