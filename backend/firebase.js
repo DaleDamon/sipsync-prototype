@@ -22,6 +22,16 @@ admin.initializeApp({
 
 const db = admin.firestore();
 const auth = admin.auth();
-const bucket = admin.storage().bucket();
+
+let bucket = null;
+try {
+  if (process.env.FIREBASE_STORAGE_BUCKET) {
+    bucket = admin.storage().bucket();
+  } else {
+    console.warn('[Firebase] FIREBASE_STORAGE_BUCKET not set — storage features disabled');
+  }
+} catch (err) {
+  console.warn('[Firebase] Storage bucket init failed (non-fatal):', err.message);
+}
 
 module.exports = { db, auth, admin, bucket };
