@@ -21,6 +21,7 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
       flavorProfile,
       sweetnessLevel,
       price,
+      glassPrice,
     } = req.body;
 
     // Support both new format (producer/varietal) and old format (name)
@@ -119,6 +120,7 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
       flavorProfile: flavorProfile || [],
       sweetnessLevel: sweetnessLevel || 'dry',
       price: price || 0,
+      glassPrice: (glassPrice && parseFloat(glassPrice) > 0) ? parseFloat(glassPrice) : null,
       inventoryStatus: 'normal',
       createdAt: new Date(),
     };

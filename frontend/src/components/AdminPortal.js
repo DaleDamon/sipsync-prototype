@@ -18,6 +18,7 @@ function AdminPortal() {
   const [wineCount, setWineCount] = useState(0);
   const [uploadHistory, setUploadHistory] = useState([]);
   const [parsedWines, setParsedWines] = useState(null);
+  const [pendingStoredPaths, setPendingStoredPaths] = useState(null);
   const [existingWines, setExistingWines] = useState([]);
   const [filteredWines, setFilteredWines] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -121,8 +122,9 @@ function AdminPortal() {
     setCurrentView('upload');
   };
 
-  const handleWinesParsed = (wines) => {
+  const handleWinesParsed = (wines, storedPaths) => {
     setParsedWines(wines);
+    setPendingStoredPaths(storedPaths || null);
     // Always show review table first so admin can see confidence flags and edit values
     setCurrentView('review');
   };
@@ -182,9 +184,10 @@ function AdminPortal() {
         },
         body: JSON.stringify({
           restaurantId: selectedRestaurant,
-          uploadType: 'csv',
+          uploadType: selectedUploadMethod,
           wineCount: wines.length,
-          summary: `Added ${result.added || wines.length} wines`
+          summary: `Added ${result.added || wines.length} wines`,
+          storedPaths: pendingStoredPaths || undefined
         })
       });
 
@@ -234,9 +237,10 @@ function AdminPortal() {
         },
         body: JSON.stringify({
           restaurantId: selectedRestaurant,
-          uploadType: 'menu-update',
+          uploadType: selectedUploadMethod,
           wineCount: result.total,
-          summary: parts.join(', ') || 'No changes'
+          summary: parts.join(', ') || 'No changes',
+          storedPaths: pendingStoredPaths || undefined
         })
       });
 
@@ -249,6 +253,31 @@ function AdminPortal() {
     } catch (err) {
       console.error('Error applying diff:', err);
       setError(err.message || 'Failed to apply changes. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReanalyze = async (historyId, storedPaths) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_URL}/ai/reanalyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminUser.token}`
+        },
+        body: JSON.stringify({ restaurantId: selectedRestaurant, historyId })
+      });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Re-analysis failed');
+      }
+      const data = await response.json();
+      handleWinesParsed(data.wines, storedPaths);
+    } catch (err) {
+      setError(err.message || 'Failed to re-analyze menu');
     } finally {
       setLoading(false);
     }
@@ -497,6 +526,7 @@ function AdminPortal() {
                     <th>Wines</th>
                     <th>Summary</th>
                     <th>Uploaded By</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -507,6 +537,17 @@ function AdminPortal() {
                       <td>{h.wineCount}</td>
                       <td>{h.summary}</td>
                       <td>{h.uploadedBy}</td>
+                      <td>
+                        {h.storedPaths && h.storedPaths.length > 0 && (
+                          <button
+                            className="reanalyze-btn"
+                            onClick={() => handleReanalyze(h.id, h.storedPaths)}
+                            title="Re-run AI analysis on the original menu images"
+                          >
+                            Re-analyze
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -523,7 +564,7 @@ function AdminPortal() {
           <button className="back-to-dashboard" onClick={handleBackToDashboard}>
             Back to Dashboard
           </button>
-          <FileUpload adminToken={adminUser.token} onWinesParsed={handleWinesParsed} initialMethod={selectedUploadMethod} />
+          <FileUpload adminToken={adminUser.token} restaurantId={selectedRestaurant} onWinesParsed={handleWinesParsed} initialMethod={selectedUploadMethod} />
         </>
       )}
 

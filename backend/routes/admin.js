@@ -167,13 +167,16 @@ router.post('/upload-history', adminAuth, async (req, res) => {
       return res.status(400).json({ error: 'Restaurant ID and upload type are required' });
     }
 
+    const { storedPaths } = req.body;
+
     const historyRef = await db.collection('restaurants').doc(restaurantId)
       .collection('uploadHistory').add({
         uploadType,
         wineCount: wineCount || 0,
         summary: summary || '',
         uploadedBy: req.admin.email,
-        createdAt: new Date()
+        createdAt: new Date(),
+        ...(storedPaths && storedPaths.length > 0 ? { storedPaths } : {})
       });
 
     res.status(201).json({

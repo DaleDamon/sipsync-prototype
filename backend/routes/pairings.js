@@ -74,13 +74,14 @@ function calculateMatchScore(userPreferences, wine) {
     console.log(`Sweetness: ${userPreferences.sweetness} vs ${wine.sweetnessLevel} = ${sweetnessMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
-  // Price match
+  // Price match (uses glassPrice when BTG mode is on)
   if (userPreferences.priceRange) {
     const { min, max } = userPreferences.priceRange;
-    const priceMatch = wine.price >= min && wine.price <= max ? 1 : 0.5;
+    const priceToCheck = userPreferences.btgOnly && wine.glassPrice ? wine.glassPrice : wine.price;
+    const priceMatch = priceToCheck >= min && priceToCheck <= max ? 1 : 0.5;
     totalScore += priceMatch;
     categoryCount++;
-    console.log(`Price: $${wine.price} in [$${min}-$${max}] = ${priceMatch} (total: ${totalScore}/${categoryCount})`);
+    console.log(`Price (${userPreferences.btgOnly ? 'glass' : 'bottle'}): $${priceToCheck} in [$${min}-$${max}] = ${priceMatch} (total: ${totalScore}/${categoryCount})`);
   }
 
   // Wine type match
@@ -132,9 +133,14 @@ router.post('/find', async (req, res) => {
     // Filter and sort by match score
     let matchedWines = scoredWines
       .filter((wine) => {
+        // BTG-only hard filter
+        if (userPreferences.btgOnly && !wine.glassPrice) return false;
         // If wine type is specified, filter to only that type
         if (userPreferences.wineType && userPreferences.wineType !== 'any') {
           console.log(`[FILTER] Checking wine type: ${wine.type} vs ${userPreferences.wineType}`);
+          if (userPreferences.wineType === 'red') {
+            return wine.type === 'red' || wine.type === 'rosé' || wine.type === 'rose';
+          }
           return wine.type === userPreferences.wineType;
         }
         return true; // If no type specified, include all wines

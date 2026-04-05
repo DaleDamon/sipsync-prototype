@@ -5,7 +5,7 @@ import { API_URL } from '../config';
 
 const REQUIRED_COLUMNS = ['producer', 'varietal', 'type', 'price'];
 
-function FileUpload({ adminToken, onWinesParsed, initialMethod = 'csv' }) {
+function FileUpload({ adminToken, restaurantId, onWinesParsed, initialMethod = 'csv' }) {
   const [uploadMethod, setUploadMethod] = useState(initialMethod);
   const [file, setFile] = useState(null);
   const [csvData, setCsvData] = useState(null);
@@ -182,7 +182,7 @@ function FileUpload({ adminToken, onWinesParsed, initialMethod = 'csv' }) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`
       },
-      body: JSON.stringify({ images: base64Images })
+      body: JSON.stringify({ images: base64Images, restaurantId })
     });
 
     if (!response.ok) {
@@ -195,7 +195,7 @@ function FileUpload({ adminToken, onWinesParsed, initialMethod = 'csv' }) {
 
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    onWinesParsed(data.wines);
+    onWinesParsed(data.wines, data.storedPaths);
   };
 
   const canProcess = () => {

@@ -186,6 +186,24 @@
   font-size: 14px;
 }
 
+.reanalyze-btn {
+  padding: 5px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #333;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.reanalyze-btn:hover {
+  background: #722F37;
+  color: white;
+  border-color: #722F37;
+}
+
 /* Admin Nav */
 .admin-nav {
   display: flex;

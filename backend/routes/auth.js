@@ -158,7 +158,7 @@ router.get('/user/:userId', async (req, res) => {
 router.put('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { name, savedPreferences, customProfiles } = req.body;
+    const { name, savedPreferences, customProfiles, quizProfile } = req.body;
 
     const userRef = db.collection('users').doc(userId);
     const updateData = {};
@@ -166,6 +166,7 @@ router.put('/user/:userId', async (req, res) => {
     if (name) updateData.name = name;
     if (savedPreferences) updateData.savedPreferences = savedPreferences;
     if (customProfiles !== undefined) updateData.customProfiles = customProfiles;
+    if (quizProfile !== undefined) updateData.quizProfile = quizProfile;
 
     if (Object.keys(updateData).length === 0) {
       return res.json({ message: 'Nothing to update', user: { userId } });
@@ -315,7 +316,7 @@ router.post('/quiz/submit', async (req, res) => {
           tannins: 'high',
           bodyWeight: 'full',
           sweetness: 'dry',
-          flavorNotes: ['oak', 'spice', 'cherry']
+          flavorNotes: ['oak', 'cherry']
         }
       },
       {
@@ -341,7 +342,7 @@ router.post('/quiz/submit', async (req, res) => {
           tannins: 'medium',
           bodyWeight: 'full',
           sweetness: 'dry',
-          flavorNotes: ['spice', 'cherry', 'oak']
+          flavorNotes: ['spice', 'cherry']
         }
       },
       {
@@ -350,11 +351,11 @@ router.post('/quiz/submit', async (req, res) => {
         wineType: 'red',
         dimensions: { acidity: 75, tannins: 30, body: 30, sweetness: 15, intensity: 45 },
         characteristics: {
-          acidity: 'high',
+          acidity: 'medium',
           tannins: 'low',
           bodyWeight: 'light',
           sweetness: 'dry',
-          flavorNotes: ['berry', 'floral', 'citrus']
+          flavorNotes: ['berry', 'earthy']
         }
       },
       {
@@ -376,7 +377,7 @@ router.post('/quiz/submit', async (req, res) => {
         wineType: 'white',
         dimensions: { acidity: 45, tannins: 15, body: 90, sweetness: 15, intensity: 75 },
         characteristics: {
-          acidity: 'low',
+          acidity: 'medium',
           tannins: 'low',
           bodyWeight: 'full',
           sweetness: 'dry',
@@ -392,8 +393,8 @@ router.post('/quiz/submit', async (req, res) => {
           acidity: 'medium',
           tannins: 'low',
           bodyWeight: 'medium',
-          sweetness: 'medium',
-          flavorNotes: ['floral', 'citrus', 'spice']
+          sweetness: 'dry',
+          flavorNotes: ['floral', 'citrus']
         }
       },
       {
@@ -406,7 +407,7 @@ router.post('/quiz/submit', async (req, res) => {
           tannins: 'low',
           bodyWeight: 'medium',
           sweetness: 'medium',
-          flavorNotes: ['citrus', 'berry']
+          flavorNotes: ['citrus']
         }
       },
       {

@@ -17,9 +17,11 @@ if (fs.existsSync(keyPath)) {
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 const db = admin.firestore();
 const auth = admin.auth();
+const bucket = admin.storage().bucket();
 
-module.exports = { db, auth, admin };
+module.exports = { db, auth, admin, bucket };

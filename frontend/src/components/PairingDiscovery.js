@@ -15,6 +15,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     flavorNotes: [],
     sweetness: 'dry',
     priceRange: { min: 0, max: 1000 },
+    btgOnly: false,
   };
 
   // Mapping from quiz profiles to wine preferences
@@ -24,7 +25,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       acidity: 'medium',
       tannins: 'high',
       bodyWeight: 'full',
-      flavorNotes: ['oak', 'spice', 'cherry'],
+      flavorNotes: ['oak', 'cherry'],
       sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
@@ -42,16 +43,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       acidity: 'medium',
       tannins: 'medium',
       bodyWeight: 'full',
-      flavorNotes: ['spice', 'cherry', 'oak'],
+      flavorNotes: ['spice', 'cherry'],
       sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
     'light-bodied-red-devotee': {
       wineType: 'red',
-      acidity: 'high',
+      acidity: 'medium',
       tannins: 'low',
       bodyWeight: 'light',
-      flavorNotes: ['berry', 'floral', 'citrus'],
+      flavorNotes: ['berry', 'earthy'],
       sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
@@ -66,10 +67,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     },
     'full-bodied-white-aficionado': {
       wineType: 'white',
-      acidity: 'low',
+      acidity: 'medium',
       tannins: 'low',
       bodyWeight: 'full',
-      flavorNotes: ['oak', 'vanilla'],
+      flavorNotes: ['oak', 'vanilla', 'butter'],
       sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
@@ -78,8 +79,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       acidity: 'medium',
       tannins: 'low',
       bodyWeight: 'light',
-      flavorNotes: ['floral', 'citrus', 'spice'],
-      sweetness: 'medium',
+      flavorNotes: ['floral', 'citrus'],
+      sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
     'fruit-forward-white-devotee': {
@@ -87,7 +88,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       acidity: 'medium',
       tannins: 'low',
       bodyWeight: 'medium',
-      flavorNotes: ['citrus', 'berry'],
+      flavorNotes: ['citrus'],
       sweetness: 'dry',
       priceRange: { min: 0, max: 1000 },
     },
@@ -124,8 +125,6 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
   const [replaceTargetId, setReplaceTargetId] = useState('');
-  const [editingProfileId, setEditingProfileId] = useState(null);
-  const [editingProfileName, setEditingProfileName] = useState('');
   const [activeInfoModal, setActiveInfoModal] = useState(null); // 'acidity', 'tannins', 'body', 'sweetness', or null
   const [confirmationModal, setConfirmationModal] = useState(null); // {wineName, show} for wine selection confirmation
 
@@ -294,6 +293,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const reverseBodyWeight = { light: 1, medium: 2, full: 3 };
 
   const handleSliderChange = (key, value) => {
+    setActiveProfileName(null);
     setPreferences((prev) => ({
       ...prev,
       [key]: key === 'bodyWeight' ? bodyWeightValues[value] : sliderValues[value],
@@ -301,6 +301,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   };
 
   const handleSweetnessChange = (value) => {
+    setActiveProfileName(null);
     setPreferences((prev) => ({
       ...prev,
       sweetness: sweetnessValues[value],
@@ -315,6 +316,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   };
 
   const handleFlavorToggle = (flavor) => {
+    setActiveProfileName(null);
     setPreferences((prev) => {
       const flavors = prev.flavorNotes.includes(flavor)
         ? prev.flavorNotes.filter((f) => f !== flavor)
@@ -488,46 +490,6 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       setReplaceTargetId('');
     } catch (err) {
       setError('Failed to save custom profile: ' + err.message);
-    }
-  };
-
-  const deleteCustomProfile = async (profileId) => {
-    if (!user || !user.userId) return;
-    const deletedProfile = customProfiles.find(p => p.id === profileId);
-    const updated = customProfiles.filter(p => p.id !== profileId);
-    try {
-      const response = await fetch(`${API_URL}/auth/user/${user.userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customProfiles: updated }),
-      });
-      if (!response.ok) throw new Error('Failed to delete');
-      setCustomProfiles(updated);
-      if (activeProfileName === deletedProfile?.name) setActiveProfileName(null);
-    } catch (err) {
-      setError('Failed to delete custom profile: ' + err.message);
-    }
-  };
-
-  const renameCustomProfile = async (profileId) => {
-    if (!editingProfileName.trim() || !user || !user.userId) return;
-    const oldProfile = customProfiles.find(p => p.id === profileId);
-    const updated = customProfiles.map(p =>
-      p.id === profileId ? { ...p, name: editingProfileName.trim() } : p
-    );
-    try {
-      const response = await fetch(`${API_URL}/auth/user/${user.userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customProfiles: updated }),
-      });
-      if (!response.ok) throw new Error('Failed to rename');
-      setCustomProfiles(updated);
-      if (activeProfileName === oldProfile?.name) setActiveProfileName(editingProfileName.trim());
-      setEditingProfileId(null);
-      setEditingProfileName('');
-    } catch (err) {
-      setError('Failed to rename custom profile: ' + err.message);
     }
   };
 
@@ -736,6 +698,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   )}
                   <p className="wine-type">{wine.type}</p>
                   <p className="wine-price">${wine.price}</p>
+                  {wine.glassPrice && (
+                    <div className="btg-banner">🥂 By the glass: ${wine.glassPrice}</div>
+                  )}
 
                   {duplicates.includes(wine.matchKey) && (
                     <div className="price-comparison-badge">
@@ -888,25 +853,18 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         <>
           {/* Preferences Section at Top */}
           <div className="preferences-section">
-        {activeProfileName && (
-          <div className="active-profile-badge">
-            🍷 Active Profile: <strong>{activeProfileName}</strong>
-          </div>
-        )}
-
         <div className="pref-row">
           <div className="pref-item">
             <label>Wine Profile</label>
             <select
               className="profile-dropdown"
-              value={
-                activeProfileName
-                  ? (profileOptions.find(p => p.label === activeProfileName)?.id ||
-                     customProfiles.find(p => p.name === activeProfileName)
-                       ? `custom-${customProfiles.find(p => p.name === activeProfileName)?.id}`
-                       : '')
-                  : ''
-              }
+              value={(() => {
+                if (!activeProfileName) return '';
+                const match = profileOptions.find(p => p.label === activeProfileName);
+                if (match) return match.id;
+                const custom = customProfiles.find(p => p.name === activeProfileName);
+                return custom ? `custom-${custom.id}` : '';
+              })()}
               onChange={(e) => e.target.value && applyProfileById(e.target.value)}
             >
               <option value="">— Select a profile —</option>
@@ -924,41 +882,6 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
               )}
             </select>
 
-            {customProfiles.length > 0 && (
-              <div className="custom-profile-list">
-                {customProfiles.map(p => (
-                  <div key={p.id} className="custom-profile-item">
-                    {editingProfileId === p.id ? (
-                      <>
-                        <input
-                          className="custom-profile-rename-input"
-                          value={editingProfileName}
-                          onChange={e => setEditingProfileName(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && renameCustomProfile(p.id)}
-                          autoFocus
-                        />
-                        <button className="custom-profile-icon-btn" onClick={() => renameCustomProfile(p.id)} title="Save">✓</button>
-                        <button className="custom-profile-icon-btn" onClick={() => setEditingProfileId(null)} title="Cancel">✕</button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="custom-profile-name">{p.name}</span>
-                        <button
-                          className="custom-profile-icon-btn"
-                          onClick={() => { setEditingProfileId(p.id); setEditingProfileName(p.name); }}
-                          title="Rename"
-                        >✏️</button>
-                        <button
-                          className="custom-profile-icon-btn"
-                          onClick={() => deleteCustomProfile(p.id)}
-                          title="Delete"
-                        >🗑️</button>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -1130,38 +1053,59 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
         <div className="pref-row">
           <div className="pref-item">
-            <label>Price Range</label>
+            <label>{preferences.btgOnly ? 'Glass Price Range' : 'Price Range'}</label>
             <div className="price-inputs">
               <input
                 type="number"
                 placeholder="Min"
                 value={preferences.priceRange.min}
-                onChange={(e) =>
+                onChange={(e) => {
+                  setActiveProfileName(null);
                   setPreferences((prev) => ({
                     ...prev,
                     priceRange: {
                       ...prev.priceRange,
                       min: parseInt(e.target.value),
                     },
-                  }))
-                }
+                  }));
+                }}
               />
               <span>-</span>
               <input
                 type="number"
                 placeholder="Max"
                 value={preferences.priceRange.max}
-                onChange={(e) =>
+                onChange={(e) => {
+                  setActiveProfileName(null);
                   setPreferences((prev) => ({
                     ...prev,
                     priceRange: {
                       ...prev.priceRange,
                       max: parseInt(e.target.value),
                     },
-                  }))
-                }
+                  }));
+                }}
               />
             </div>
+          </div>
+        </div>
+
+        <div className="pref-row">
+          <div className="pref-item btg-toggle-item">
+            <button
+              className={`btg-toggle-btn ${preferences.btgOnly ? 'active' : ''}`}
+              onClick={() => {
+                setActiveProfileName(null);
+                setPreferences(prev => ({ ...prev, btgOnly: !prev.btgOnly }));
+              }}
+            >
+              <span className="btg-toggle-icon">🥂</span>
+              By the glass only
+              <span className="btg-toggle-status">{preferences.btgOnly ? 'ON' : 'OFF'}</span>
+            </button>
+            {preferences.btgOnly && (
+              <p className="btg-toggle-note">Showing only wines available by the glass. Price range applies to glass prices.</p>
+            )}
           </div>
         </div>
 
@@ -1271,6 +1215,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 )}
                 <p className="wine-type">{wine.type}</p>
                 <p className="wine-price">${wine.price}</p>
+                {wine.glassPrice && (
+                  <div className="btg-banner">🥂 By the glass: ${wine.glassPrice}</div>
+                )}
                 <div className="wine-details">
                   <span className="detail">
                     <strong>Acidity:</strong> {wine.acidity}

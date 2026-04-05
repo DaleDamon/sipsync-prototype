@@ -151,6 +151,7 @@ function WineReviewTable({ wines, onConfirm }) {
         </div>
       )}
 
+      {/* Desktop table */}
       <div className="review-table-container">
         <table className="review-table">
           <thead>
@@ -161,7 +162,8 @@ function WineReviewTable({ wines, onConfirm }) {
               <th className={`col-varietal ${sortCol === 'varietal' ? 'sort-active' : ''}`} onClick={() => handleSort('varietal')}>Varietal{renderSortArrow('varietal')}</th>
               <th className={`col-region ${sortCol === 'region' ? 'sort-active' : ''}`} onClick={() => handleSort('region')}>Region{renderSortArrow('region')}</th>
               <th className={`col-type ${sortCol === 'type' ? 'sort-active' : ''}`} onClick={() => handleSort('type')}>Type{renderSortArrow('type')}</th>
-              <th className={`col-price ${sortCol === 'price' ? 'sort-active' : ''}`} onClick={() => handleSort('price')}>Price{renderSortArrow('price')}</th>
+              <th className={`col-price ${sortCol === 'price' ? 'sort-active' : ''}`} onClick={() => handleSort('price')}>Bottle $${renderSortArrow('price')}</th>
+              <th className="col-glass-price">Glass $</th>
               <th className="col-acidity" onClick={() => handleSort('acidity')}>Acidity{renderSortArrow('acidity')}</th>
               <th className="col-tannins" onClick={() => handleSort('tannins')}>Tannins{renderSortArrow('tannins')}</th>
               <th className="col-body" onClick={() => handleSort('bodyWeight')}>Body{renderSortArrow('bodyWeight')}</th>
@@ -198,6 +200,9 @@ function WineReviewTable({ wines, onConfirm }) {
                 </td>
                 <td className="col-price">
                   <input type="number" value={row.price || ''} onChange={e => updateRow(row._id, 'price', e.target.value)} min="0" step="0.5" />
+                </td>
+                <td className="col-glass-price">
+                  <input type="number" value={row.glassPrice || ''} onChange={e => updateRow(row._id, 'glassPrice', e.target.value || null)} min="0" step="0.5" placeholder="—" />
                 </td>
                 <td className={`col-acidity ${isLowConfidence(row, 'acidity') ? 'low-confidence' : ''}`}>
                   <select value={row.acidity || 'medium'} onChange={e => updateRow(row._id, 'acidity', e.target.value)}>
@@ -236,6 +241,100 @@ function WineReviewTable({ wines, onConfirm }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="wine-mobile-cards">
+        {sortedRows.map((row, index) => (
+          <div key={row._id} className={`wine-mobile-card ${isLowConfidence(row, 'acidity') || isLowConfidence(row, 'tannins') || isLowConfidence(row, 'bodyWeight') || isLowConfidence(row, 'sweetnessLevel') || isLowConfidence(row, 'flavorProfile') ? 'has-low-confidence' : ''}`}>
+            <div className="mobile-card-header">
+              <span className="mobile-card-number">Wine {index + 1}</span>
+              <div className="mobile-card-actions">
+                <button className="row-action-btn duplicate" title="Duplicate" onClick={() => duplicateRow(row._id)}>⧉</button>
+                <button className="row-action-btn delete" title="Delete" onClick={() => deleteRow(row._id)}>✕</button>
+              </div>
+            </div>
+
+            <div className="mobile-card-row mobile-card-row-4">
+              <div className="mobile-field">
+                <label>Year</label>
+                <input type="text" value={row.year || ''} onChange={e => updateRow(row._id, 'year', e.target.value)} placeholder="—" />
+              </div>
+              <div className="mobile-field">
+                <label>Type *</label>
+                <select className={isInvalid(row, 'type') ? 'invalid' : ''} value={row.type || ''} onChange={e => updateRow(row._id, 'type', e.target.value)}>
+                  <option value="">—</option>
+                  {TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className="mobile-field">
+                <label>Bottle ($)</label>
+                <input type="number" value={row.price || ''} onChange={e => updateRow(row._id, 'price', e.target.value)} min="0" step="0.5" placeholder="0" />
+              </div>
+              <div className="mobile-field">
+                <label>Glass ($)</label>
+                <input type="number" value={row.glassPrice || ''} onChange={e => updateRow(row._id, 'glassPrice', e.target.value || null)} min="0" step="0.5" placeholder="—" />
+              </div>
+            </div>
+
+            <div className="mobile-field mobile-field-full">
+              <label>Producer *</label>
+              <input type="text" className={isInvalid(row, 'producer') ? 'invalid' : ''} value={row.producer || ''} onChange={e => updateRow(row._id, 'producer', e.target.value)} placeholder="Required" />
+            </div>
+            <div className="mobile-field mobile-field-full">
+              <label>Varietal *</label>
+              <input type="text" className={isInvalid(row, 'varietal') ? 'invalid' : ''} value={row.varietal || ''} onChange={e => updateRow(row._id, 'varietal', e.target.value)} placeholder="Required" />
+            </div>
+            <div className="mobile-field mobile-field-full">
+              <label>Region</label>
+              <input type="text" value={row.region || ''} onChange={e => updateRow(row._id, 'region', e.target.value)} placeholder="—" />
+            </div>
+
+            <div className="mobile-card-row mobile-sensory-row">
+              <div className={`mobile-field ${isLowConfidence(row, 'acidity') ? 'low-confidence' : ''}`}>
+                <label>Acidity</label>
+                <select value={row.acidity || 'medium'} onChange={e => updateRow(row._id, 'acidity', e.target.value)}>
+                  {ACIDITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+              <div className={`mobile-field ${isLowConfidence(row, 'tannins') ? 'low-confidence' : ''}`}>
+                <label>Tannins</label>
+                <select value={row.tannins || 'medium'} onChange={e => updateRow(row._id, 'tannins', e.target.value)}>
+                  {TANNINS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+              <div className={`mobile-field ${isLowConfidence(row, 'bodyWeight') ? 'low-confidence' : ''}`}>
+                <label>Body</label>
+                <select value={row.bodyWeight || 'medium'} onChange={e => updateRow(row._id, 'bodyWeight', e.target.value)}>
+                  {BODY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+              <div className={`mobile-field ${isLowConfidence(row, 'sweetnessLevel') ? 'low-confidence' : ''}`}>
+                <label>Sweet</label>
+                <select value={row.sweetnessLevel || 'dry'} onChange={e => updateRow(row._id, 'sweetnessLevel', e.target.value)}>
+                  {SWEETNESS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className={`mobile-field mobile-field-full ${isLowConfidence(row, 'flavorProfile') ? 'low-confidence' : ''}`}>
+              <label>Flavors</label>
+              <div className="flavor-picker">
+                {APPROVED_FLAVORS.map(f => (
+                  <span
+                    key={f}
+                    className={`flavor-chip ${(row.flavorProfile || []).includes(f) ? 'selected' : ''}`}
+                    onClick={() => toggleFlavor(row._id, f)}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <button className="mobile-add-btn" onClick={addRow}>+ Add Wine</button>
       </div>
 
       <div className="review-footer">

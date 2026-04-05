@@ -46,6 +46,43 @@
   display: inline-block;
 }
 
+.user-profile-selector {
+  margin: 12px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.user-profile-selector-label {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.user-profile-selector-select {
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #8b0000;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 260px;
+}
+
+.user-profile-selector-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.user-profile-saving {
+  font-size: 13px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
 .retake-quiz-btn {
   margin-top: 20px;
   padding: 10px 20px;
@@ -272,4 +309,55 @@
     padding: 14px;
     border-radius: 8px;
   }
+}
+
+/* Custom Wine Profiles */
+.custom-profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.custom-profile-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f9f6f6;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.custom-profile-name {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.custom-profile-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.custom-profile-icon-btn:hover {
+  opacity: 1;
+}
+
+.custom-profile-rename-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #8b0000;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.custom-profile-rename-input:focus {
+  outline: none;
 }
