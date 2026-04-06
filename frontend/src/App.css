@@ -182,38 +182,41 @@ body {
 
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
     position: sticky;
     top: 0;
     z-index: 100;
   }
 
   .logo-container {
-    justify-content: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
   }
 
   .logo-image {
-    height: 36px;
+    height: 32px;
   }
 
   .nav-menu {
-    width: 100%;
     display: flex;
-    justify-content: space-between;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
     margin-left: 0;
-    gap: 0;
+    gap: 4px;
+    overflow-x: auto;
   }
 
   .nav-btn {
-    flex: 1;
-    font-size: 12px;
-    padding: 8px 4px;
-    text-align: center;
+    font-size: 11px;
+    padding: 6px 7px;
     border-width: 1px;
     border-radius: 4px;
-    min-height: 36px;
+    white-space: nowrap;
+    min-height: 32px;
   }
 
   .main-content {
