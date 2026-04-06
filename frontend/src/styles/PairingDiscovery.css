@@ -724,6 +724,8 @@
     padding: 10px;
     font-size: 15px;
     min-height: 44px;
+    width: 40%;
+    min-width: 0;
   }
 
   /* Select dropdown */
