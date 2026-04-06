@@ -28,6 +28,7 @@
   border-radius: 12px;
   margin-bottom: 30px;
   box-shadow: 0 4px 15px rgba(139, 0, 0, 0.2);
+  position: relative;
 }
 
 .quiz-banner .banner-content {
@@ -120,9 +121,9 @@
   }
 
   .banner-close-btn {
-    align-self: flex-end;
-    margin-top: -30px;
-    margin-right: -10px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
   }
 }
 
