@@ -63,9 +63,6 @@ function AdminPortal() {
       if (response.ok) {
         const data = await response.json();
         setRestaurants(data.restaurants);
-        if (data.restaurants.length > 0 && !selectedRestaurant) {
-          setSelectedRestaurant(data.restaurants[0].id);
-        }
       }
     } catch (error) {
       console.error('Error fetching restaurants:', error);

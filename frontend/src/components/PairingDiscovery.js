@@ -270,13 +270,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       const restaurantList = data.restaurants || [];
       setRestaurants(restaurantList);
 
-      // Auto-select Quartino if available AND no restaurant is pre-selected
       if (restaurantList.length > 0 && !preSelectedRestaurant && !selectedRestaurant) {
-        const quartino = restaurantList.find(r => r.name === 'Quartino');
-        if (quartino) {
-          setSelectedRestaurant(quartino.restaurantId);
-        } else if (restaurantList.length === 1) {
-          // Fallback: if only one restaurant, select it
+        if (restaurantList.length === 1) {
           setSelectedRestaurant(restaurantList[0].restaurantId);
         }
       }
