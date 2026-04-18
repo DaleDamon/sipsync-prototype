@@ -1,0 +1,265 @@
+.admin-analytics {
+  width: 100%;
+}
+
+/* Date range + export bar */
+.analytics-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.analytics-controls label {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.analytics-date-input {
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #333;
+  background: white;
+}
+
+.analytics-date-input:focus {
+  outline: none;
+  border-color: #8b0000;
+}
+
+.analytics-export-btn {
+  margin-left: auto;
+  padding: 7px 16px;
+  background: #8b0000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.analytics-export-btn:hover {
+  background: #6a0000;
+}
+
+/* Stat cards */
+.analytics-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.analytics-stat-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.analytics-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #8b0000;
+  line-height: 1;
+}
+
+.analytics-stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.analytics-stat-benchmark {
+  font-size: 11px;
+  color: #999;
+  margin-top: 3px;
+}
+
+.analytics-stat-benchmark.better {
+  color: #2e7d32;
+}
+
+.analytics-stat-benchmark.worse {
+  color: #c62828;
+}
+
+/* Section headers */
+.analytics-section {
+  margin-bottom: 28px;
+}
+
+.analytics-section h3 {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 14px 0;
+  font-weight: 600;
+}
+
+/* Charts */
+.analytics-chart-wrap {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Upload history table in analytics */
+.analytics-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.analytics-history-table th,
+.analytics-history-table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.analytics-history-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.analytics-loading {
+  text-align: center;
+  color: #999;
+  padding: 60px 0;
+  font-size: 14px;
+}
+
+.analytics-empty {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  font-size: 14px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+}
+
+/* Health score badge */
+.health-score-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.health-score-badge.good { background: #e8f5e9; color: #2e7d32; }
+.health-score-badge.ok   { background: #fff8e1; color: #f57f17; }
+.health-score-badge.poor { background: #ffebee; color: #c62828; }
+
+@media (max-width: 768px) {
+  .analytics-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .analytics-export-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Sub-tabs */
+.analytics-subtabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  width: fit-content;
+}
+
+.analytics-subtab {
+  padding: 9px 20px;
+  background: white;
+  border: none;
+  border-right: 1px solid #e0e0e0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.analytics-subtab:last-child { border-right: none; }
+.analytics-subtab:hover { background: #f5f5f5; }
+.analytics-subtab.active { background: #8b0000; color: white; }
+
+/* Funnel */
+.funnel-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.funnel-step {}
+
+.funnel-step-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.funnel-step-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.funnel-step-count {
+  font-size: 12px;
+  color: #666;
+}
+
+.funnel-bar-track {
+  height: 28px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.funnel-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b0000, #c62828);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.funnel-dropoff {
+  font-size: 11px;
+  color: #999;
+  margin-top: 3px;
+  text-align: right;
+}

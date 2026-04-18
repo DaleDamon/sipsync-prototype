@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../styles/PairingDiscovery.css';
 import { API_URL } from '../config';
 import SearchableSelect from './SearchableSelect';
+import { useEventTracker } from '../hooks/useEventTracker';
 
 function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [restaurants, setRestaurants] = useState([]);
@@ -140,6 +141,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
   const debounceTimer = useRef(null);
   const searchDebounceTimer = useRef(null);
+  const { trackEvent } = useEventTracker(user?.userId);
 
   // Helper function to get display name for wines
   const getWineDisplayName = (wine) => {
@@ -243,6 +245,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     // Set new timer - search after 500ms of inactivity
     debounceTimer.current = setTimeout(() => {
       handleFindMatches();
+      trackEvent('filter_applied', { restaurantId: selectedRestaurant, filterState: preferences });
     }, 500);
 
     // Cleanup function
@@ -595,6 +598,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         setMatches(data.matches || []);
         if (data.matches.length === 0) {
           setError('No wines match your preferences at this restaurant');
+        } else {
+          trackEvent('pairing_result_viewed', { restaurantId: selectedRestaurant });
         }
       } else {
         setError(data.error || 'Failed to find matches');
@@ -604,7 +609,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     } finally {
       setLoading(false);
     }
-  }, [selectedRestaurant, preferences]);
+  }, [selectedRestaurant, preferences, trackEvent]);
 
   const savePairing = async (wine) => {
     if (!user || !user.userId) {
@@ -886,7 +891,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
             <SearchableSelect
               options={restaurantOptions}
               value={selectedRestaurant || ''}
-              onChange={setSelectedRestaurant}
+              onChange={(val) => {
+                setSelectedRestaurant(val);
+                if (val) trackEvent('restaurant_view', { restaurantId: val });
+              }}
               placeholder="Choose a restaurant..."
             />
           </div>

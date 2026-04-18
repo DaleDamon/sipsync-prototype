@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import '../styles/UserProfile.css';
 import PolarGraph from './PolarGraph';
 import { API_URL } from '../config';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line,
+} from 'recharts';
 
 const QUIZ_PROFILES = [
   { id: 'full-bodied-red-enthusiast',      name: 'Full-Bodied Red Enthusiast',      preferences: { wineType: 'red',      acidity: 'medium', tannins: 'high',   bodyWeight: 'full',   flavorNotes: ['oak', 'cherry'],          sweetness: 'dry',    priceRange: { min: 0, max: 1000 } } },
@@ -25,6 +29,7 @@ function UserProfile({ user, onRetakeQuiz }) {
   const [editingProfileId, setEditingProfileId] = useState(null);
   const [editingProfileName, setEditingProfileName] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
+  const [userAnalytics, setUserAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -71,6 +76,14 @@ function UserProfile({ user, onRetakeQuiz }) {
       if (restaurantsResponse.ok) {
         setVisitedRestaurants(restaurantsData.visitedRestaurants || []);
       }
+
+      // Fetch analytics (non-blocking — don't fail if this endpoint errors)
+      try {
+        const analyticsRes = await fetch(`${API_URL}/analytics/user/${user.userId}`);
+        if (analyticsRes.ok) {
+          setUserAnalytics(await analyticsRes.json());
+        }
+      } catch (_) { /* analytics is non-critical */ }
     } catch (err) {
       setError('Failed to load profile data: ' + err.message);
     } finally {
@@ -312,6 +325,109 @@ function UserProfile({ user, onRetakeQuiz }) {
             </p>
           )}
         </div>
+
+        {/* My Analytics Section */}
+        {(() => {
+          // Compute stats from already-fetched data (always available)
+          // then overlay richer data from the analytics endpoint if it loaded
+          const totalPairings = userAnalytics?.totalPairings ?? pairingHistory.length;
+          const restaurantsExplored = userAnalytics?.restaurantsExplored ?? visitedRestaurants.length;
+          const avgMatchScore = userAnalytics?.avgMatchScore ?? (
+            pairingHistory.length > 0
+              ? Math.round(pairingHistory.reduce((s, p) => s + (p.matchScore || 0), 0) / pairingHistory.length * 100)
+              : null
+          );
+          const totalSessions = userAnalytics?.totalSessions ?? null;
+
+          // Top varietals from pairing history if analytics endpoint hasn't loaded
+          const topVarietals = userAnalytics?.topVarietals ?? (() => {
+            const counts = {};
+            pairingHistory.forEach(p => {
+              const v = p.wineType || 'Unknown';
+              counts[v] = (counts[v] || 0) + 1;
+            });
+            return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
+          })();
+
+          const matchScoreOverTime = userAnalytics?.matchScoreOverTime ?? pairingHistory.slice(0, 20).reverse().map(p => ({
+            date: new Date(p.saved_at).toLocaleDateString(),
+            score: Math.round((p.matchScore || 0) * 100),
+          }));
+
+          return (
+            <div className="section user-analytics-section">
+              <h3>My Analytics</h3>
+
+              {/* Stat cards */}
+              <div className="user-analytics-stats">
+                <div className="user-analytics-stat">
+                  <div className="user-analytics-stat-value">{totalPairings}</div>
+                  <div className="user-analytics-stat-label">Saved Pairings</div>
+                </div>
+                <div className="user-analytics-stat">
+                  <div className="user-analytics-stat-value">{restaurantsExplored}</div>
+                  <div className="user-analytics-stat-label">Restaurants Explored</div>
+                </div>
+                <div className="user-analytics-stat">
+                  <div className="user-analytics-stat-value">
+                    {avgMatchScore != null ? `${avgMatchScore}%` : '—'}
+                  </div>
+                  <div className="user-analytics-stat-label">Avg Match Score</div>
+                </div>
+                <div className="user-analytics-stat">
+                  <div className="user-analytics-stat-value">{totalSessions ?? '—'}</div>
+                  <div className="user-analytics-stat-label">App Sessions</div>
+                </div>
+              </div>
+
+              {/* Top Varietals */}
+              {topVarietals.length > 0 && (
+                <div className="user-analytics-chart">
+                  <h4>Top Wine Types</h4>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart
+                      data={topVarietals}
+                      layout="vertical"
+                      margin={{ top: 0, right: 16, left: 8, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 11 }} />
+                      <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} />
+                      <Tooltip formatter={(v) => [`${v} selections`, 'Count']} />
+                      <Bar dataKey="count" fill="#722F37" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {/* Match Score over time */}
+              {matchScoreOverTime.length > 1 && (
+                <div className="user-analytics-chart">
+                  <h4>Match Score History</h4>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <LineChart
+                      data={matchScoreOverTime}
+                      margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" />
+                      <Tooltip formatter={(v) => [`${v}%`, 'Match Score']} />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#722F37"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                        activeDot={{ r: 5 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

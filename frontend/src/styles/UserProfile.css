@@ -361,3 +361,59 @@
 .custom-profile-rename-input:focus {
   outline: none;
 }
+
+/* ── User Analytics ── */
+.user-analytics-section h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.user-analytics-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.user-analytics-stat {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.user-analytics-stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #8b0000;
+  line-height: 1;
+}
+
+.user-analytics-stat-label {
+  font-size: 11px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.user-analytics-chart {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+
+.user-analytics-chart h4 {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .user-analytics-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

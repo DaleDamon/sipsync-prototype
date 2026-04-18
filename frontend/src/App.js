@@ -9,6 +9,7 @@ import UserProfile from './components/UserProfile';
 import WineQuiz from './components/WineQuiz';
 import AdminPortal from './components/AdminPortal';
 import { API_URL } from './config';
+import { logSession } from './hooks/useEventTracker';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -26,6 +27,9 @@ function App() {
     if (token && userId) {
       const userData = { userId, token };
       setUser(userData);
+
+      // Log session start
+      logSession(userId);
 
       // Check if user has preferences
       checkUserPreferences(userId);

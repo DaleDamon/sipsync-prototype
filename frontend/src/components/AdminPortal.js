@@ -8,6 +8,7 @@ import MenuDiff from './MenuDiff';
 import WineListFilter from './WineListFilter';
 import RestaurantForm from './RestaurantForm';
 import SearchableSelect from './SearchableSelect';
+import AdminAnalytics from './AdminAnalytics';
 
 function AdminPortal() {
   const [adminUser, setAdminUser] = useState(null);
@@ -544,6 +545,27 @@ function AdminPortal() {
           <div className="processing-spinner" style={{ width: 40, height: 40, border: '4px solid #f0f0f0', borderTopColor: '#722F37', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }}></div>
           <p style={{ color: '#666' }}>Saving...</p>
         </div>
+      )}
+
+      {(currentView === 'dashboard' || currentView === 'analytics') && selectedRestaurant && (
+        <div className="admin-nav">
+          <button
+            className={`admin-nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setCurrentView('dashboard')}
+          >
+            Dashboard
+          </button>
+          <button
+            className={`admin-nav-btn ${currentView === 'analytics' ? 'active' : ''}`}
+            onClick={() => setCurrentView('analytics')}
+          >
+            Analytics
+          </button>
+        </div>
+      )}
+
+      {currentView === 'analytics' && selectedRestaurant && (
+        <AdminAnalytics restaurantId={selectedRestaurant} token={adminUser.token} />
       )}
 
       {currentView === 'dashboard' && selectedRestaurant && (
