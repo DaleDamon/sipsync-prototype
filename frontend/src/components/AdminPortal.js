@@ -13,6 +13,7 @@ function AdminPortal() {
   const [adminUser, setAdminUser] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedUploadMethod, setSelectedUploadMethod] = useState('csv');
+  const [uploadMode, setUploadMode] = useState('replace'); // 'replace' | 'append'
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
   const [wineCount, setWineCount] = useState(0);
@@ -128,7 +129,24 @@ function AdminPortal() {
 
   const handleReviewComplete = (wines) => {
     setParsedWines(wines);
-    if (existingWines.length > 0) {
+    if (uploadMode === 'append') {
+      const existingKeys = new Set(
+        existingWines.map(w =>
+          (w.producer || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
+          (w.varietal || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
+          (w.type || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+        )
+      );
+      const newOnly = wines.filter(w => {
+        const key =
+          (w.producer || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
+          (w.varietal || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
+          (w.type || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return !existingKeys.has(key);
+      });
+      setParsedWines(newOnly);
+      setCurrentView('appendReview');
+    } else if (existingWines.length > 0) {
       setCurrentView('diff');
     } else {
       handleSaveWines(wines);
@@ -197,6 +215,74 @@ function AdminPortal() {
     } catch (err) {
       console.error('Error saving wines:', err);
       setError(err.message || 'Failed to save wines. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAppendSave = async (wines) => {
+    setLoading(true);
+    setError('');
+    try {
+      const operations = wines.map(wine => ({
+        action: 'add',
+        wine: {
+          year: wine.year || '',
+          producer: wine.producer,
+          varietal: wine.varietal,
+          region: wine.region || '',
+          type: wine.type,
+          price: parseFloat(wine.price) || 0,
+          acidity: wine.acidity || 'medium',
+          tannins: wine.tannins || 'low',
+          bodyWeight: wine.bodyWeight || 'medium',
+          sweetnessLevel: wine.sweetnessLevel || 'dry',
+          flavorProfile: wine.flavorProfile || [],
+          inventoryStatus: 'available',
+          createdAt: new Date()
+        }
+      }));
+
+      const response = await fetch(`${API_URL}/wines/restaurant/${selectedRestaurant}/batch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminUser.token}`
+        },
+        body: JSON.stringify({ operations })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to append wines');
+      }
+
+      const result = await response.json();
+      await fetch(`${API_URL}/admin/upload-history`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminUser.token}`
+        },
+        body: JSON.stringify({
+          restaurantId: selectedRestaurant,
+          uploadType: `append-${selectedUploadMethod}`,
+          wineCount: wines.length,
+          summary: `Appended ${result.added || wines.length} new wines`,
+          storedPaths: pendingStoredPaths || undefined
+        })
+      });
+
+      setSuccessMsg(`Appended ${result.added || wines.length} new wines to the list!`);
+      setParsedWines(null);
+      setUploadMode('replace');
+      setCurrentView('dashboard');
+      fetchWineCount();
+      fetchUploadHistory();
+      setTimeout(() => setSuccessMsg(''), 5000);
+    } catch (err) {
+      console.error('Error appending wines:', err);
+      setError(err.message || 'Failed to append wines. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -284,6 +370,7 @@ function AdminPortal() {
     setCurrentView('dashboard');
     setParsedWines(null);
     setFilteredWines(null);
+    setUploadMode('replace');
   };
 
   const handleManualEdit = async () => {
@@ -492,6 +579,20 @@ function AdminPortal() {
           {/* Upload Methods */}
           <div className="upload-section">
             <h3>Upload Wine Menu</h3>
+            <div className="upload-mode-toggle">
+              <button
+                className={`upload-mode-btn ${uploadMode === 'replace' ? 'active' : ''}`}
+                onClick={() => setUploadMode('replace')}
+              >
+                Replace — Upload a new menu, review all changes
+              </button>
+              <button
+                className={`upload-mode-btn ${uploadMode === 'append' ? 'active' : ''}`}
+                onClick={() => setUploadMode('append')}
+              >
+                Append — Add new wines only, nothing removed
+              </button>
+            </div>
             <div className="upload-cards">
               <div className="upload-card" onClick={() => handleUploadMethodSelect('csv')}>
                 <div className="upload-card-icon">CSV</div>
@@ -585,6 +686,22 @@ function AdminPortal() {
             onApply={handleApplyDiff}
             loading={loading}
           />
+        </>
+      )}
+
+      {currentView === 'appendReview' && parsedWines && (
+        <>
+          <button className="back-to-dashboard" onClick={handleBackToDashboard}>
+            Back to Dashboard
+          </button>
+          <div className="append-review-notice">
+            {parsedWines.length === 0
+              ? 'All wines in this upload already exist in your list. Nothing new to add.'
+              : `${parsedWines.length} new wine${parsedWines.length !== 1 ? 's' : ''} found that are not yet in your list. Review and confirm to add them.`}
+          </div>
+          {parsedWines.length > 0 && (
+            <WineReviewTable wines={parsedWines} onConfirm={handleAppendSave} />
+          )}
         </>
       )}
 
