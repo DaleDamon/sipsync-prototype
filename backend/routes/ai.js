@@ -265,7 +265,7 @@ async function parseImageBatch(imageGroup, label, structureContext = '') {
 
   let responseText = '';
   const stream = await anthropic.messages.stream({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     max_tokens: 32000,
     messages: [{ role: 'user', content }]
   });
@@ -373,7 +373,7 @@ router.post('/parse-csv', adminAuth, async (req, res) => {
     console.log(`[AI] Processing ${wines.length} wines for sensory estimation...`);
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 8000,
       messages: [
         {
@@ -418,7 +418,7 @@ router.post('/parse-csv', adminAuth, async (req, res) => {
     res.json({
       wines: enrichedWines,
       count: enrichedWines.length,
-      model: 'claude-sonnet-4-20250514'
+      model: 'claude-sonnet-4-6'
     });
   } catch (error) {
     console.error('[AI] Error processing CSV:', error);
@@ -498,7 +498,7 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
     res.json({
       wines: parsedWines,
       count: parsedWines.length,
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       pagesProcessed: images.length,
       storedPaths: storedPaths.length > 0 ? storedPaths : undefined
     });
@@ -587,7 +587,7 @@ router.post('/reanalyze', adminAuth, async (req, res) => {
     res.json({
       wines: parsedWines,
       count: parsedWines.length,
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       storedPaths,
       reanalyzed: true
     });
