@@ -50,6 +50,7 @@ export default function AdminAnalytics({ restaurantId, token }) {
   const [engagement, setEngagement] = useState(null);
   const [engLoading, setEngLoading] = useState(false);
   const [engError, setEngError] = useState('');
+  const [convSort, setConvSort] = useState('views');
 
   const fetchMetrics = useCallback(async () => {
     if (!restaurantId) return;
@@ -99,13 +100,34 @@ export default function AdminAnalytics({ restaurantId, token }) {
     return <div className="analytics-empty">Select a restaurant to view analytics.</div>;
   }
 
-  const radarData = metrics
-    ? [
-        { subject: 'BTG %', value: metrics.btgCoverage, benchmark: benchmarks?.avgBtgCoverage ?? 0 },
-        { subject: 'Red %', value: metrics.redPct, benchmark: 0 },
-        { subject: 'White %', value: metrics.whitePct, benchmark: 0 },
-      ]
-    : [];
+  const radarData = (() => {
+    if (!metrics) return [];
+    const total = metrics.totalWines || 1;
+    // Scale 0.8–1.6× → 0–100 (covers real dataset range with headroom)
+    const btgMarkupNorm = metrics.btgMarkupRatio != null
+      ? Math.min(Math.max(Math.round(((metrics.btgMarkupRatio - 0.8) / 0.8) * 100), 0), 100) : 0;
+    const entryPct = Math.round((metrics.priceRangeTiers.entry / total) * 100);
+    const premiumPct = Math.round((metrics.priceRangeTiers.premium / total) * 100);
+    const avgMed = benchmarks?.avgMedianBottlePrice;
+    const pricePos = avgMed
+      ? Math.min(Math.round((metrics.medianBottlePrice / (avgMed * 2)) * 100), 100)
+      : 50;
+    return [
+      // Scale 0–20% → 0–100 (outlier-resistant; top quartile ≈ 13%)
+      { subject: 'BTG Coverage',    value: Math.min(Math.round((metrics.btgCoverage / 20) * 100), 100),
+        benchmark: benchmarks ? Math.min(Math.round((benchmarks.avgBtgCoverage / 20) * 100), 100) : 0,
+        raw: `${metrics.btgCoverage}%`, benchRaw: benchmarks ? `${benchmarks.avgBtgCoverage}%` : null },
+      { subject: 'Glass Markup',    value: btgMarkupNorm, benchmark: Math.round(((1.25 - 0.8) / 0.8) * 100),
+        raw: metrics.btgMarkupRatio != null ? `${metrics.btgMarkupRatio}×` : 'N/A', benchRaw: '1.25× (system avg)' },
+      { subject: 'Entry Wines',     value: entryPct, benchmark: 34,
+        raw: `${entryPct}%`, benchRaw: '34% (system avg)' },
+      { subject: 'Premium Wines',   value: premiumPct, benchmark: 25,
+        raw: `${premiumPct}%`, benchRaw: '25% (system avg)' },
+      { subject: 'Price vs. Market', value: pricePos, benchmark: 50,
+        raw: metrics.medianBottlePrice ? `$${metrics.medianBottlePrice} median` : '—',
+        benchRaw: avgMed ? `$${avgMed} system avg` : 'no benchmark' },
+    ];
+  })();
 
   return (
     <div className="admin-analytics">
@@ -165,7 +187,7 @@ export default function AdminAnalytics({ restaurantId, token }) {
                 <PriceRangeCard tiers={metrics.priceRangeTiers} />
               </div>
 
-              <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 28 }}>
+              <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 16 }}>
                 <StatCard label="Median Bottle Price"
                   value={metrics.medianBottlePrice ? `$${metrics.medianBottlePrice}` : '—'}
                   benchmarks={benchmarks} rawValue={metrics.medianBottlePrice} avgKey="avgMedianBottlePrice" />
@@ -173,6 +195,73 @@ export default function AdminAnalytics({ restaurantId, token }) {
                   value={metrics.btgMarkupRatio != null ? `${metrics.btgMarkupRatio}×` : '—'}
                   benchmarks={null}
                   subtitle={metrics.btgMarkupRatio == null ? 'No BTG wines' : '(glass × 5) ÷ bottle — ideal ≈ 1.0'} />
+              </div>
+
+              {/* 5 KPI Cards */}
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#8b0000', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Wine Program KPIs</div>
+                <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)', marginBottom: 28 }}>
+                  <div className="analytics-stat-card">
+                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                      {metrics.glassPourProfitIndex != null ? metrics.glassPourProfitIndex.toFixed(1) : '—'}
+                    </div>
+                    <div className="analytics-stat-label">Glass Pour Profit Index</div>
+                    <div className="analytics-stat-benchmark">BTG coverage × markup ratio</div>
+                    {benchmarks?.avgGlassPourProfitIndex != null && (
+                      <div className={`analytics-stat-benchmark ${metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'better' : 'worse'}`}>
+                        avg: {benchmarks.avgGlassPourProfitIndex.toFixed(1)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="analytics-stat-card">
+                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                      {metrics.tierConversion ? `${metrics.tierConversion.mid}%` : '—'}
+                    </div>
+                    <div className="analytics-stat-label">Mid-Tier BTG Rate</div>
+                    <div className="analytics-stat-benchmark">$75–$150 wines by the glass</div>
+                    {benchmarks?.avgTierConversionMid != null && (
+                      <div className={`analytics-stat-benchmark ${(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'better' : 'worse'}`}>
+                        avg: {benchmarks.avgTierConversionMid}%
+                      </div>
+                    )}
+                  </div>
+                  <div className="analytics-stat-card">
+                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                      {metrics.varietalHHI ?? '—'}
+                    </div>
+                    <div className="analytics-stat-label">Varietal Concentration (HHI)</div>
+                    <div className="analytics-stat-benchmark">lower = more diverse</div>
+                    {benchmarks?.avgVarietalHHI != null && (
+                      <div className={`analytics-stat-benchmark ${(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'better' : 'worse'}`}>
+                        avg: {benchmarks.avgVarietalHHI}
+                      </div>
+                    )}
+                  </div>
+                  <div className="analytics-stat-card">
+                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                      {metrics.priceSpreadIndex != null ? `${metrics.priceSpreadIndex}×` : '—'}
+                    </div>
+                    <div className="analytics-stat-label">Price Spread Index</div>
+                    <div className="analytics-stat-benchmark">p90 ÷ p10 bottle price</div>
+                    {benchmarks?.avgPriceSpreadIndex != null && (
+                      <div className={`analytics-stat-benchmark ${(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'better' : 'worse'}`}>
+                        avg: {benchmarks.avgPriceSpreadIndex}×
+                      </div>
+                    )}
+                  </div>
+                  <div className="analytics-stat-card">
+                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                      {metrics.btgMarkupConsistency != null ? `${Math.round(metrics.btgMarkupConsistency * 100)}%` : '—'}
+                    </div>
+                    <div className="analytics-stat-label">Markup Consistency</div>
+                    <div className="analytics-stat-benchmark">pricing strategy coherence</div>
+                    {benchmarks?.avgBtgMarkupConsistency != null && (
+                      <div className={`analytics-stat-benchmark ${(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'better' : 'worse'}`}>
+                        avg: {Math.round(benchmarks.avgBtgMarkupConsistency * 100)}%
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="analytics-charts-grid">
@@ -196,24 +285,35 @@ export default function AdminAnalytics({ restaurantId, token }) {
 
                 <div className="analytics-section">
                   <div className="analytics-chart-wrap">
-                    <h3 style={{ marginTop: 0 }}>Coverage vs. System Avg</h3>
-                    <ResponsiveContainer width="100%" height={260}>
-                      <RadarChart data={radarData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+                    <h3 style={{ marginTop: 0 }}>Pricing Health Profile</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                         <PolarGrid />
-                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} tickCount={3} />
                         <Radar name="This Restaurant" dataKey="value" stroke="#8b0000" fill="#8b0000" fillOpacity={0.4} />
-                        {benchmarks && (
-                          <Radar name="System Avg" dataKey="benchmark" stroke="#999" fill="#999" fillOpacity={0.15} />
-                        )}
-                        <Tooltip formatter={(v) => [`${v}`, '']} />
+                        <Radar name="Benchmark" dataKey="benchmark" stroke="#999" fill="#999" fillOpacity={0.15} />
+                        <Legend wrapperStyle={{ fontSize: 12 }} />
+                        <Tooltip
+                          content={({ payload }) => {
+                            if (!payload?.length) return null;
+                            const d = payload[0]?.payload;
+                            if (!d) return null;
+                            return (
+                              <div style={{ background: 'white', border: '1px solid #e0e0e0', borderRadius: 6, padding: '8px 12px', fontSize: 12 }}>
+                                <div style={{ fontWeight: 600, marginBottom: 4 }}>{d.subject}</div>
+                                <div style={{ color: '#8b0000' }}>This restaurant: <strong>{d.raw}</strong></div>
+                                {d.benchRaw && <div style={{ color: '#888' }}>Benchmark: {d.benchRaw}</div>}
+                              </div>
+                            );
+                          }}
+                        />
                       </RadarChart>
                     </ResponsiveContainer>
-                    {benchmarks && (
-                      <p style={{ fontSize: 11, color: '#999', textAlign: 'center', margin: '4px 0 0' }}>
-                        Red = this restaurant · Grey = system average ({benchmarks.restaurantCount} restaurants)
-                      </p>
-                    )}
+                    <div style={{ fontSize: 11, color: '#aaa', textAlign: 'center', marginTop: 4, lineHeight: 1.5 }}>
+                      All axes scaled 0–100. BTG Coverage: 20% = 100 (≥20% saturates). Glass Markup: 0.8× = 0, 1.6× = 100. Price vs. Market: 50 = at system median.
+                      {benchmarks && ` Benchmarks from ${benchmarks.restaurantCount} restaurants.`}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -256,7 +356,7 @@ export default function AdminAnalytics({ restaurantId, token }) {
           {!engLoading && engagement && (
             <>
               {/* Summary stats */}
-              <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(2, 1fr)', marginBottom: 24 }}>
+              <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 24 }}>
                 <div className="analytics-stat-card">
                   <div className="analytics-stat-value">{engagement.uniqueUsers}</div>
                   <div className="analytics-stat-label">Unique Users</div>
@@ -264,6 +364,16 @@ export default function AdminAnalytics({ restaurantId, token }) {
                 <div className="analytics-stat-card">
                   <div className="analytics-stat-value">{engagement.totalEvents}</div>
                   <div className="analytics-stat-label">Total Events</div>
+                </div>
+                <div className="analytics-stat-card">
+                  <div className="analytics-stat-value">{engagement.avgEventsPerSession ?? '—'}</div>
+                  <div className="analytics-stat-label">Avg Events / Session</div>
+                  <div className="analytics-stat-benchmark">engagement depth</div>
+                </div>
+                <div className="analytics-stat-card">
+                  <div className="analytics-stat-value">{engagement.returningUsersPct ?? '—'}%</div>
+                  <div className="analytics-stat-label">Returning Users</div>
+                  <div className="analytics-stat-benchmark">{engagement.returningUsers} of {engagement.uniqueUsers}</div>
                 </div>
               </div>
 
@@ -329,6 +439,80 @@ export default function AdminAnalytics({ restaurantId, token }) {
                 </div>
               )}
 
+              {/* Peak activity hours */}
+              {engagement.peakHours?.some(h => h.count > 0) && (
+                <div className="analytics-section">
+                  <div className="analytics-chart-wrap">
+                    <h3 style={{ marginTop: 0 }}>Peak Activity Hours</h3>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={engagement.peakHours}
+                        margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="hour" tick={{ fontSize: 10 }} interval={2}
+                          tickFormatter={h => h === 0 ? '12am' : h === 12 ? '12pm' : h < 12 ? `${h}am` : `${h - 12}pm`} />
+                        <YAxis tick={{ fontSize: 10 }} />
+                        <Tooltip labelFormatter={h => h === 0 ? '12am' : h === 12 ? '12pm' : h < 12 ? `${h}am` : `${h - 12}pm`}
+                          formatter={(v) => [v, 'Events']} />
+                        <Bar dataKey="count" fill="#8b0000" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Filter dimension breakdown */}
+              {engagement.filterDimensions?.totalFilterEvents > 0 && (
+                <div className="analytics-section">
+                  <div className="analytics-chart-wrap">
+                    <h3 style={{ marginTop: 0 }}>What Users Are Filtering For</h3>
+                    <p style={{ fontSize: 12, color: '#888', marginTop: 0, marginBottom: 16 }}>
+                      Based on {engagement.filterDimensions.totalFilterEvents} filter events. Each dimension is independent.
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+                      {[
+                        { title: 'Wine Type',    key: 'wineType' },
+                        { title: 'By the Glass', key: 'btgOnly' },
+                        { title: 'Sweetness',    key: 'sweetness' },
+                        { title: 'Acidity',      key: 'acidity' },
+                        { title: 'Tannins',      key: 'tannins' },
+                        { title: 'Body',         key: 'bodyWeight' },
+                        { title: 'Flavor Notes', key: 'flavorNotes', wide: true },
+                      ].map(({ title, key, wide }) => {
+                        const items = engagement.filterDimensions[key] || [];
+                        const topCount = items[0]?.count || 1;
+                        return (
+                          <div key={title} style={wide ? { gridColumn: 'span 2' } : {}}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: '#8b0000', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{title}</div>
+                            <div style={wide ? { columns: 2, columnGap: 24 } : { display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              {items.map(({ label, count }) => (
+                                <div key={label} style={wide ? { breakInside: 'avoid', marginBottom: 8 } : {}}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 3 }}>
+                                    <span style={{ color: '#333', fontWeight: 500 }}>{label}</span>
+                                    <span style={{ color: '#888' }}>{count}</span>
+                                  </div>
+                                  <div style={{ height: 8, background: '#f0f0f0', borderRadius: 4, overflow: 'hidden' }}>
+                                    <div style={{
+                                      width: `${Math.round((count / topCount) * 100)}%`,
+                                      height: '100%',
+                                      background: 'linear-gradient(90deg, #8b0000, #c62828)',
+                                      borderRadius: 4,
+                                      minWidth: count > 0 ? 4 : 0,
+                                    }} />
+                                  </div>
+                                </div>
+                              ))}
+                              {items.length === 0 && (
+                                <div style={{ fontSize: 12, color: '#bbb' }}>No data yet</div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Top restaurants by views */}
               {engagement.topRestaurants.length > 0 && (
                 <div className="analytics-section">
@@ -344,6 +528,61 @@ export default function AdminAnalytics({ restaurantId, token }) {
                         <Bar dataKey="views" fill="#8b0000" radius={[0, 4, 4, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Restaurant conversion table */}
+              {engagement.restaurantConversionTable?.length > 0 && (
+                <div className="analytics-section">
+                  <div className="analytics-chart-wrap">
+                    <h3 style={{ marginTop: 0 }}>Restaurant Conversion</h3>
+                    <p style={{ fontSize: 12, color: '#888', marginTop: 0, marginBottom: 12 }}>
+                      Highlighted rows (light red) have high views but low save rate — potential discovery friction.
+                    </p>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table className="analytics-history-table">
+                        <thead>
+                          <tr>
+                            {[
+                              { key: 'name', label: 'Restaurant' },
+                              { key: 'views', label: 'Views' },
+                              { key: 'results', label: 'Results Viewed' },
+                              { key: 'opens', label: 'Wine Opens' },
+                              { key: 'saves', label: 'Saves' },
+                              { key: 'conversionRate', label: 'Save Rate' },
+                            ].map(col => (
+                              <th key={col.key}
+                                onClick={() => setConvSort(col.key)}
+                                style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>
+                                {col.label} {convSort === col.key ? '▼' : ''}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...engagement.restaurantConversionTable]
+                            .sort((a, b) => {
+                              if (convSort === 'name') return a.name.localeCompare(b.name);
+                              return b[convSort] - a[convSort];
+                            })
+                            .map(row => (
+                              <tr key={row.restaurantId}
+                                style={row.views > 20 && row.conversionRate < 5 ? { background: '#fff5f5' } : {}}>
+                                <td>{row.name}</td>
+                                <td>{row.views}</td>
+                                <td>{row.results}</td>
+                                <td>{row.opens}</td>
+                                <td>{row.saves}</td>
+                                <td style={{ fontWeight: 600, color: row.conversionRate < 5 ? '#c62828' : '#2e7d32' }}>
+                                  {row.conversionRate}%
+                                </td>
+                              </tr>
+                            ))
+                          }
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               )}

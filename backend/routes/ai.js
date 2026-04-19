@@ -148,6 +148,8 @@ Also estimate the sensory profile:
 - flavorProfile: array of 2-5 strings from ONLY: oak, cherry, citrus, berry, vanilla, spice, floral, chocolate, earthy, tropical, herbal, honey, pear, biscuit
 - lowConfidence: array of field names (from: acidity, tannins, bodyWeight, sweetnessLevel, flavorProfile) where your confidence is LOW. Flag a field if you don't recognize the producer, the varietal is unusual/a blend that could vary widely, or the region doesn't narrow things down. If confident in all, return an empty array [].
 
+DEDUPLICATION — this is critical: Many menus list wines in separate "By the Glass" and "By the Bottle" sections. When you see the same wine appearing in both sections, create ONE entry with both prices — glassPrice from the glass section and price from the bottle section. Match wines across sections by producer + varietal + region similarity. Do NOT create two separate objects for the same wine.
+
 Additional extraction rules:
 - If the menu has section headers like "Light Whites", "Medium Reds", "Full Body" — use those as direct signals for bodyWeight and type
 - For wines in "Cellar Selections" or similar premium sections, infer body from wine knowledge (most are full-bodied)
@@ -315,6 +317,43 @@ function sanitizeWines(wines) {
       ? wine.lowConfidence.filter(f => CONFIDENCE_FIELDS.includes(f))
       : []
   }));
+}
+
+// Merge duplicate wine entries that appear in both BTG and bottle sections
+function deduplicateWines(wines) {
+  const map = new Map();
+
+  for (const wine of wines) {
+    const key = [wine.producer, wine.varietal, wine.region]
+      .map(s => (s || '').toLowerCase().trim().replace(/[^a-z0-9]/g, ''))
+      .join('|');
+
+    if (!map.has(key)) {
+      map.set(key, { ...wine });
+    } else {
+      const existing = map.get(key);
+      // Determine which entry is the bottle and which is the glass
+      // The bottle price is always higher
+      const prices = [existing.price, wine.price].filter(p => p > 0).sort((a, b) => a - b);
+      const glassPrices = [existing.glassPrice, wine.glassPrice].filter(p => p > 0);
+
+      if (prices.length === 2) {
+        // Two bottle prices — smaller is the glass price
+        existing.glassPrice = prices[0];
+        existing.price = prices[1];
+      } else if (glassPrices.length > 0 && !existing.glassPrice) {
+        existing.glassPrice = glassPrices[0];
+        if (wine.price > existing.price) existing.price = wine.price;
+      }
+      map.set(key, existing);
+    }
+  }
+
+  const deduped = Array.from(map.values());
+  if (deduped.length < wines.length) {
+    console.log(`[AI] Deduplication: merged ${wines.length - deduped.length} duplicate wine entry(s) → ${deduped.length} unique wines`);
+  }
+  return deduped;
 }
 
 // Save base64 images to Firebase Storage; returns array of GCS paths
@@ -493,6 +532,7 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
 
     console.log(`[AI] Total wines parsed: ${parsedWines.length}`);
     parsedWines = sanitizeWines(parsedWines);
+    parsedWines = deduplicateWines(parsedWines);
     console.log(`[AI] Successfully parsed ${parsedWines.length} wines from menu images`);
 
     res.json({
@@ -582,6 +622,7 @@ router.post('/reanalyze', adminAuth, async (req, res) => {
     }
 
     parsedWines = sanitizeWines(parsedWines);
+    parsedWines = deduplicateWines(parsedWines);
     console.log(`[AI] Re-analysis complete: ${parsedWines.length} wines parsed`);
 
     res.json({

@@ -326,17 +326,54 @@ router.get('/restaurant/:restaurantId', adminAuth, async (req, res) => {
     // BTG Markup Ratio (glassPrice * 5 / bottlePrice)
     const markupWines = wines.filter(w => parseFloat(w.glassPrice) > 0 && parseFloat(w.price) > 0);
     let btgMarkupRatio = null;
+    let btgMarkupConsistency = null;
     if (markupWines.length > 0) {
       const ratios = markupWines.map(w => (parseFloat(w.glassPrice) * 5) / parseFloat(w.price));
-      btgMarkupRatio = Math.round((ratios.reduce((a, b) => a + b, 0) / ratios.length) * 100) / 100;
+      const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+      btgMarkupRatio = Math.round(mean * 100) / 100;
+      if (ratios.length > 1) {
+        const variance = ratios.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / ratios.length;
+        const stdDev = Math.sqrt(variance);
+        btgMarkupConsistency = Math.round(Math.max(0, 1 - (stdDev / mean)) * 100) / 100;
+      } else {
+        btgMarkupConsistency = 1; // single BTG wine = perfectly consistent by definition
+      }
     }
 
-    // Varietal Distribution — top 10
+    // KPI 1: Glass Pour Profit Index = btgCoverage% × avgMarkupRatio
+    const glassPourProfitIndex = btgMarkupRatio != null
+      ? Math.round(btgCoverage * btgMarkupRatio * 100) / 100
+      : null;
+
+    // KPI 2: Tier Conversion Rate — % of BTG wines in each price tier
+    const btgPricedWines = markupWines; // already has both glassPrice and price
+    const btgBottlePrices = btgPricedWines.map(w => parseFloat(w.price));
+    const tierConversion = {
+      entry:   btgBottlePrices.length > 0 ? Math.round((btgBottlePrices.filter(p => p < 75).length   / Math.max(priceRangeTiers.entry, 1)) * 100) : 0,
+      mid:     btgBottlePrices.length > 0 ? Math.round((btgBottlePrices.filter(p => p >= 75 && p <= 150).length / Math.max(priceRangeTiers.mid, 1)) * 100) : 0,
+      premium: btgBottlePrices.length > 0 ? Math.round((btgBottlePrices.filter(p => p > 150).length  / Math.max(priceRangeTiers.premium, 1)) * 100) : 0,
+    };
+
+    // KPI 3: Varietal Concentration Risk (HHI) — lower = more diverse
     const varietalCounts = {};
     wines.forEach(w => {
       const v = (w.varietal || 'Unknown').trim();
       varietalCounts[v] = (varietalCounts[v] || 0) + 1;
     });
+    const hhi = Object.values(varietalCounts)
+      .reduce((sum, count) => sum + Math.pow(count / total, 2) * 10000, 0);
+    const varietalHHI = Math.round(hhi);
+
+    // KPI 4: Price Spread Index — p90 / p10
+    let priceSpreadIndex = null;
+    if (bottlePrices.length >= 10) {
+      const sortedPrices = [...bottlePrices].sort((a, b) => a - b);
+      const p10 = sortedPrices[Math.floor(sortedPrices.length * 0.10)];
+      const p90 = sortedPrices[Math.floor(sortedPrices.length * 0.90)];
+      priceSpreadIndex = p10 > 0 ? Math.round((p90 / p10) * 100) / 100 : null;
+    }
+
+    // Varietal Distribution — top 10
     const varietalDistribution = Object.entries(varietalCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
@@ -372,6 +409,12 @@ router.get('/restaurant/:restaurantId', adminAuth, async (req, res) => {
       btgMarkupRatio,
       varietalDistribution,
       uploadHistory,
+      // 5 KPIs
+      glassPourProfitIndex,
+      tierConversion,
+      varietalHHI,
+      priceSpreadIndex,
+      btgMarkupConsistency,
     });
   } catch (err) {
     console.error('[Analytics] restaurant metrics error:', err);
@@ -396,8 +439,8 @@ router.get('/system-benchmarks', adminAuth, async (req, res) => {
 
     // Compute fresh
     const restSnap = await db.collection('restaurants').get();
-    const totals = { btgCoverage: 0, medianBottlePrice: 0 };
-    let included = 0;
+    const totals = { btgCoverage: 0, medianBottlePrice: 0, glassPourProfitIndex: 0, varietalHHI: 0, priceSpreadIndex: 0, btgMarkupConsistency: 0, tierConversionMid: 0 };
+    const counts = { btgCoverage: 0, medianBottlePrice: 0, glassPourProfitIndex: 0, varietalHHI: 0, priceSpreadIndex: 0, btgMarkupConsistency: 0, tierConversionMid: 0 };
 
     for (const restDoc of restSnap.docs) {
       const winesSnap = await db
@@ -408,21 +451,63 @@ router.get('/system-benchmarks', adminAuth, async (req, res) => {
       const wines = winesSnap.docs.map(d => d.data());
       if (wines.length === 0) continue;
 
-      const btg = Math.round((wines.filter(w => parseFloat(w.glassPrice) > 0).length / wines.length) * 100);
+      const total = wines.length;
+      const btg = Math.round((wines.filter(w => parseFloat(w.glassPrice) > 0).length / total) * 100);
       const prices = wines.filter(w => parseFloat(w.price) > 0).map(w => parseFloat(w.price)).filter(p => !isNaN(p));
       const medPrice = median(prices);
 
-      totals.btgCoverage += btg;
-      totals.medianBottlePrice += medPrice;
-      included++;
+      totals.btgCoverage += btg; counts.btgCoverage++;
+      totals.medianBottlePrice += medPrice; counts.medianBottlePrice++;
+
+      // Glass Pour Profit Index + Consistency + Tier Conversion Mid
+      const markupW = wines.filter(w => parseFloat(w.glassPrice) > 0 && parseFloat(w.price) > 0);
+      if (markupW.length > 0) {
+        const ratios = markupW.map(w => (parseFloat(w.glassPrice) * 5) / parseFloat(w.price));
+        const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+        totals.glassPourProfitIndex += btg * mean; counts.glassPourProfitIndex++;
+        // Consistency
+        if (ratios.length > 1) {
+          const variance = ratios.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / ratios.length;
+          const consistency = Math.max(0, 1 - (Math.sqrt(variance) / mean));
+          totals.btgMarkupConsistency += consistency; counts.btgMarkupConsistency++;
+        }
+        // Mid-tier BTG conversion
+        const btgPrices = markupW.map(w => parseFloat(w.price));
+        const midBtg = btgPrices.filter(p => p >= 75 && p <= 150).length;
+        const midTotal = prices.filter(p => p >= 75 && p <= 150).length;
+        if (midTotal > 0) {
+          totals.tierConversionMid += Math.round((midBtg / midTotal) * 100);
+          counts.tierConversionMid++;
+        }
+      }
+
+      // HHI
+      const vCounts = {};
+      wines.forEach(w => { const v = (w.varietal || 'Unknown').trim(); vCounts[v] = (vCounts[v] || 0) + 1; });
+      const hhi = Object.values(vCounts).reduce((s, c) => s + Math.pow(c / total, 2) * 10000, 0);
+      totals.varietalHHI += hhi; counts.varietalHHI++;
+
+      // Price Spread Index
+      if (prices.length >= 10) {
+        const sp = [...prices].sort((a, b) => a - b);
+        const p10 = sp[Math.floor(sp.length * 0.10)];
+        const p90 = sp[Math.floor(sp.length * 0.90)];
+        if (p10 > 0) { totals.priceSpreadIndex += p90 / p10; counts.priceSpreadIndex++; }
+      }
     }
 
-    const result = included === 0
-      ? { avgBtgCoverage: 0, avgMedianBottlePrice: 0 }
-      : {
-          avgBtgCoverage: Math.round(totals.btgCoverage / included),
-          avgMedianBottlePrice: Math.round((totals.medianBottlePrice / included) * 100) / 100,
-        };
+    const avg = (key, decimals = 2) => counts[key] === 0 ? 0
+      : Math.round((totals[key] / counts[key]) * Math.pow(10, decimals)) / Math.pow(10, decimals);
+
+    const result = {
+      avgBtgCoverage:          avg('btgCoverage', 0),
+      avgMedianBottlePrice:    avg('medianBottlePrice', 2),
+      avgGlassPourProfitIndex: avg('glassPourProfitIndex', 2),
+      avgVarietalHHI:          avg('varietalHHI', 0),
+      avgPriceSpreadIndex:     avg('priceSpreadIndex', 2),
+      avgBtgMarkupConsistency: avg('btgMarkupConsistency', 2),
+      avgTierConversionMid:    avg('tierConversionMid', 0),
+    };
 
     result.computedAt = new Date();
     result.restaurantCount = included;
@@ -661,6 +746,23 @@ router.get('/engagement', adminAuth, async (req, res) => {
     const restaurantViews = {};
     // Unique user count
     const uniqueUsers = new Set();
+    // Peak hours (0-23)
+    const hourCounts = Array(24).fill(0);
+    // Session depth
+    const sessionEventCount = {};
+    const userSessions = {};
+    // Per-restaurant conversion
+    const restaurantConversion = {};
+    // Filter dimensions (separate breakdown per dimension)
+    const filterDimensions = {
+      wineType:    {},
+      btgOnly:     { yes: 0, no: 0 },
+      sweetness:   {},
+      acidity:     {},
+      tannins:     {},
+      bodyWeight:  {},
+      flavorNotes: {},
+    };
 
     events.forEach(e => {
       const type = e.eventType;
@@ -670,23 +772,84 @@ router.get('/engagement', adminAuth, async (req, res) => {
       }
       if (e.userId) uniqueUsers.add(e.userId);
 
-      // Daily breakdown
+      // Timestamp (hoisted for reuse)
       const ts = e.timestamp?.toDate ? e.timestamp.toDate() : new Date(e.timestamp);
+
+      // Daily breakdown
       const day = ts.toISOString().split('T')[0];
       if (!daily[day]) daily[day] = { restaurant_view: 0, filter_applied: 0, pairing_result_viewed: 0, wine_card_open: 0 };
       if (daily[day][type] !== undefined) daily[day][type]++;
+
+      // Peak hours
+      hourCounts[ts.getHours()]++;
+
+      // Session depth
+      if (e.sessionId) sessionEventCount[e.sessionId] = (sessionEventCount[e.sessionId] || 0) + 1;
+      if (e.userId && e.sessionId) {
+        if (!userSessions[e.userId]) userSessions[e.userId] = new Set();
+        userSessions[e.userId].add(e.sessionId);
+      }
 
       // Restaurant views
       if (type === 'restaurant_view' && e.restaurantId) {
         restaurantViews[e.restaurantId] = (restaurantViews[e.restaurantId] || 0) + 1;
       }
+
+      // Per-restaurant conversion
+      if (e.restaurantId) {
+        if (!restaurantConversion[e.restaurantId]) {
+          restaurantConversion[e.restaurantId] = { views: 0, results: 0, opens: 0, saves: 0 };
+        }
+        if (type === 'restaurant_view')       restaurantConversion[e.restaurantId].views++;
+        if (type === 'pairing_result_viewed') restaurantConversion[e.restaurantId].results++;
+        if (type === 'wine_card_open')        restaurantConversion[e.restaurantId].opens++;
+      }
+
+      // Filter dimensions
+      if (type === 'filter_applied' && e.filterState) {
+        const fs = e.filterState;
+        const cap = s => s ? (s.charAt(0).toUpperCase() + s.slice(1)) : 'Any';
+        // Wine type
+        const wt = cap(fs.wineType === 'any' ? 'Any' : fs.wineType);
+        filterDimensions.wineType[wt] = (filterDimensions.wineType[wt] || 0) + 1;
+        // BTG
+        filterDimensions.btgOnly[fs.btgOnly ? 'yes' : 'no']++;
+        // Sweetness
+        const sw = cap(fs.sweetness);
+        filterDimensions.sweetness[sw] = (filterDimensions.sweetness[sw] || 0) + 1;
+        // Acidity
+        const ac = cap(fs.acidity);
+        filterDimensions.acidity[ac] = (filterDimensions.acidity[ac] || 0) + 1;
+        // Tannins
+        const ta = cap(fs.tannins);
+        filterDimensions.tannins[ta] = (filterDimensions.tannins[ta] || 0) + 1;
+        // Body
+        const bw = cap(fs.bodyWeight);
+        filterDimensions.bodyWeight[bw] = (filterDimensions.bodyWeight[bw] || 0) + 1;
+        // Flavor notes (each note independently)
+        if (Array.isArray(fs.flavorNotes)) {
+          fs.flavorNotes.forEach(note => {
+            filterDimensions.flavorNotes[note] = (filterDimensions.flavorNotes[note] || 0) + 1;
+          });
+        }
+      }
     });
 
-    // Fetch restaurant names for top restaurants
+    // Session depth metrics
+    const sessionCounts = Object.values(sessionEventCount);
+    const avgEventsPerSession = sessionCounts.length > 0
+      ? Math.round((sessionCounts.reduce((a, b) => a + b, 0) / sessionCounts.length) * 10) / 10
+      : 0;
+    const returningUsers = Object.values(userSessions).filter(s => s.size > 1).length;
+    const returningUsersPct = uniqueUsers.size > 0 ? Math.round((returningUsers / uniqueUsers.size) * 100) : 0;
+
+    // Fetch restaurant names for top restaurants + conversion table (cap 30 unique)
     const topRestaurantIds = Object.entries(restaurantViews)
       .sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+    const conversionRestaurantIds = Object.keys(restaurantConversion).slice(0, 30);
+    const allNameIds = [...new Set([...topRestaurantIds, ...conversionRestaurantIds])];
     const restaurantNames = {};
-    await Promise.all(topRestaurantIds.map(async id => {
+    await Promise.all(allNameIds.map(async id => {
       const doc = await db.collection('restaurants').doc(id).get();
       restaurantNames[id] = doc.exists ? (doc.data().name || id) : id;
     }));
@@ -701,7 +864,7 @@ router.get('/engagement', adminAuth, async (req, res) => {
     const usersSnap = await db.collection('users').get();
     let totalSaves = 0;
     const saveUsers = new Set();
-    for (const userDoc of usersSnap.docs) {
+    await Promise.all(usersSnap.docs.map(async (userDoc) => {
       const histSnap = await db.collection('users').doc(userDoc.id)
         .collection('pairing_history')
         .where('saved_at', '>=', fromDate)
@@ -710,25 +873,67 @@ router.get('/engagement', adminAuth, async (req, res) => {
       if (histSnap.size > 0) {
         totalSaves += histSnap.size;
         saveUsers.add(userDoc.id);
+        // Per-restaurant saves
+        histSnap.docs.forEach(pDoc => {
+          const rId = pDoc.data().restaurantId;
+          if (rId && restaurantConversion[rId]) restaurantConversion[rId].saves++;
+        });
       }
-    }
+    }));
 
     // Daily array sorted chronologically
     const dailyArray = Object.entries(daily)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, counts]) => ({ date, ...counts }));
 
+    // Restaurant conversion table
+    const restaurantConversionTable = Object.entries(restaurantConversion)
+      .map(([id, c]) => ({
+        restaurantId: id,
+        name: restaurantNames[id] || id,
+        views: c.views,
+        results: c.results,
+        opens: c.opens,
+        saves: c.saves,
+        conversionRate: c.views > 0 ? Math.round((c.saves / c.views) * 1000) / 10 : 0,
+      }))
+      .sort((a, b) => b.views - a.views);
+
     res.json({
       totalEvents: events.length,
       uniqueUsers: uniqueUsers.size,
+      avgEventsPerSession,
+      returningUsers,
+      returningUsersPct,
       funnel: [
         { step: 'Restaurant Viewed', count: funnel.restaurant_view, users: funnelUsers.restaurant_view.size },
         { step: 'Filters Applied', count: funnel.filter_applied, users: funnelUsers.filter_applied.size },
         { step: 'Results Viewed', count: funnel.pairing_result_viewed, users: funnelUsers.pairing_result_viewed.size },
+        { step: 'Wine Opened', count: funnel.wine_card_open, users: funnelUsers.wine_card_open.size },
         { step: 'Wine Saved', count: totalSaves, users: saveUsers.size },
       ],
       dailyActivity: dailyArray,
       topRestaurants,
+      peakHours: hourCounts.map((count, hour) => ({ hour, count })),
+      filterDimensions: (() => {
+        const dimArray = obj => Object.entries(obj)
+          .sort((a, b) => b[1] - a[1])
+          .map(([label, count]) => ({ label, count }));
+        return {
+          wineType:    dimArray(filterDimensions.wineType),
+          btgOnly: [
+            { label: 'BTG Only',      count: filterDimensions.btgOnly.yes },
+            { label: 'Show All Wines', count: filterDimensions.btgOnly.no },
+          ],
+          sweetness:   dimArray(filterDimensions.sweetness),
+          acidity:     dimArray(filterDimensions.acidity),
+          tannins:     dimArray(filterDimensions.tannins),
+          bodyWeight:  dimArray(filterDimensions.bodyWeight),
+          flavorNotes: dimArray(filterDimensions.flavorNotes),
+          totalFilterEvents: filterDimensions.btgOnly.yes + filterDimensions.btgOnly.no,
+        };
+      })(),
+      restaurantConversionTable,
     });
   } catch (err) {
     console.error('[Analytics] engagement error:', err);
