@@ -161,6 +161,20 @@ Additional extraction rules:
 
 Return ONLY a JSON array of wine objects, no other text.`;
 
+// Process items with a concurrency limit — avoids rate limits and OOM on large PDFs
+async function processWithConcurrency(items, concurrency, fn) {
+  const results = new Array(items.length);
+  let index = 0;
+  async function worker() {
+    while (index < items.length) {
+      const i = index++;
+      results[i] = await fn(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+  return results;
+}
+
 // Split a base64 PDF into individual single-page PDFs (preserves text layer for Claude native processing)
 async function splitPdfToPages(base64Pdf) {
   const srcBuffer = Buffer.from(base64Pdf, 'base64');
@@ -294,7 +308,7 @@ async function parseImageBatch(imageGroup, label, structureContext = '') {
 function sanitizeWines(wines) {
   const CONFIDENCE_FIELDS = ['acidity', 'tannins', 'bodyWeight', 'sweetnessLevel', 'flavorProfile'];
   // Filter out priceless entries — these are typically from map/infographic pages
-  const priced = wines.filter(w => parseFloat(w.price) > 0);
+  const priced = wines.filter(w => parseFloat(w.price) > 0 || parseFloat(w.glassPrice) > 0);
   if (priced.length < wines.length) {
     console.log(`[AI] Filtered out ${wines.length - priced.length} priceless entries (likely from non-menu pages)`);
   }
@@ -332,19 +346,12 @@ function deduplicateWines(wines) {
       map.set(key, { ...wine });
     } else {
       const existing = map.get(key);
-      // Determine which entry is the bottle and which is the glass
-      // The bottle price is always higher
-      const prices = [existing.price, wine.price].filter(p => p > 0).sort((a, b) => a - b);
-      const glassPrices = [existing.glassPrice, wine.glassPrice].filter(p => p > 0);
-
-      if (prices.length === 2) {
-        // Two bottle prices — smaller is the glass price
-        existing.glassPrice = prices[0];
-        existing.price = prices[1];
-      } else if (glassPrices.length > 0 && !existing.glassPrice) {
-        existing.glassPrice = glassPrices[0];
-        if (wine.price > existing.price) existing.price = wine.price;
-      }
+      // Always take the highest non-zero price as the bottle price
+      const bottlePrice = Math.max(existing.price || 0, wine.price || 0);
+      // Take whichever entry has a glass price
+      const glassPrice = existing.glassPrice || wine.glassPrice || null;
+      if (bottlePrice > 0) existing.price = bottlePrice;
+      existing.glassPrice = glassPrice;
       map.set(key, existing);
     }
   }
@@ -492,6 +499,9 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
       return res.status(400).json({ error: 'Maximum 10 images per request' });
     }
 
+    const MAX_PAGES = 150;
+    const PAGE_CONCURRENCY = 10;
+
     console.log(`[AI] Processing ${images.length} menu image(s) with vision...`);
 
     // Split any PDF files into individual page images so each page gets its own API call
@@ -504,6 +514,12 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
       } else {
         processedImages.push(img);
       }
+    }
+
+    if (processedImages.length > MAX_PAGES) {
+      return res.status(400).json({
+        error: `PDF has too many pages (${processedImages.length}). Maximum is ${MAX_PAGES} pages. Consider splitting the PDF into smaller sections.`
+      });
     }
 
     // Save original images (not split pages) to storage in parallel with Claude parsing
@@ -519,11 +535,13 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
       // Single page — send directly
       parsedWines = await parseImageBatch(processedImages, 'page 1/1');
     } else {
-      // Multiple pages — run structure pre-pass then process in parallel
-      console.log(`[AI] Processing ${processedImages.length} pages in parallel...`);
+      // Multiple pages — run structure pre-pass then process with concurrency limit
+      console.log(`[AI] Processing ${processedImages.length} pages with concurrency=${PAGE_CONCURRENCY}...`);
       const structureContext = await detectPricingStructure(processedImages[0]);
-      const results = await Promise.all(
-        processedImages.map((img, idx) => parseImageBatch([img], `page ${idx + 1}/${processedImages.length}`, structureContext))
+      const results = await processWithConcurrency(
+        processedImages,
+        PAGE_CONCURRENCY,
+        (img, idx) => parseImageBatch([img], `page ${idx + 1}/${processedImages.length}`, structureContext)
       );
       parsedWines = results.flat();
     }
@@ -615,8 +633,10 @@ router.post('/reanalyze', adminAuth, async (req, res) => {
       parsedWines = await parseImageBatch(processedImages, 'page 1/1');
     } else {
       const structureContext = await detectPricingStructure(processedImages[0]);
-      const results = await Promise.all(
-        processedImages.map((img, idx) => parseImageBatch([img], `page ${idx + 1}/${processedImages.length}`, structureContext))
+      const results = await processWithConcurrency(
+        processedImages,
+        10,
+        (img, idx) => parseImageBatch([img], `page ${idx + 1}/${processedImages.length}`, structureContext)
       );
       parsedWines = results.flat();
     }

@@ -56,8 +56,8 @@ function FileUpload({ adminToken, restaurantId, onWinesParsed, initialMethod = '
     setError('');
 
     files.forEach(file => {
-      if (file.size > 20 * 1024 * 1024) {
-        setError(`File ${file.name} is too large (max 20MB)`);
+      if (file.size > 25 * 1024 * 1024) {
+        setError(`File ${file.name} is too large (max 25MB)`);
         return;
       }
 
@@ -77,8 +77,8 @@ function FileUpload({ adminToken, restaurantId, onWinesParsed, initialMethod = '
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
-    if (selectedFile.size > 20 * 1024 * 1024) {
-      setError('File is too large (max 20MB)');
+    if (selectedFile.size > 25 * 1024 * 1024) {
+      setError('File is too large (max 25MB)');
       return;
     }
 
