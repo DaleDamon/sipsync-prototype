@@ -175,24 +175,34 @@ async function processWithConcurrency(items, concurrency, fn) {
   return results;
 }
 
-// Split a base64 PDF into individual single-page PDFs (preserves text layer for Claude native processing)
-async function splitPdfToPages(base64Pdf) {
+// Get page count of a PDF without splitting
+async function getPdfPageCount(base64Pdf) {
   const srcBuffer = Buffer.from(base64Pdf, 'base64');
   const srcDoc = await PDFDocument.load(srcBuffer);
-  const pageCount = srcDoc.getPageCount();
+  return { pageCount: srcDoc.getPageCount(), srcBuffer };
+}
 
-  const pageDocs = await Promise.all(
-    Array.from({ length: pageCount }, async (_, i) => {
-      const pageDoc = await PDFDocument.create();
-      const [copiedPage] = await pageDoc.copyPages(srcDoc, [i]);
-      pageDoc.addPage(copiedPage);
-      const pageBytes = await pageDoc.save();
-      return 'data:application/pdf;base64,' + Buffer.from(pageBytes).toString('base64');
-    })
-  );
+// Split a range of pages from a PDF into individual single-page base64 PDFs
+async function splitPdfPageRange(srcBuffer, startIdx, endIdx) {
+  const srcDoc = await PDFDocument.load(srcBuffer);
+  const pages = [];
+  for (let i = startIdx; i < endIdx; i++) {
+    const pageDoc = await PDFDocument.create();
+    const [copiedPage] = await pageDoc.copyPages(srcDoc, [i]);
+    pageDoc.addPage(copiedPage);
+    const pageBytes = await pageDoc.save();
+    pages.push('data:application/pdf;base64,' + Buffer.from(pageBytes).toString('base64'));
+  }
+  return pages;
+}
 
-  console.log(`[AI] PDF split into ${pageDocs.length} single-page PDF(s)`);
-  return pageDocs;
+// Split a base64 PDF into individual single-page PDFs (preserves text layer for Claude native processing)
+// Only used for small PDFs (single image/PDF uploads that are not large)
+async function splitPdfToPages(base64Pdf) {
+  const { pageCount, srcBuffer } = await getPdfPageCount(base64Pdf);
+  const pages = await splitPdfPageRange(srcBuffer, 0, pageCount);
+  console.log(`[AI] PDF split into ${pages.length} single-page PDF(s)`);
+  return pages;
 }
 
 // Detect pricing structure from the first image using Haiku (cheap, fast)
@@ -500,29 +510,11 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
     }
 
     const MAX_PAGES = 150;
-    const PAGE_CONCURRENCY = 10;
+    const CHUNK_SIZE = 10; // Process this many pages at a time to bound memory usage
 
     console.log(`[AI] Processing ${images.length} menu image(s) with vision...`);
 
-    // Split any PDF files into individual page images so each page gets its own API call
-    let processedImages = [];
-    for (const img of images) {
-      if (img.startsWith('data:application/pdf;base64,')) {
-        const base64 = img.replace('data:application/pdf;base64,', '');
-        const pages = await splitPdfToPages(base64);
-        processedImages.push(...pages);
-      } else {
-        processedImages.push(img);
-      }
-    }
-
-    if (processedImages.length > MAX_PAGES) {
-      return res.status(400).json({
-        error: `PDF has too many pages (${processedImages.length}). Maximum is ${MAX_PAGES} pages. Consider splitting the PDF into smaller sections.`
-      });
-    }
-
-    // Save original images (not split pages) to storage in parallel with Claude parsing
+    // Save original images to storage (non-blocking)
     const storagePromise = restaurantId
       ? saveImagesToStorage(images, restaurantId).catch(err => {
           console.error('[AI] Storage save failed (non-fatal):', err.message);
@@ -530,21 +522,76 @@ router.post('/parse-menu', adminAuth, async (req, res) => {
         })
       : Promise.resolve([]);
 
-    let parsedWines;
-    if (processedImages.length === 1) {
-      // Single page — send directly
-      parsedWines = await parseImageBatch(processedImages, 'page 1/1');
-    } else {
-      // Multiple pages — run structure pre-pass then process with concurrency limit
-      console.log(`[AI] Processing ${processedImages.length} pages with concurrency=${PAGE_CONCURRENCY}...`);
-      const structureContext = await detectPricingStructure(processedImages[0]);
-      const results = await processWithConcurrency(
-        processedImages,
-        PAGE_CONCURRENCY,
-        (img, idx) => parseImageBatch([img], `page ${idx + 1}/${processedImages.length}`, structureContext)
-      );
-      parsedWines = results.flat();
+    // Separate PDFs from regular images
+    const pdfItems = [];   // { base64, srcBuffer, pageCount }
+    const nonPdfImages = [];
+    for (const img of images) {
+      if (img.startsWith('data:application/pdf;base64,')) {
+        const base64 = img.replace('data:application/pdf;base64,', '');
+        const { pageCount, srcBuffer } = await getPdfPageCount(base64);
+        pdfItems.push({ srcBuffer, pageCount });
+      } else {
+        nonPdfImages.push(img);
+      }
     }
+
+    const totalPdfPages = pdfItems.reduce((sum, p) => sum + p.pageCount, 0);
+    const totalPages = totalPdfPages + nonPdfImages.length;
+
+    if (totalPages > MAX_PAGES) {
+      return res.status(400).json({
+        error: `PDF has too many pages (${totalPages}). Maximum is ${MAX_PAGES} pages. Consider splitting the PDF into smaller sections.`
+      });
+    }
+
+    // Get structure context from first page of first PDF (or first image)
+    let structureContext = '';
+    if (totalPages > 1) {
+      let firstPage;
+      if (pdfItems.length > 0) {
+        const [fp] = await splitPdfPageRange(pdfItems[0].srcBuffer, 0, 1);
+        firstPage = fp;
+      } else {
+        firstPage = nonPdfImages[0];
+      }
+      structureContext = await detectPricingStructure(firstPage);
+    }
+
+    // Process all content in memory-bounded chunks
+    const allWines = [];
+
+    // Process regular images first (usually just 1-3)
+    if (nonPdfImages.length === 1 && totalPages === 1) {
+      const wines = await parseImageBatch(nonPdfImages, 'page 1/1');
+      allWines.push(...wines);
+    } else if (nonPdfImages.length > 0) {
+      const results = await processWithConcurrency(
+        nonPdfImages,
+        CHUNK_SIZE,
+        (img, idx) => parseImageBatch([img], `image ${idx + 1}/${totalPages}`, structureContext)
+      );
+      allWines.push(...results.flat());
+    }
+
+    // Process each PDF in chunks — split CHUNK_SIZE pages, process, discard, repeat
+    let pageOffset = nonPdfImages.length;
+    for (const pdf of pdfItems) {
+      for (let start = 0; start < pdf.pageCount; start += CHUNK_SIZE) {
+        const end = Math.min(start + CHUNK_SIZE, pdf.pageCount);
+        console.log(`[AI] Splitting PDF pages ${start + 1}–${end} of ${pdf.pageCount}...`);
+        const chunkPages = await splitPdfPageRange(pdf.srcBuffer, start, end);
+        const results = await processWithConcurrency(
+          chunkPages,
+          CHUNK_SIZE,
+          (img, idx) => parseImageBatch([img], `page ${pageOffset + start + idx + 1}/${totalPages}`, structureContext)
+        );
+        allWines.push(...results.flat());
+        // chunkPages goes out of scope here — GC can reclaim the memory
+      }
+      pageOffset += pdf.pageCount;
+    }
+
+    let parsedWines = allWines;
 
     const storedPaths = await storagePromise;
 
