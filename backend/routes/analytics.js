@@ -437,10 +437,9 @@ router.get('/system-benchmarks', adminAuth, async (req, res) => {
       }
     }
 
-    // Compute fresh
+    // Compute fresh — collect per-restaurant values then take median (not mean) to avoid skew
     const restSnap = await db.collection('restaurants').get();
-    const totals = { btgCoverage: 0, medianBottlePrice: 0, glassPourProfitIndex: 0, varietalHHI: 0, priceSpreadIndex: 0, btgMarkupConsistency: 0, tierConversionMid: 0 };
-    const counts = { btgCoverage: 0, medianBottlePrice: 0, glassPourProfitIndex: 0, varietalHHI: 0, priceSpreadIndex: 0, btgMarkupConsistency: 0, tierConversionMid: 0 };
+    const vals = { btgCoverage: [], medianBottlePrice: [], glassPourProfitIndex: [], varietalHHI: [], priceSpreadIndex: [], btgMarkupConsistency: [], tierConversionMid: [] };
 
     for (const restDoc of restSnap.docs) {
       const winesSnap = await db
@@ -456,28 +455,27 @@ router.get('/system-benchmarks', adminAuth, async (req, res) => {
       const prices = wines.filter(w => parseFloat(w.price) > 0).map(w => parseFloat(w.price)).filter(p => !isNaN(p));
       const medPrice = median(prices);
 
-      totals.btgCoverage += btg; counts.btgCoverage++;
-      totals.medianBottlePrice += medPrice; counts.medianBottlePrice++;
+      vals.btgCoverage.push(btg);
+      vals.medianBottlePrice.push(medPrice);
 
       // Glass Pour Profit Index + Consistency + Tier Conversion Mid
       const markupW = wines.filter(w => parseFloat(w.glassPrice) > 0 && parseFloat(w.price) > 0);
       if (markupW.length > 0) {
         const ratios = markupW.map(w => (parseFloat(w.glassPrice) * 5) / parseFloat(w.price));
         const mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
-        totals.glassPourProfitIndex += btg * mean; counts.glassPourProfitIndex++;
+        vals.glassPourProfitIndex.push(btg * mean);
         // Consistency
         if (ratios.length > 1) {
           const variance = ratios.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / ratios.length;
           const consistency = Math.max(0, 1 - (Math.sqrt(variance) / mean));
-          totals.btgMarkupConsistency += consistency; counts.btgMarkupConsistency++;
+          vals.btgMarkupConsistency.push(consistency);
         }
         // Mid-tier BTG conversion
         const btgPrices = markupW.map(w => parseFloat(w.price));
         const midBtg = btgPrices.filter(p => p >= 75 && p <= 150).length;
         const midTotal = prices.filter(p => p >= 75 && p <= 150).length;
         if (midTotal > 0) {
-          totals.tierConversionMid += Math.round((midBtg / midTotal) * 100);
-          counts.tierConversionMid++;
+          vals.tierConversionMid.push(Math.round((midBtg / midTotal) * 100));
         }
       }
 
@@ -485,32 +483,36 @@ router.get('/system-benchmarks', adminAuth, async (req, res) => {
       const vCounts = {};
       wines.forEach(w => { const v = (w.varietal || 'Unknown').trim(); vCounts[v] = (vCounts[v] || 0) + 1; });
       const hhi = Object.values(vCounts).reduce((s, c) => s + Math.pow(c / total, 2) * 10000, 0);
-      totals.varietalHHI += hhi; counts.varietalHHI++;
+      vals.varietalHHI.push(hhi);
 
       // Price Spread Index
       if (prices.length >= 10) {
         const sp = [...prices].sort((a, b) => a - b);
         const p10 = sp[Math.floor(sp.length * 0.10)];
         const p90 = sp[Math.floor(sp.length * 0.90)];
-        if (p10 > 0) { totals.priceSpreadIndex += p90 / p10; counts.priceSpreadIndex++; }
+        if (p10 > 0) { vals.priceSpreadIndex.push(p90 / p10); }
       }
     }
 
-    const avg = (key, decimals = 2) => counts[key] === 0 ? 0
-      : Math.round((totals[key] / counts[key]) * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    const med = (key, decimals = 2) => {
+      const arr = vals[key];
+      if (!arr || arr.length === 0) return 0;
+      const m = median(arr);
+      return Math.round(m * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    };
 
     const result = {
-      avgBtgCoverage:          avg('btgCoverage', 0),
-      avgMedianBottlePrice:    avg('medianBottlePrice', 2),
-      avgGlassPourProfitIndex: avg('glassPourProfitIndex', 2),
-      avgVarietalHHI:          avg('varietalHHI', 0),
-      avgPriceSpreadIndex:     avg('priceSpreadIndex', 2),
-      avgBtgMarkupConsistency: avg('btgMarkupConsistency', 2),
-      avgTierConversionMid:    avg('tierConversionMid', 0),
+      avgBtgCoverage:          med('btgCoverage', 0),
+      avgMedianBottlePrice:    med('medianBottlePrice', 2),
+      avgGlassPourProfitIndex: med('glassPourProfitIndex', 2),
+      avgVarietalHHI:          med('varietalHHI', 0),
+      avgPriceSpreadIndex:     med('priceSpreadIndex', 2),
+      avgBtgMarkupConsistency: med('btgMarkupConsistency', 2),
+      avgTierConversionMid:    med('tierConversionMid', 0),
     };
 
     result.computedAt = new Date();
-    result.restaurantCount = included;
+    result.restaurantCount = vals.btgCoverage.length;
 
     await cacheRef.set({ ...result, computedAt: FieldValue.serverTimestamp() });
 

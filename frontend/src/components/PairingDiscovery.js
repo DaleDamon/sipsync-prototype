@@ -117,6 +117,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [restaurantError, setRestaurantError] = useState(false);
   const [saveStatus, setSaveStatus] = useState(''); // 'saving', 'saved', or ''
   const [quizProfile, setQuizProfile] = useState(null); // User's quiz profile name
   const [hasQuiz, setHasQuiz] = useState(false); // Whether user has taken quiz
@@ -267,6 +268,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   }, [selectedRestaurant]);
 
   const fetchRestaurants = async () => {
+    setRestaurantError(false);
     try {
       const response = await fetch(`${API_URL}/restaurants`);
       const data = await response.json();
@@ -279,7 +281,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         }
       }
     } catch (err) {
-      setError('Failed to fetch restaurants: ' + err.message);
+      setRestaurantError(true);
     }
   };
 
@@ -597,7 +599,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         }
         setMatches(data.matches || []);
         if (data.matches.length === 0) {
-          setError('No wines match your preferences at this restaurant');
+          setError('No wines match your current preferences. Try loosening your filters — expand your price range, remove a flavor note, or adjust a slider.');
         } else {
           trackEvent('pairing_result_viewed', { restaurantId: selectedRestaurant });
         }
@@ -637,6 +639,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       });
 
       if (response.ok) {
+        trackEvent('wine_saved', { wineId: wine.wineId, restaurantId: selectedRestaurant, wineName: getWineDisplayName(wine) });
         // Show confirmation modal with wine name
         setConfirmationModal({
           wineName: getWineDisplayName(wine),
@@ -855,48 +858,23 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           <div className="preferences-section">
         <div className="pref-row">
           <div className="pref-item">
-            <label>Wine Profile</label>
-            <select
-              className="profile-dropdown"
-              value={(() => {
-                if (!activeProfileName) return '';
-                const match = profileOptions.find(p => p.label === activeProfileName);
-                if (match) return match.id;
-                const custom = customProfiles.find(p => p.name === activeProfileName);
-                return custom ? `custom-${custom.id}` : '';
-              })()}
-              onChange={(e) => e.target.value && applyProfileById(e.target.value)}
-            >
-              <option value="">— Select a profile —</option>
-              {profileOptions.map(p => (
-                <option key={p.id} value={p.id}>
-                  {p.label}{quizProfile && p.label === quizProfile ? ' (Your Profile)' : ''}
-                </option>
-              ))}
-              {customProfiles.length > 0 && (
-                <optgroup label="My Profiles">
-                  {customProfiles.map(p => (
-                    <option key={p.id} value={`custom-${p.id}`}>{p.name}</option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
-
-          </div>
-        </div>
-
-        <div className="pref-row">
-          <div className="pref-item">
             <label>Select Restaurant</label>
-            <SearchableSelect
-              options={restaurantOptions}
-              value={selectedRestaurant || ''}
-              onChange={(val) => {
-                setSelectedRestaurant(val);
-                if (val) trackEvent('restaurant_view', { restaurantId: val });
-              }}
-              placeholder="Choose a restaurant..."
-            />
+            {restaurantError ? (
+              <div className="restaurant-load-error">
+                Couldn't load restaurants.{' '}
+                <button className="retry-link" onClick={fetchRestaurants}>Tap to retry</button>
+              </div>
+            ) : (
+              <SearchableSelect
+                options={restaurantOptions}
+                value={selectedRestaurant || ''}
+                onChange={(val) => {
+                  setSelectedRestaurant(val);
+                  if (val) trackEvent('restaurant_view', { restaurantId: val });
+                }}
+                placeholder="Choose a restaurant..."
+              />
+            )}
           </div>
         </div>
 
@@ -913,6 +891,42 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
             <span>Loading update date...</span>
           </div>
         )}
+
+        <div className="pref-row">
+          <div className="pref-item">
+            <label>Quick-fill from profile</label>
+            <select
+              className="profile-dropdown"
+              value={(() => {
+                if (!activeProfileName) return '';
+                const match = profileOptions.find(p => p.label === activeProfileName);
+                if (match) return match.id;
+                const custom = customProfiles.find(p => p.name === activeProfileName);
+                return custom ? `custom-${custom.id}` : '';
+              })()}
+              onChange={(e) => e.target.value && applyProfileById(e.target.value)}
+            >
+              <option value="">— Choose a profile to auto-fill —</option>
+              {profileOptions.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.label}{quizProfile && p.label === quizProfile ? ' (Your Profile)' : ''}
+                </option>
+              ))}
+              {customProfiles.length > 0 && (
+                <optgroup label="My Profiles">
+                  {customProfiles.map(p => (
+                    <option key={p.id} value={`custom-${p.id}`}>{p.name}</option>
+                  ))}
+                </optgroup>
+              )}
+            </select>
+          </div>
+        </div>
+
+        <div className="pref-or-divider">
+          <span>OR</span>
+        </div>
+        <p className="pref-or-hint">Adjust as many or as few fields as you'd like — there's no wrong answer.</p>
 
         <div className="pref-row">
           <div className="pref-item">

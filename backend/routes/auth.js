@@ -16,6 +16,46 @@ if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_ACCOUNT_SID !== 'your_t
 // Store verification codes temporarily (in production, use Redis or database)
 const verificationCodes = {};
 
+// POST /api/auth/login
+// Beta login — phone + name only, no code verification
+router.post('/login', async (req, res) => {
+  try {
+    const { phoneNumber, name } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+
+    const userRef = db.collection('users').doc(phoneNumber);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      if (!name) {
+        return res.status(400).json({ error: 'Name is required for new users' });
+      }
+      await userRef.set({
+        phoneNumber,
+        name,
+        savedPreferences: [],
+        wineHistory: [],
+        createdAt: new Date(),
+      });
+    }
+
+    const userId = phoneNumber;
+    const token = jwt.sign(
+      { userId, phoneNumber },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.json({ message: 'Logged in', token, userId, phoneNumber });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
 // POST /api/auth/send-verification
 // Sends an SMS verification code to the user's phone
 router.post('/send-verification', async (req, res) => {

@@ -201,66 +201,147 @@ export default function AdminAnalytics({ restaurantId, token }) {
               <div style={{ marginBottom: 8 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#8b0000', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Wine Program KPIs</div>
                 <div className="analytics-stats-row" style={{ gridTemplateColumns: 'repeat(5, 1fr)', marginBottom: 28 }}>
-                  <div className="analytics-stat-card">
-                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
-                      {metrics.glassPourProfitIndex != null ? metrics.glassPourProfitIndex.toFixed(1) : '—'}
+
+                  <div className="kpi-tooltip-wrap">
+                    <div className="kpi-tooltip">
+                      <div className="tooltip-title">Glass Pour Profit Index</div>
+                      How efficiently your by-the-glass pricing converts wine cost into revenue. A higher score means your glass pours generate stronger margins relative to bottle prices.
+                      {benchmarks?.avgGlassPourProfitIndex != null && (
+                        <div className="tooltip-compare">
+                          Your score ({metrics.glassPourProfitIndex?.toFixed(1)}) is{' '}
+                          <span className={metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'better' : 'worse'}>
+                            {metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'above' : 'below'} the network median ({benchmarks.avgGlassPourProfitIndex.toFixed(1)})
+                          </span>
+                          {' '}— {metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'your glass pours are well-priced for margin.' : 'your glass prices may be underpriced relative to bottles.'}
+                        </div>
+                      )}
                     </div>
-                    <div className="analytics-stat-label">Glass Pour Profit Index</div>
-                    <div className="analytics-stat-benchmark">BTG coverage × markup ratio</div>
-                    {benchmarks?.avgGlassPourProfitIndex != null && (
-                      <div className={`analytics-stat-benchmark ${metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'better' : 'worse'}`}>
-                        avg: {benchmarks.avgGlassPourProfitIndex.toFixed(1)}
+                    <div className="analytics-stat-card">
+                      <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                        {metrics.glassPourProfitIndex != null ? metrics.glassPourProfitIndex.toFixed(1) : '—'}
                       </div>
-                    )}
-                  </div>
-                  <div className="analytics-stat-card">
-                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
-                      {metrics.tierConversion ? `${metrics.tierConversion.mid}%` : '—'}
+                      <div className="analytics-stat-label">Glass Pour Profit Index</div>
+                      <div className="analytics-stat-benchmark">BTG coverage × markup ratio</div>
+                      {benchmarks?.avgGlassPourProfitIndex != null && (
+                        <div className={`analytics-stat-benchmark ${metrics.glassPourProfitIndex >= benchmarks.avgGlassPourProfitIndex ? 'better' : 'worse'}`}>
+                          median: {benchmarks.avgGlassPourProfitIndex.toFixed(1)}
+                        </div>
+                      )}
                     </div>
-                    <div className="analytics-stat-label">Mid-Tier BTG Rate</div>
-                    <div className="analytics-stat-benchmark">$75–$150 wines by the glass</div>
-                    {benchmarks?.avgTierConversionMid != null && (
-                      <div className={`analytics-stat-benchmark ${(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'better' : 'worse'}`}>
-                        avg: {benchmarks.avgTierConversionMid}%
-                      </div>
-                    )}
                   </div>
-                  <div className="analytics-stat-card">
-                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
-                      {metrics.varietalHHI ?? '—'}
+
+                  <div className="kpi-tooltip-wrap">
+                    <div className="kpi-tooltip">
+                      <div className="tooltip-title">Mid-Tier BTG Rate</div>
+                      The percentage of your mid-priced wines ($75–$150 bottle) that are also available by the glass. Mid-tier BTG drives volume — guests are more likely to try a wine by the glass before committing to a bottle.
+                      {benchmarks?.avgTierConversionMid != null && (
+                        <div className="tooltip-compare">
+                          Your rate ({metrics.tierConversion?.mid}%) is{' '}
+                          <span className={(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'better' : 'worse'}>
+                            {(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'above' : 'below'} the network median ({benchmarks.avgTierConversionMid}%)
+                          </span>
+                          {' '}— {(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'good mid-tier glass coverage.' : 'fewer mid-tier glass options than peer restaurants.'}
+                        </div>
+                      )}
                     </div>
-                    <div className="analytics-stat-label">Varietal Concentration (HHI)</div>
-                    <div className="analytics-stat-benchmark">lower = more diverse</div>
-                    {benchmarks?.avgVarietalHHI != null && (
-                      <div className={`analytics-stat-benchmark ${(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'better' : 'worse'}`}>
-                        avg: {benchmarks.avgVarietalHHI}
+                    <div className="analytics-stat-card">
+                      <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                        {metrics.tierConversion ? `${metrics.tierConversion.mid}%` : '—'}
                       </div>
-                    )}
-                  </div>
-                  <div className="analytics-stat-card">
-                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
-                      {metrics.priceSpreadIndex != null ? `${metrics.priceSpreadIndex}×` : '—'}
+                      <div className="analytics-stat-label">Mid-Tier BTG Rate</div>
+                      <div className="analytics-stat-benchmark">$75–$150 wines by the glass</div>
+                      {benchmarks?.avgTierConversionMid != null && (
+                        <div className={`analytics-stat-benchmark ${(metrics.tierConversion?.mid ?? 0) >= benchmarks.avgTierConversionMid ? 'better' : 'worse'}`}>
+                          median: {benchmarks.avgTierConversionMid}%
+                        </div>
+                      )}
                     </div>
-                    <div className="analytics-stat-label">Price Spread Index</div>
-                    <div className="analytics-stat-benchmark">p90 ÷ p10 bottle price</div>
-                    {benchmarks?.avgPriceSpreadIndex != null && (
-                      <div className={`analytics-stat-benchmark ${(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'better' : 'worse'}`}>
-                        avg: {benchmarks.avgPriceSpreadIndex}×
-                      </div>
-                    )}
                   </div>
-                  <div className="analytics-stat-card">
-                    <div className="analytics-stat-value" style={{ fontSize: 22 }}>
-                      {metrics.btgMarkupConsistency != null ? `${Math.round(metrics.btgMarkupConsistency * 100)}%` : '—'}
+
+                  <div className="kpi-tooltip-wrap">
+                    <div className="kpi-tooltip">
+                      <div className="tooltip-title">Varietal Concentration (HHI)</div>
+                      Measures how diverse your wine list is by grape variety. A high score means your list is dominated by a few varietals. A low score means broad variety. Scored 0–10,000 — lower is better.
+                      {benchmarks?.avgVarietalHHI != null && (
+                        <div className="tooltip-compare">
+                          Your score ({metrics.varietalHHI}) is{' '}
+                          <span className={(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'better' : 'worse'}>
+                            {(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'below' : 'above'} the network median ({benchmarks.avgVarietalHHI})
+                          </span>
+                          {' '}— {(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'your list is more diverse than most.' : 'your list is more concentrated in fewer varietals than peers.'}
+                        </div>
+                      )}
                     </div>
-                    <div className="analytics-stat-label">Markup Consistency</div>
-                    <div className="analytics-stat-benchmark">pricing strategy coherence</div>
-                    {benchmarks?.avgBtgMarkupConsistency != null && (
-                      <div className={`analytics-stat-benchmark ${(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'better' : 'worse'}`}>
-                        avg: {Math.round(benchmarks.avgBtgMarkupConsistency * 100)}%
+                    <div className="analytics-stat-card">
+                      <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                        {metrics.varietalHHI ?? '—'}
                       </div>
-                    )}
+                      <div className="analytics-stat-label">Varietal Concentration (HHI)</div>
+                      <div className="analytics-stat-benchmark">lower = more diverse</div>
+                      {benchmarks?.avgVarietalHHI != null && (
+                        <div className={`analytics-stat-benchmark ${(metrics.varietalHHI ?? 9999) <= benchmarks.avgVarietalHHI ? 'better' : 'worse'}`}>
+                          median: {benchmarks.avgVarietalHHI}
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  <div className="kpi-tooltip-wrap">
+                    <div className="kpi-tooltip">
+                      <div className="tooltip-title">Price Spread Index</div>
+                      The ratio between your most expensive and least expensive bottle. A higher spread means your list spans a wide price range — appealing to both budget-conscious and premium guests.
+                      {benchmarks?.avgPriceSpreadIndex != null && (
+                        <div className="tooltip-compare">
+                          Your spread ({metrics.priceSpreadIndex}×) is{' '}
+                          <span className={(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'better' : 'worse'}>
+                            {(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'above' : 'below'} the network median ({benchmarks.avgPriceSpreadIndex}×)
+                          </span>
+                          {' '}— {(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'your list spans a wider price range than most.' : 'your price range is narrower than peer restaurants.'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="analytics-stat-card">
+                      <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                        {metrics.priceSpreadIndex != null ? `${metrics.priceSpreadIndex}×` : '—'}
+                      </div>
+                      <div className="analytics-stat-label">Price Spread Index</div>
+                      <div className="analytics-stat-benchmark">p90 ÷ p10 bottle price</div>
+                      {benchmarks?.avgPriceSpreadIndex != null && (
+                        <div className={`analytics-stat-benchmark ${(metrics.priceSpreadIndex ?? 0) >= benchmarks.avgPriceSpreadIndex ? 'better' : 'worse'}`}>
+                          median: {benchmarks.avgPriceSpreadIndex}×
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="kpi-tooltip-wrap">
+                    <div className="kpi-tooltip">
+                      <div className="tooltip-title">Markup Consistency</div>
+                      How consistent your glass-to-bottle markup ratios are across your wine list. High consistency means guests can predict what a glass will cost relative to a bottle — building pricing trust.
+                      {benchmarks?.avgBtgMarkupConsistency != null && (
+                        <div className="tooltip-compare">
+                          Your score ({Math.round((metrics.btgMarkupConsistency ?? 0) * 100)}%) is{' '}
+                          <span className={(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'better' : 'worse'}>
+                            {(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'above' : 'below'} the network median ({Math.round(benchmarks.avgBtgMarkupConsistency * 100)}%)
+                          </span>
+                          {' '}— {(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'your pricing is more consistent than most.' : 'variable markups across your list may confuse guests.'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="analytics-stat-card">
+                      <div className="analytics-stat-value" style={{ fontSize: 22 }}>
+                        {metrics.btgMarkupConsistency != null ? `${Math.round(metrics.btgMarkupConsistency * 100)}%` : '—'}
+                      </div>
+                      <div className="analytics-stat-label">Markup Consistency</div>
+                      <div className="analytics-stat-benchmark">pricing strategy coherence</div>
+                      {benchmarks?.avgBtgMarkupConsistency != null && (
+                        <div className={`analytics-stat-benchmark ${(metrics.btgMarkupConsistency ?? 0) >= benchmarks.avgBtgMarkupConsistency ? 'better' : 'worse'}`}>
+                          median: {Math.round(benchmarks.avgBtgMarkupConsistency * 100)}%
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
               </div>
 
@@ -269,12 +350,12 @@ export default function AdminAnalytics({ restaurantId, token }) {
                   <div className="analytics-chart-wrap">
                     <h3 style={{ marginTop: 0 }}>Varietal Distribution</h3>
                     {metrics.varietalDistribution.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={260}>
+                      <ResponsiveContainer width="100%" height={Math.max(260, metrics.varietalDistribution.length * 40)}>
                         <BarChart data={metrics.varietalDistribution} layout="vertical"
                           margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                           <XAxis type="number" tick={{ fontSize: 12 }} />
-                          <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
+                          <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12 }} />
                           <Tooltip formatter={(v) => [`${v} wines`, 'Count']} />
                           <Bar dataKey="count" fill="#8b0000" radius={[0, 4, 4, 0]} />
                         </BarChart>

@@ -1525,3 +1525,48 @@
 .custom-profile-rename-input:focus {
   outline: none;
 }
+
+/* OR divider between profile shortcut and manual characteristic fields */
+.pref-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 14px;
+  color: #999;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.pref-or-divider::before,
+.pref-or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.restaurant-load-error {
+  font-size: 13px;
+  color: #c62828;
+  padding: 10px 0;
+}
+
+.retry-link {
+  background: none;
+  border: none;
+  color: #8b0000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.pref-or-hint {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: #8b0000;
+  font-style: italic;
+  text-align: center;
+}

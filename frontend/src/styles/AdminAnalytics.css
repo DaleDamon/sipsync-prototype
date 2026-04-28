@@ -2,6 +2,71 @@
   width: 100%;
 }
 
+/* ===== KPI Tooltip ===== */
+.kpi-tooltip-wrap {
+  position: relative;
+}
+
+.kpi-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 270px;
+  background: #1a1a1a;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+
+.kpi-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #1a1a1a;
+}
+
+.kpi-tooltip-wrap:hover .kpi-tooltip {
+  display: block;
+}
+
+.kpi-tooltip .tooltip-title {
+  font-weight: 700;
+  color: #e8c97e;
+  margin-bottom: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.kpi-tooltip .tooltip-compare {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.kpi-tooltip .tooltip-compare .better {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.kpi-tooltip .tooltip-compare .worse {
+  color: #ef5350;
+  font-weight: 600;
+}
+
 /* Date range + export bar */
 .analytics-controls {
   display: flex;

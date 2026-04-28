@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../styles/WineQuiz.css';
 import QuizResults from './QuizResults';
 import { API_URL } from '../config';
+import { useEventTracker } from '../hooks/useEventTracker';
 
 function WineQuiz({ user, onComplete }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -9,6 +10,7 @@ function WineQuiz({ user, onComplete }) {
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { trackEvent } = useEventTracker(user?.userId);
 
   const questions = [
     {
@@ -198,6 +200,7 @@ function WineQuiz({ user, onComplete }) {
 
       const data = await response.json();
       if (response.ok) {
+        trackEvent('quiz_completed', { profile: data.profile, profileId: data.profileId });
         setQuizResult(data);
         setShowResults(true);
       } else {

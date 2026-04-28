@@ -1,24 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import '../styles/QuizResults.css';
 
 function QuizResults({ result, user, onComplete, onRetake }) {
-  const [secondsLeft, setSecondsLeft] = useState(5);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleNavigateToPairing();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
   const handleNavigateToPairing = () => {
     onComplete();
   };
@@ -104,10 +87,6 @@ function QuizResults({ result, user, onComplete, onRetake }) {
             <h4>Example Wines You'll Love</h4>
             <p>{profileInfo.exampleWines}</p>
           </div>
-        </div>
-
-        <div className="auto-navigate-notice">
-          <p>Redirecting to wine discovery in <strong>{secondsLeft}</strong> seconds...</p>
         </div>
 
         <div className="results-actions">
