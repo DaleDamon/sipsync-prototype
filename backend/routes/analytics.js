@@ -6,35 +6,28 @@ const { db } = require('../firebase');
 // Get the most selected wines based on user pairing history
 router.get('/popular-wines', async (req, res) => {
   try {
-    const usersSnapshot = await db.collection('users').get();
     const wineSelectionCount = {};
 
-    // Iterate through all users and count their wine selections
-    for (const userDoc of usersSnapshot.docs) {
-      const pairingHistorySnapshot = await db
-        .collection('users')
-        .doc(userDoc.id)
-        .collection('pairing_history')
-        .get();
+    // Single collectionGroup query across all users' pairing_history
+    const pairingHistorySnapshot = await db.collectionGroup('pairing_history').get();
 
-      pairingHistorySnapshot.forEach((pairingDoc) => {
-        const pairing = pairingDoc.data();
-        const { wineName, restaurantName } = pairing;
+    pairingHistorySnapshot.forEach((pairingDoc) => {
+      const pairing = pairingDoc.data();
+      const { wineName, restaurantName } = pairing;
 
-        const displayName = wineName || 'Unnamed Wine';
-        const key = displayName;
+      const displayName = wineName || 'Unnamed Wine';
+      const key = displayName;
 
-        if (!wineSelectionCount[key]) {
-          wineSelectionCount[key] = {
-            count: 0,
-            displayName,
-            wineName,
-            restaurantName: restaurantName || '',
-          };
-        }
-        wineSelectionCount[key].count += 1;
-      });
-    }
+      if (!wineSelectionCount[key]) {
+        wineSelectionCount[key] = {
+          count: 0,
+          displayName,
+          wineName,
+          restaurantName: restaurantName || '',
+        };
+      }
+      wineSelectionCount[key].count += 1;
+    });
 
     // Sort by selection count and return top 20
     const popularWines = Object.values(wineSelectionCount)
@@ -130,57 +123,33 @@ router.get('/top-pairings', async (req, res) => {
 // Get overall restaurant and wine statistics
 router.get('/restaurant-stats', async (req, res) => {
   try {
-    const restaurantsSnapshot = await db.collection('restaurants').get();
-    const stats = {
-      totalRestaurants: 0,
-      totalWines: 0,
-      totalFoodItems: 0,
-      cities: new Set(),
-      winesByType: { red: 0, white: 0, rosé: 0, sparkling: 0, other: 0 },
-    };
+    const winesByType = { red: 0, white: 0, rosé: 0, sparkling: 0, other: 0 };
 
-    for (const restaurantDoc of restaurantsSnapshot.docs) {
-      const restaurant = restaurantDoc.data();
-      stats.totalRestaurants += 1;
+    // Run all three collection-level queries in parallel
+    const [restaurantsSnapshot, winesSnapshot, foodSnapshot] = await Promise.all([
+      db.collection('restaurants').get(),
+      db.collectionGroup('wines').get(),
+      db.collectionGroup('foodItems').get(),
+    ]);
 
-      if (restaurant.city) {
-        stats.cities.add(restaurant.city);
-      }
+    const cities = new Set();
+    restaurantsSnapshot.forEach(doc => {
+      if (doc.data().city) cities.add(doc.data().city);
+    });
 
-      // Count wines
-      const winesSnapshot = await db
-        .collection('restaurants')
-        .doc(restaurantDoc.id)
-        .collection('wines')
-        .get();
-
-      winesSnapshot.forEach((wineDoc) => {
-        stats.totalWines += 1;
-        const wineType = wineDoc.data().type || 'other';
-        if (wineType in stats.winesByType) {
-          stats.winesByType[wineType] += 1;
-        } else {
-          stats.winesByType['other'] += 1;
-        }
-      });
-
-      // Count food items
-      const foodSnapshot = await db
-        .collection('restaurants')
-        .doc(restaurantDoc.id)
-        .collection('foodItems')
-        .get();
-
-      stats.totalFoodItems += foodSnapshot.size;
-    }
+    winesSnapshot.forEach(doc => {
+      const wineType = doc.data().type || 'other';
+      if (wineType in winesByType) winesByType[wineType] += 1;
+      else winesByType['other'] += 1;
+    });
 
     res.json({
-      totalRestaurants: stats.totalRestaurants,
-      totalWines: stats.totalWines,
-      totalFoodItems: stats.totalFoodItems,
-      totalCities: stats.cities.size,
-      cities: Array.from(stats.cities),
-      winesByType: stats.winesByType,
+      totalRestaurants: restaurantsSnapshot.size,
+      totalWines: winesSnapshot.size,
+      totalFoodItems: foodSnapshot.size,
+      totalCities: cities.size,
+      cities: Array.from(cities),
+      winesByType,
     });
   } catch (error) {
     console.error('Error getting restaurant stats:', error);
@@ -192,7 +161,6 @@ router.get('/restaurant-stats', async (req, res) => {
 // Get preference trends based on actual wine selections (Confirm Selection clicks)
 router.get('/preference-trends', async (req, res) => {
   try {
-    const usersSnapshot = await db.collection('users').get();
     const trends = {
       acidity: { low: 0, medium: 0, high: 0 },
       tannins: { low: 0, medium: 0, high: 0 },
@@ -202,35 +170,29 @@ router.get('/preference-trends', async (req, res) => {
     };
     let totalSelections = 0;
 
-    // Iterate through all users' pairing history (confirmed selections)
-    for (const userDoc of usersSnapshot.docs) {
-      const pairingHistorySnapshot = await db
-        .collection('users')
-        .doc(userDoc.id)
-        .collection('pairing_history')
-        .get();
+    // Single collectionGroup query across all users' pairing_history
+    const pairingHistorySnapshot = await db.collectionGroup('pairing_history').get();
 
-      pairingHistorySnapshot.forEach((pairingDoc) => {
-        const pairing = pairingDoc.data();
-        totalSelections++;
+    pairingHistorySnapshot.forEach((pairingDoc) => {
+      const pairing = pairingDoc.data();
+      totalSelections++;
 
-        if (pairing.acidity && trends.acidity[pairing.acidity] !== undefined) {
-          trends.acidity[pairing.acidity] += 1;
-        }
-        if (pairing.tannins && trends.tannins[pairing.tannins] !== undefined) {
-          trends.tannins[pairing.tannins] += 1;
-        }
-        if (pairing.bodyWeight && trends.bodyWeight[pairing.bodyWeight] !== undefined) {
-          trends.bodyWeight[pairing.bodyWeight] += 1;
-        }
-        if (pairing.sweetnessLevel && trends.sweetnessLevel[pairing.sweetnessLevel] !== undefined) {
-          trends.sweetnessLevel[pairing.sweetnessLevel] += 1;
-        }
-        if (pairing.wineType) {
-          trends.wineTypes[pairing.wineType] = (trends.wineTypes[pairing.wineType] || 0) + 1;
-        }
-      });
-    }
+      if (pairing.acidity && trends.acidity[pairing.acidity] !== undefined) {
+        trends.acidity[pairing.acidity] += 1;
+      }
+      if (pairing.tannins && trends.tannins[pairing.tannins] !== undefined) {
+        trends.tannins[pairing.tannins] += 1;
+      }
+      if (pairing.bodyWeight && trends.bodyWeight[pairing.bodyWeight] !== undefined) {
+        trends.bodyWeight[pairing.bodyWeight] += 1;
+      }
+      if (pairing.sweetnessLevel && trends.sweetnessLevel[pairing.sweetnessLevel] !== undefined) {
+        trends.sweetnessLevel[pairing.sweetnessLevel] += 1;
+      }
+      if (pairing.wineType) {
+        trends.wineTypes[pairing.wineType] = (trends.wineTypes[pairing.wineType] || 0) + 1;
+      }
+    });
 
     res.json({
       trends,

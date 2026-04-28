@@ -330,6 +330,10 @@ router.post('/restaurant/:restaurantId/batch', adminAuth, async (req, res) => {
 
     await batch.commit();
 
+    // Keep wineCount on the restaurant document current so GET /restaurants skips subcollection queries
+    const currentWines = await db.collection('restaurants').doc(restaurantId).collection('wines').get();
+    await db.collection('restaurants').doc(restaurantId).update({ wineCount: currentWines.size });
+
     res.json({
       message: 'Batch operation completed',
       added,

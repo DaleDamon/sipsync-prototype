@@ -13,22 +13,20 @@ router.get('/', async (req, res) => {
   try {
     const restaurantsSnapshot = await db.collection('restaurants').get();
     console.log(`[RESTAURANTS GET /] Found ${restaurantsSnapshot.size} restaurants`);
-    const restaurants = [];
 
-    for (const doc of restaurantsSnapshot.docs) {
-      const winesSnapshot = await db
-        .collection('restaurants')
-        .doc(doc.id)
-        .collection('wines')
-        .get();
-
+    const restaurants = await Promise.all(restaurantsSnapshot.docs.map(async (doc) => {
       const rest = doc.data();
       rest.id = doc.id;
       rest.restaurantId = doc.id;
-      rest.wineCount = winesSnapshot.size;
-      console.log(`[RESTAURANTS GET /] ${rest.name}: ${winesSnapshot.size} wines`);
-      restaurants.push(rest);
-    }
+
+      // Use stored wineCount if available; otherwise fall back to subcollection query
+      if (typeof rest.wineCount !== 'number') {
+        const winesSnapshot = await db.collection('restaurants').doc(doc.id).collection('wines').get();
+        rest.wineCount = winesSnapshot.size;
+      }
+
+      return rest;
+    }));
 
     console.log(`[RESTAURANTS GET /] Sending response with ${restaurants.length} restaurants`);
     res.json({ restaurants, count: restaurants.length });
