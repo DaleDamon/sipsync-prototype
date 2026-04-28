@@ -1132,7 +1132,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           </button>
 
           <button className="save-btn" onClick={() => setShowSaveModal(true)}>
-            Set Current Selections as Preferred Taste Profile
+            Save as Custom Profile
           </button>
 
           {showSaveModal && (
