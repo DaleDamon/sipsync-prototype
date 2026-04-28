@@ -610,6 +610,7 @@ router.post('/quiz/submit', async (req, res) => {
       await userRef.set({
         quizProfile: winningProfile.name,
         quizCompletedAt: new Date(),
+        quizAnswers: answers,
         savedPreferences: [preferencesData]
       }, { merge: true });
 

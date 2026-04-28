@@ -200,7 +200,7 @@ function WineQuiz({ user, onComplete }) {
 
       const data = await response.json();
       if (response.ok) {
-        trackEvent('quiz_completed', { profile: data.profile, profileId: data.profileId });
+        trackEvent('quiz_completed', { profile: data.profile, profileId: data.profileId, answers: finalAnswers });
         setQuizResult(data);
         setShowResults(true);
       } else {
