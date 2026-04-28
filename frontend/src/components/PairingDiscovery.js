@@ -896,7 +896,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           <div className="pref-item">
             <label>Quick-fill from profile</label>
             <select
-              className="profile-dropdown"
+              className={`profile-dropdown${!activeProfileName ? ' placeholder' : ''}`}
               value={(() => {
                 if (!activeProfileName) return '';
                 const match = profileOptions.find(p => p.label === activeProfileName);
@@ -906,7 +906,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
               })()}
               onChange={(e) => e.target.value && applyProfileById(e.target.value)}
             >
-              <option value="">— Choose a profile to auto-fill —</option>
+              <option value="">Choose a profile to auto-fill...</option>
               {profileOptions.map(p => (
                 <option key={p.id} value={p.id}>
                   {p.label}{quizProfile && p.label === quizProfile ? ' (Your Profile)' : ''}

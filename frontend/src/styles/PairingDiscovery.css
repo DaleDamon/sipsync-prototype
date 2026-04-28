@@ -1372,6 +1372,10 @@
   cursor: pointer;
 }
 
+.profile-dropdown.placeholder {
+  color: #999;
+}
+
 .profile-dropdown:focus {
   outline: none;
   border-color: #8b0000;
@@ -1530,12 +1534,8 @@
 .pref-or-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 18px 0 14px;
-  color: #999;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  gap: 0;
+  margin: 22px 0 0;
 }
 
 .pref-or-divider::before,
@@ -1543,7 +1543,19 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #e0e0e0;
+  background: linear-gradient(to right, transparent, #c9a96e, transparent);
+}
+
+.pref-or-divider span {
+  background: #8b0000;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin: 0 14px;
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.25);
 }
 
 .restaurant-load-error {
@@ -1564,9 +1576,11 @@
 }
 
 .pref-or-hint {
-  margin: 0 0 16px;
-  font-size: 15px;
-  color: #8b0000;
-  font-style: italic;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  color: #9e8878;
+  font-style: normal;
+  font-weight: 400;
   text-align: center;
+  letter-spacing: 0.02em;
 }

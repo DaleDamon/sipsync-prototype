@@ -147,12 +147,6 @@ function App() {
               Profile
             </button>
             <button
-              className={`nav-btn ${showQRScanner ? 'active' : ''}`}
-              onClick={() => { setShowQuiz(false); setShowQRScanner(true); }}
-            >
-              Scan
-            </button>
-            <button
               className={`nav-btn ${!showQuiz && currentScreen === 'admin' ? 'active' : ''}`}
               onClick={() => { setShowQuiz(false); setCurrentScreen('admin'); }}
             >
