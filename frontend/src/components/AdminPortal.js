@@ -513,19 +513,26 @@ function AdminPortal() {
         </div>
       </div>
 
-      {/* Restaurant Selector (super admin only) */}
-      {adminUser.role === 'superadmin' && restaurants.length > 0 && (
-        <div className="restaurant-selector">
-          <label>Select Restaurant</label>
-          <SearchableSelect
-            options={restaurants.map(r => ({
-              label: `${r.name} — ${r.city || 'No city'}`,
-              value: r.id
-            }))}
-            value={selectedRestaurant || ''}
-            onChange={(val) => setSelectedRestaurant(val)}
-            placeholder="Search restaurants..."
-          />
+      {/* Restaurant Selector + Add New (super admin only) */}
+      {adminUser.role === 'superadmin' && (
+        <div className="restaurant-selector-row">
+          {restaurants.length > 0 && (
+            <div className="restaurant-selector">
+              <label>Select Restaurant</label>
+              <SearchableSelect
+                options={restaurants.map(r => ({
+                  label: `${r.name} — ${r.city || 'No city'}`,
+                  value: r.id
+                }))}
+                value={selectedRestaurant || ''}
+                onChange={(val) => setSelectedRestaurant(val)}
+                placeholder="Search restaurants..."
+              />
+            </div>
+          )}
+          <button className="add-restaurant-btn" onClick={handleAddRestaurant}>
+            + Add New Restaurant
+          </button>
         </div>
       )}
 
@@ -587,13 +594,6 @@ function AdminPortal() {
               <div className="stat-label">Restaurant</div>
             </div>
           </div>
-
-          {/* Add Restaurant Button (superadmin only) */}
-          {adminUser.role === 'superadmin' && (
-            <button className="add-restaurant-btn" onClick={handleAddRestaurant}>
-              + Add New Restaurant
-            </button>
-          )}
 
           {/* Manual Edit Button */}
           <button className="edit-winelist-btn" onClick={handleManualEdit}>

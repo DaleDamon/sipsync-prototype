@@ -44,6 +44,27 @@
   background: #777;
 }
 
+/* Restaurant Selector Row */
+.restaurant-selector-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.restaurant-selector-row .restaurant-selector {
+  flex: 1;
+  min-width: 240px;
+  margin-bottom: 0;
+}
+
+.restaurant-selector-row .add-restaurant-btn {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  align-self: flex-end;
+}
+
 /* Restaurant Selector */
 .restaurant-selector {
   margin-bottom: 24px;
