@@ -71,7 +71,7 @@ function RestaurantMap({ onRestaurantSelect }) {
   return (
     <div className="map-container">
       <h2>🗺️ Find Restaurants Near You</h2>
-      <p className="map-subtitle">Hover over a restaurant to see details</p>
+      <p className="map-subtitle">Hover over a restaurant to see details and pair wines</p>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -131,7 +131,6 @@ function RestaurantMap({ onRestaurantSelect }) {
                   icon={customIcon}
                   eventHandlers={{
                     mouseover: (e) => e.target.openPopup(),
-                    mouseout: (e) => e.target.closePopup(),
                   }}
                 >
                   <Popup>
