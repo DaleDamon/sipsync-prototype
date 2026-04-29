@@ -856,7 +856,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         <>
           {/* Preferences Section at Top */}
           <div className="preferences-section">
-        <div className="step-badge-divider"><span>1</span></div>
+        <div className="step-badge-divider"><span>STEP 1</span></div>
         <div className="pref-row">
           <div className="pref-item">
             <label>Select Restaurant</label>
@@ -893,7 +893,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           </div>
         )}
 
-        <div className="step-badge-divider"><span>2</span></div>
+        <div className={`step-badge-divider${!selectedRestaurant ? ' step-badge-dimmed' : ''}`}><span>STEP 2</span></div>
         <div className={!selectedRestaurant ? 'step-locked' : ''}>
         <div className="pref-row">
           <div className="pref-item">
@@ -1214,7 +1214,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
       {/* Results Section Below */}
       {searchMode === 'matching' && (
-        <div className="step-badge-divider"><span>3</span></div>
+        <div className={`step-badge-divider${!selectedRestaurant ? ' step-badge-dimmed' : ''}`}><span>STEP 3</span></div>
       )}
       <div className={`results-panel${searchMode === 'matching' && !selectedRestaurant ? ' step-locked' : ''}`}>
         {searchMode === 'matching' ? (

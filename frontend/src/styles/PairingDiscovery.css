@@ -1582,26 +1582,27 @@
   margin: 20px 0 16px;
 }
 
-.step-badge-divider::before,
+.step-badge-divider::before {
+  display: none;
+}
+
 .step-badge-divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, transparent, #c9a96e, transparent);
+  background: linear-gradient(to right, #c9a96e, transparent);
 }
 
 .step-badge-divider span {
-  width: 28px;
-  height: 28px;
   background: #8b0000;
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 14px;
+  letter-spacing: 0.1em;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin: 0 14px 0 0;
   box-shadow: 0 2px 8px rgba(139, 0, 0, 0.25);
   flex-shrink: 0;
 }
@@ -1609,6 +1610,11 @@
 .step-locked {
   opacity: 0.35;
   pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.step-badge-dimmed {
+  opacity: 0.35;
   transition: opacity 0.25s ease;
 }
 
