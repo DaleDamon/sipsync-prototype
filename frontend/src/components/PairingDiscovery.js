@@ -856,6 +856,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         <>
           {/* Preferences Section at Top */}
           <div className="preferences-section">
+        <div className="step-badge-divider"><span>1</span></div>
         <div className="pref-row">
           <div className="pref-item">
             <label>Select Restaurant</label>
@@ -892,6 +893,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           </div>
         )}
 
+        <div className="step-badge-divider"><span>2</span></div>
+        <div className={!selectedRestaurant ? 'step-locked' : ''}>
         <div className="pref-row">
           <div className="pref-item">
             <label>Quick-fill from profile</label>
@@ -1177,8 +1180,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
         {loading && <p className="loading-indicator">Searching...</p>}
         {saveStatus === 'saved' && <p className="save-indicator">Preferences saved!</p>}
+        </div>{/* end step-locked */}
       </div>
-      </>
+</>
       ) : (
         /* Search Mode UI */
         <div className="search-section">
@@ -1209,7 +1213,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       )}
 
       {/* Results Section Below */}
-      <div className="results-panel">
+      {searchMode === 'matching' && (
+        <div className="step-badge-divider"><span>3</span></div>
+      )}
+      <div className={`results-panel${searchMode === 'matching' && !selectedRestaurant ? ' step-locked' : ''}`}>
         {searchMode === 'matching' ? (
           <>
             <h3>Matching Wines</h3>
