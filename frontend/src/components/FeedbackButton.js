@@ -9,7 +9,7 @@ function FeedbackButton({ user, currentScreen }) {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!rating && !text.trim()) return;
+    if (!text.trim()) return;
     setSubmitting(true);
     try {
       const sessionId = sessionStorage.getItem('sipsync_session') || null;
