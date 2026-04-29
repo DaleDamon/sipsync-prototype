@@ -19,7 +19,7 @@ export function useEventTracker(userId) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, eventType, sessionId: getSessionId(), ...extra }),
-    }).catch(() => {}); // fire-and-forget, never block UI
+    }).catch(() => {});
   }, [userId]);
 
   return { trackEvent };
@@ -28,6 +28,9 @@ export function useEventTracker(userId) {
 export function logSession(userId) {
   if (!userId) return;
   const sessionId = getSessionId();
+  const startTime = Date.now();
+  sessionStorage.setItem('sipsync_session_start', startTime);
+
   fetch(`${API_URL}/analytics/session`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,4 +40,20 @@ export function logSession(userId) {
       platform: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile-web' : 'web',
     }),
   }).catch(() => {});
+
+  // Fire session_end with duration when user leaves or tabs away
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      const durationMs = Date.now() - startTime;
+      navigator.sendBeacon(
+        `${API_URL}/analytics/session-end`,
+        new Blob(
+          [JSON.stringify({ userId, sessionId, durationMs })],
+          { type: 'application/json' }
+        )
+      );
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 }

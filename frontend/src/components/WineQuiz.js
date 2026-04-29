@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/WineQuiz.css';
 import QuizResults from './QuizResults';
 import { API_URL } from '../config';
@@ -11,6 +11,11 @@ function WineQuiz({ user, onComplete }) {
   const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const { trackEvent } = useEventTracker(user?.userId);
+
+  useEffect(() => {
+    trackEvent('quiz_started', { totalQuestions: 15 });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const questions = [
     {
@@ -170,10 +175,15 @@ function WineQuiz({ user, onComplete }) {
     newAnswers[currentQuestion] = answerIndex;
     setAnswers(newAnswers);
 
+    trackEvent('quiz_question_answered', {
+      questionIndex: currentQuestion,
+      answerIndex,
+      totalQuestions: questions.length,
+    });
+
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Last question answered, submit quiz
       submitQuiz(newAnswers);
     }
   };

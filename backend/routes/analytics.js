@@ -935,4 +935,65 @@ router.get('/events/export.csv', adminAuth, async (req, res) => {
   }
 });
 
+// POST /api/analytics/feedback
+router.post('/feedback', async (req, res) => {
+  try {
+    const { userId, rating, text, currentScreen, sessionId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+
+    await db.collection('feedback').add({
+      userId,
+      rating: rating || null,
+      text: (text || '').trim(),
+      currentScreen: currentScreen || null,
+      sessionId: sessionId || null,
+      timestamp: FieldValue.serverTimestamp(),
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[Analytics] feedback error:', err);
+    res.status(500).json({ error: 'Failed to save feedback' });
+  }
+});
+
+// GET /api/analytics/feedback (admin only)
+router.get('/feedback', adminAuth, async (req, res) => {
+  try {
+    const snap = await db.collection('feedback')
+      .orderBy('timestamp', 'desc')
+      .limit(100)
+      .get();
+
+    const items = snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      timestamp: doc.data().timestamp?.toDate?.()?.toISOString() || null,
+    }));
+
+    res.json({ feedback: items, count: items.length });
+  } catch (err) {
+    console.error('[Analytics] feedback fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch feedback' });
+  }
+});
+
+// POST /api/analytics/session-end
+router.post('/session-end', async (req, res) => {
+  try {
+    const { userId, sessionId, durationMs } = req.body;
+    if (!userId || !sessionId) return res.status(400).json({ error: 'userId and sessionId required' });
+
+    await db.collection('users').doc(userId).collection('sessions').doc(sessionId).update({
+      durationMs: durationMs || null,
+      endedAt: FieldValue.serverTimestamp(),
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    // Session doc may not exist yet — not fatal
+    res.json({ ok: true });
+  }
+});
+
 module.exports = router;

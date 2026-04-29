@@ -8,6 +8,7 @@ import QRScanner from './components/QRScanner';
 import UserProfile from './components/UserProfile';
 import WineQuiz from './components/WineQuiz';
 import AdminPortal from './components/AdminPortal';
+import FeedbackButton from './components/FeedbackButton';
 import { API_URL } from './config';
 import { logSession } from './hooks/useEventTracker';
 
@@ -196,6 +197,13 @@ function App() {
 
       {showQRScanner && user && (
         <QRScanner onScan={handleQRScan} onClose={handleCloseScanner} />
+      )}
+
+      {user && (
+        <FeedbackButton
+          user={user}
+          currentScreen={showQuiz ? 'quiz' : currentScreen}
+        />
       )}
     </div>
   );
