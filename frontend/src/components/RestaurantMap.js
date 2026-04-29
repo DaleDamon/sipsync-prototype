@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +10,8 @@ function RestaurantMap({ onRestaurantSelect }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const searchContainerRef = useRef(null);
 
   // Custom marker icon (traditional wine glass shaped)
   const customIcon = new L.Icon({
@@ -22,6 +24,23 @@ function RestaurantMap({ onRestaurantSelect }) {
   useEffect(() => {
     fetchRestaurants();
   }, []);
+
+  // Close dropdown when clicking outside the search container
+  useEffect(() => {
+    const handleMouseDown = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, []);
+
+  const handleDropdownSelect = (restaurant) => {
+    setSearchQuery('');
+    setDropdownOpen(false);
+    onRestaurantSelect(restaurant.restaurantId);
+  };
 
   const fetchRestaurants = async () => {
     try {
@@ -77,23 +96,53 @@ function RestaurantMap({ onRestaurantSelect }) {
 
       {/* Search Bar */}
       {restaurantsWithCoords.length > 0 && (
-        <div className="map-search-container">
+        <div className="map-search-container" ref={searchContainerRef}>
           <input
             type="text"
             className="map-search-input"
             placeholder="Search restaurants by name..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setDropdownOpen(e.target.value.trim().length > 0);
+            }}
+            onFocus={() => {
+              if (searchQuery.trim()) setDropdownOpen(true);
+            }}
           />
           {searchQuery && (
             <button
               className="map-search-clear"
-              onClick={() => setSearchQuery('')}
+              onClick={() => { setSearchQuery(''); setDropdownOpen(false); }}
               aria-label="Clear search"
             >
               ✕
             </button>
           )}
+
+          {dropdownOpen && filteredRestaurants.length > 0 && (
+            <ul className="map-search-dropdown">
+              {filteredRestaurants.map((restaurant) => (
+                <li
+                  key={restaurant.id}
+                  className="map-search-dropdown-item"
+                  onMouseDown={() => handleDropdownSelect(restaurant)}
+                >
+                  <span className="dropdown-name">{restaurant.name}</span>
+                  <span className="dropdown-meta">
+                    {restaurant.address?.city || restaurant.city} · {restaurant.wineCount || 0} wines
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {dropdownOpen && filteredRestaurants.length === 0 && (
+            <div className="map-search-dropdown map-search-dropdown-empty">
+              No restaurants match "{searchQuery}"
+            </div>
+          )}
+
           <div className="map-search-count">
             Showing {filteredRestaurants.length} of {restaurantsWithCoords.length} restaurants
           </div>
