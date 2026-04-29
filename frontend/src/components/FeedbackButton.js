@@ -4,8 +4,6 @@ import { API_URL } from '../config';
 
 function FeedbackButton({ user, currentScreen }) {
   const [open, setOpen] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [hovered, setHovered] = useState(0);
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +18,6 @@ function FeedbackButton({ user, currentScreen }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.userId,
-          rating,
           text: text.trim(),
           currentScreen,
           sessionId,
@@ -29,7 +26,6 @@ function FeedbackButton({ user, currentScreen }) {
       setSubmitted(true);
       setTimeout(() => {
         setOpen(false);
-        setRating(0);
         setText('');
         setSubmitted(false);
       }, 1800);
@@ -42,7 +38,6 @@ function FeedbackButton({ user, currentScreen }) {
 
   const handleClose = () => {
     setOpen(false);
-    setRating(0);
     setText('');
     setSubmitted(false);
   };
@@ -73,21 +68,6 @@ function FeedbackButton({ user, currentScreen }) {
                   <button className="feedback-close" onClick={handleClose}>×</button>
                 </div>
 
-                <div className="feedback-stars">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <button
-                      key={star}
-                      className={`feedback-star ${star <= (hovered || rating) ? 'active' : ''}`}
-                      onMouseEnter={() => setHovered(star)}
-                      onMouseLeave={() => setHovered(0)}
-                      onClick={() => setRating(star)}
-                      aria-label={`${star} star`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-
                 <textarea
                   className="feedback-text"
                   placeholder="Tell us what happened, what you loved, or what's missing..."
@@ -100,7 +80,7 @@ function FeedbackButton({ user, currentScreen }) {
                 <button
                   className="feedback-submit"
                   onClick={handleSubmit}
-                  disabled={submitting || (!rating && !text.trim())}
+                  disabled={submitting || !text.trim()}
                 >
                   {submitting ? 'Sending...' : 'Send Feedback'}
                 </button>
