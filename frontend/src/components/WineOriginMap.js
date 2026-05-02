@@ -50,7 +50,7 @@ const REGION_LOOKUP = [
   { keywords: ['tuscany', 'toscana'], lat: 43.5, lng: 11.2, label: 'Tuscany' },
   { keywords: ['barolo', 'barbaresco', 'langhe', 'barbera', 'dolcetto', 'gavi', 'asti', 'moscato d\'asti', 'roero'], lat: 44.7, lng: 8.0, label: 'Piedmont' },
   { keywords: ['piedmont', 'piemonte'], lat: 44.7, lng: 8.0, label: 'Piedmont' },
-  { keywords: ['amarone', 'valpolicella', 'soave', 'prosecco', 'bardolino', 'recioto', 'lugana', 'custoza'], lat: 45.5, lng: 11.5, label: 'Veneto' },
+  { keywords: ['amarone', 'valpolicella', 'soave', 'prosecco', 'bardolino', 'recioto', 'lugana', 'custoza', 'venice'], lat: 45.5, lng: 11.5, label: 'Veneto' },
   { keywords: ['veneto'], lat: 45.5, lng: 11.5, label: 'Veneto' },
   { keywords: ['etna', 'nero d\'avola', 'grillo', 'catarratto', 'marsala', 'cerasuolo di vittoria', 'nerello'], lat: 37.6, lng: 14.0, label: 'Sicily' },
   { keywords: ['sicily', 'sicilia'], lat: 37.6, lng: 14.0, label: 'Sicily' },
@@ -62,7 +62,7 @@ const REGION_LOOKUP = [
   { keywords: ['puglia', 'apulia'], lat: 41.0, lng: 16.5, label: 'Puglia' },
   { keywords: ['sagrantino', 'orvieto', 'montefalco', 'torgiano'], lat: 43.0, lng: 12.5, label: 'Umbria' },
   { keywords: ['umbria'], lat: 43.0, lng: 12.5, label: 'Umbria' },
-  { keywords: ['collio', 'colli orientali', 'friuli'], lat: 46.0, lng: 13.5, label: 'Friuli' },
+  { keywords: ['collio', 'colli orientali', 'friuli', 'fruili'], lat: 46.0, lng: 13.5, label: 'Friuli' },
   { keywords: ['montepulciano d\'abruzzo', 'trebbiano d\'abruzzo'], lat: 42.1, lng: 13.9, label: 'Abruzzo' },
   { keywords: ['abruzzo'], lat: 42.1, lng: 13.9, label: 'Abruzzo' },
   { keywords: ['verdicchio', 'rosso conero', 'lacrima di morro'], lat: 43.3, lng: 13.0, label: 'Marche' },
@@ -76,10 +76,11 @@ const REGION_LOOKUP = [
 
   // ── Spain ──
   { keywords: ['rioja'], lat: 42.3, lng: -2.5, label: 'Rioja' },
-  { keywords: ['ribera del duero'], lat: 41.6, lng: -3.7, label: 'Ribera del Duero' },
+  { keywords: ['ribera del duero', 'ribero del duero'], lat: 41.6, lng: -3.7, label: 'Ribera del Duero' },
   { keywords: ['priorat'], lat: 41.2, lng: 0.8, label: 'Priorat' },
   { keywords: ['rías baixas', 'rias baixas', 'albariño', 'albarino', 'galicia'], lat: 42.5, lng: -8.6, label: 'Rías Baixas' },
   { keywords: ['penedès', 'penedes', 'cava', 'catalonia', 'cataluña'], lat: 41.4, lng: 1.7, label: 'Penedès' },
+  { keywords: ['binissalem', 'mallorca', 'balearic'], lat: 39.6, lng: 2.9, label: 'Mallorca' },
   { keywords: ['bierzo', 'mencía', 'mencia'], lat: 42.6, lng: -6.7, label: 'Bierzo' },
   { keywords: ['jerez', 'sherry', 'manzanilla', 'fino'], lat: 36.7, lng: -6.1, label: 'Jerez' },
   { keywords: ['spain', 'españa', 'espana'], lat: 40.4, lng: -3.7, label: 'Spain' },
@@ -171,13 +172,17 @@ function MapBoundsUpdater({ markers }) {
 function WineOriginMap({ userId }) {
   const [origins, setOrigins] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchFailed, setFetchFailed] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
     fetch(`${API_URL}/analytics/user/${userId}/wine-origins`)
-      .then(r => r.ok ? r.json() : [])
+      .then(r => {
+        if (!r.ok) { setFetchFailed(true); return []; }
+        return r.json();
+      })
       .then(data => setOrigins(Array.isArray(data) ? data : []))
-      .catch(() => {})
+      .catch(() => setFetchFailed(true))
       .finally(() => setLoading(false));
   }, [userId]);
 
@@ -199,6 +204,17 @@ function WineOriginMap({ userId }) {
     return (
       <div className="wom-wrap">
         <div className="wom-loading">Loading your wine world…</div>
+      </div>
+    );
+  }
+
+  if (fetchFailed) {
+    return (
+      <div className="wom-wrap">
+        <div className="wom-empty">
+          <div className="wom-empty-icon">🌍</div>
+          <p>Map is warming up — refresh in a moment.</p>
+        </div>
       </div>
     );
   }
