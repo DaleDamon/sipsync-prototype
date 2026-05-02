@@ -570,13 +570,13 @@ router.get('/user/:userId', async (req, res) => {
     const totalPairings = pairings.length;
 
     const avgMatchScore = totalPairings > 0
-      ? Math.round(pairings.reduce((sum, p) => sum + (p.matchScore || 0), 0) / totalPairings)
+      ? Math.round((pairings.reduce((sum, p) => sum + (p.matchScore || 0), 0) / totalPairings) * 100)
       : 0;
 
     // Match score over time (last 20, chronological)
     const matchScoreOverTime = pairings.slice(0, 20).reverse().map(p => ({
       date: (p.saved_at?.toDate ? p.saved_at.toDate() : new Date(p.saved_at)).toLocaleDateString(),
-      score: p.matchScore || 0,
+      score: Math.round((p.matchScore || 0) * 100),
     }));
 
     // Top varietals from wineName (best effort — use wineType if varietal not stored)
