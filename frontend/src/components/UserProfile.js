@@ -328,8 +328,6 @@ function UserProfile({ user, onRetakeQuiz }) {
 
         {/* My Analytics Section */}
         {(() => {
-          // Compute stats from already-fetched data (always available)
-          // then overlay richer data from the analytics endpoint if it loaded
           const totalPairings = userAnalytics?.totalPairings ?? pairingHistory.length;
           const restaurantsExplored = userAnalytics?.restaurantsExplored ?? visitedRestaurants.length;
           const avgMatchScore = pairingHistory.length > 0
@@ -337,13 +335,9 @@ function UserProfile({ user, onRetakeQuiz }) {
             : null;
           const totalSessions = userAnalytics?.totalSessions ?? null;
 
-          // Top varietals from pairing history if analytics endpoint hasn't loaded
           const topVarietals = userAnalytics?.topVarietals ?? (() => {
             const counts = {};
-            pairingHistory.forEach(p => {
-              const v = p.wineType || 'Unknown';
-              counts[v] = (counts[v] || 0) + 1;
-            });
+            pairingHistory.forEach(p => { const v = p.wineType || 'Unknown'; counts[v] = (counts[v] || 0) + 1; });
             return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
           })();
 
@@ -351,6 +345,17 @@ function UserProfile({ user, onRetakeQuiz }) {
             date: new Date(p.saved_at).toLocaleDateString(),
             score: Math.round((p.matchScore || 0) * 100),
           }));
+
+          const wineTypeBreakdown = userAnalytics?.wineTypeBreakdown ?? null;
+          const dominantType = userAnalytics?.dominantType ?? null;
+          const comfortZone = userAnalytics?.comfortZone ?? null;
+          const favoriteRestaurant = userAnalytics?.favoriteRestaurant ?? null;
+          const priceTendency = userAnalytics?.priceTendency ?? null;
+          const regionsExplored = userAnalytics?.regionsExplored ?? [];
+          const palateRealityCheck = userAnalytics?.palateRealityCheck ?? null;
+          const nextWine = userAnalytics?.nextWineRecommendation ?? null;
+
+          const typeColors = { red: '#8b0000', white: '#c9a96e', rosé: '#d4829a', sparkling: '#6baed6', dessert: '#9e6b3c' };
 
           return (
             <div className="section user-analytics-section">
@@ -367,9 +372,7 @@ function UserProfile({ user, onRetakeQuiz }) {
                   <div className="user-analytics-stat-label">Restaurants Explored</div>
                 </div>
                 <div className="user-analytics-stat">
-                  <div className="user-analytics-stat-value">
-                    {avgMatchScore != null ? `${avgMatchScore}%` : '—'}
-                  </div>
+                  <div className="user-analytics-stat-value">{avgMatchScore != null ? `${avgMatchScore}%` : '—'}</div>
                   <div className="user-analytics-stat-label">Avg Match Score</div>
                 </div>
                 <div className="user-analytics-stat">
@@ -378,16 +381,115 @@ function UserProfile({ user, onRetakeQuiz }) {
                 </div>
               </div>
 
+              {/* Row: Comfort Zone + Favorite Restaurant + Price */}
+              {(comfortZone || favoriteRestaurant || priceTendency) && (
+                <div className="ua-insight-row">
+                  {comfortZone && (
+                    <div className="ua-insight-card">
+                      <div className="ua-insight-label">Your Sipping Style</div>
+                      <div className="ua-insight-value">{comfortZone.label}</div>
+                      <div className="ua-insight-sub">
+                        {comfortZone.adventurousPct}% of saves were outside your profile
+                      </div>
+                    </div>
+                  )}
+                  {favoriteRestaurant && (
+                    <div className="ua-insight-card">
+                      <div className="ua-insight-label">Favorite Spot</div>
+                      <div className="ua-insight-value">{favoriteRestaurant.name}</div>
+                      <div className="ua-insight-sub">{favoriteRestaurant.count} wines saved here</div>
+                    </div>
+                  )}
+                  {priceTendency && (
+                    <div className="ua-insight-card">
+                      <div className="ua-insight-label">Your Price Range</div>
+                      <div className="ua-insight-value">${priceTendency.min}–${priceTendency.max}</div>
+                      <div className="ua-insight-sub">avg ${priceTendency.avg} per bottle</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Wine type breakdown */}
+              {wineTypeBreakdown && wineTypeBreakdown.length > 0 && (
+                <div className="user-analytics-chart">
+                  <h4>
+                    Your Wine Breakdown
+                    {dominantType && <span className="ua-dominant-label"> — {dominantType.charAt(0).toUpperCase() + dominantType.slice(1)} dominant</span>}
+                  </h4>
+                  <div className="ua-type-bar-track">
+                    {wineTypeBreakdown.map(({ type, pct }) => (
+                      <div
+                        key={type}
+                        className="ua-type-bar-segment"
+                        style={{ width: `${pct}%`, background: typeColors[type] || '#999' }}
+                        title={`${type}: ${pct}%`}
+                      />
+                    ))}
+                  </div>
+                  <div className="ua-type-legend">
+                    {wineTypeBreakdown.map(({ type, count, pct }) => (
+                      <div key={type} className="ua-type-legend-item">
+                        <span className="ua-type-dot" style={{ background: typeColors[type] || '#999' }} />
+                        <span className="ua-type-name">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                        <span className="ua-type-pct">{pct}% ({count})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Palate reality check */}
+              {palateRealityCheck?.hasDrift && (
+                <div className="ua-palate-check">
+                  <div className="ua-palate-check-title">Palate Reality Check</div>
+                  <p className="ua-palate-check-sub">Your recent saves differ from your quiz profile in {palateRealityCheck.drifts.length} dimension{palateRealityCheck.drifts.length > 1 ? 's' : ''} — your palate may be evolving.</p>
+                  <div className="ua-palate-drifts">
+                    {palateRealityCheck.drifts.map(({ dimension, quiz, actual }) => (
+                      <div key={dimension} className="ua-palate-drift-row">
+                        <span className="ua-drift-dim">{dimension.charAt(0).toUpperCase() + dimension.slice(1)}</span>
+                        <span className="ua-drift-quiz">{quiz}</span>
+                        <span className="ua-drift-arrow">→</span>
+                        <span className="ua-drift-actual">{actual}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="ua-palate-retake">Tastes change. <button className="ua-retake-link" onClick={onRetakeQuiz}>Retake the quiz</button> to update your profile.</p>
+                </div>
+              )}
+
+              {/* Regions explored */}
+              {regionsExplored.length > 0 && (
+                <div className="user-analytics-chart">
+                  <h4>Regions Explored <span className="ua-region-count">({regionsExplored.length})</span></h4>
+                  <div className="ua-region-tags">
+                    {regionsExplored.map(r => (
+                      <span key={r} className="ua-region-tag">{r}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Next wine recommendation */}
+              {nextWine && (
+                <div className="ua-next-wine">
+                  <div className="ua-next-wine-label">Your Next Wine</div>
+                  <div className="ua-next-wine-name">{nextWine.wineName}</div>
+                  <div className="ua-next-wine-meta">
+                    {nextWine.wineType && <span className="ua-next-type">{nextWine.wineType.charAt(0).toUpperCase() + nextWine.wineType.slice(1)}</span>}
+                    {nextWine.region && <span className="ua-next-region">{nextWine.region}</span>}
+                    {nextWine.price > 0 && <span className="ua-next-price">${nextWine.price}</span>}
+                  </div>
+                  <div className="ua-next-wine-rest">Available at {nextWine.restaurantName} · {nextWine.matchPct}% match</div>
+                </div>
+              )}
+
               {/* Top Varietals */}
               {topVarietals.length > 0 && (
                 <div className="user-analytics-chart">
                   <h4>Top Wine Types</h4>
                   <ResponsiveContainer width="100%" height={180}>
-                    <BarChart
-                      data={topVarietals}
-                      layout="vertical"
-                      margin={{ top: 0, right: 16, left: 8, bottom: 0 }}
-                    >
+                    <BarChart data={topVarietals} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                       <XAxis type="number" tick={{ fontSize: 11 }} />
                       <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} />
@@ -403,22 +505,12 @@ function UserProfile({ user, onRetakeQuiz }) {
                 <div className="user-analytics-chart">
                   <h4>Match Score History</h4>
                   <ResponsiveContainer width="100%" height={160}>
-                    <LineChart
-                      data={matchScoreOverTime}
-                      margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-                    >
+                    <LineChart data={matchScoreOverTime} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
                       <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" />
                       <Tooltip formatter={(v) => [`${v}%`, 'Match Score']} />
-                      <Line
-                        type="monotone"
-                        dataKey="score"
-                        stroke="#722F37"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                        activeDot={{ r: 5 }}
-                      />
+                      <Line type="monotone" dataKey="score" stroke="#722F37" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>

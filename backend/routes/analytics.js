@@ -601,6 +601,119 @@ router.get('/user/:userId', async (req, res) => {
     const restaurantIds = new Set(eventsSnap.docs.map(d => d.data().restaurantId).filter(Boolean));
     const restaurantsExplored = restaurantIds.size;
 
+    // ── Wine type breakdown ──
+    const wineTypeCounts = {};
+    pairings.forEach(p => {
+      const t = p.wineType || 'unknown';
+      wineTypeCounts[t] = (wineTypeCounts[t] || 0) + 1;
+    });
+    const wineTypeBreakdown = Object.entries(wineTypeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([type, count]) => ({ type, count, pct: totalPairings > 0 ? Math.round(count / totalPairings * 100) : 0 }));
+    const dominantType = wineTypeBreakdown[0]?.type || null;
+
+    // ── Comfort zone score ──
+    const adventurousSaves = pairings.filter(p => (p.matchScore || 0) < 0.85).length;
+    const adventurousPct = totalPairings > 0 ? Math.round(adventurousSaves / totalPairings * 100) : 0;
+    const comfortZoneLabel = adventurousPct >= 40 ? 'Adventurous Sipper'
+      : adventurousPct >= 20 ? 'Curious Explorer'
+      : 'Profile Loyalist';
+
+    // ── Favorite restaurant ──
+    const restCounts = {};
+    const restNames = {};
+    pairings.forEach(p => {
+      if (p.restaurantId) {
+        restCounts[p.restaurantId] = (restCounts[p.restaurantId] || 0) + 1;
+        restNames[p.restaurantId] = p.restaurantName || p.restaurantId;
+      }
+    });
+    const favRestId = Object.entries(restCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const favoriteRestaurant = favRestId
+      ? { id: favRestId, name: restNames[favRestId], count: restCounts[favRestId] }
+      : null;
+
+    // ── Price tendency ──
+    const pricedPairings = pairings.filter(p => p.price && p.price > 0);
+    const priceTendency = pricedPairings.length > 0 ? {
+      avg: Math.round(pricedPairings.reduce((s, p) => s + p.price, 0) / pricedPairings.length),
+      min: Math.round(Math.min(...pricedPairings.map(p => p.price))),
+      max: Math.round(Math.max(...pricedPairings.map(p => p.price))),
+      count: pricedPairings.length,
+    } : null;
+
+    // ── Regions explored ──
+    const regionsSet = new Set();
+    pairings.forEach(p => { if (p.region) regionsSet.add(p.region); });
+    const regionsExploredList = [...regionsSet];
+
+    // ── Palate reality check ──
+    const quizPrefs = userData.savedPreferences?.[0] || null;
+    let palateRealityCheck = null;
+    if (quizPrefs && totalPairings >= 3) {
+      const dimMap = [
+        { dim: 'acidity',      quizKey: 'acidity',      pairingKey: 'acidity' },
+        { dim: 'tannins',      quizKey: 'tannins',      pairingKey: 'tannins' },
+        { dim: 'body',         quizKey: 'bodyWeight',   pairingKey: 'bodyWeight' },
+        { dim: 'sweetness',    quizKey: 'sweetness',    pairingKey: 'sweetnessLevel' },
+        { dim: 'wine type',    quizKey: 'wineType',     pairingKey: 'wineType' },
+      ];
+      const drifts = [];
+      dimMap.forEach(({ dim, quizKey, pairingKey }) => {
+        const quizVal = quizPrefs[quizKey];
+        if (!quizVal) return;
+        const counts = {};
+        pairings.forEach(p => {
+          const v = p[pairingKey];
+          if (v) counts[v] = (counts[v] || 0) + 1;
+        });
+        const mostCommon = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
+        if (mostCommon && mostCommon !== quizVal) {
+          drifts.push({ dimension: dim, quiz: quizVal, actual: mostCommon });
+        }
+      });
+      palateRealityCheck = { drifts, hasDrift: drifts.length > 0 };
+    }
+
+    // ── Next wine recommendation ──
+    let nextWineRecommendation = null;
+    if (quizPrefs && totalPairings > 0 && favRestId) {
+      try {
+        const savedWineIds = new Set(allPairings.map(p => p.wineId));
+        const candidateRestIds = Object.entries(restCounts)
+          .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => id);
+
+        for (const rId of candidateRestIds) {
+          const winesSnap = await db.collection('restaurants').doc(rId).collection('wines').get();
+          let bestWine = null, bestScore = 0;
+          winesSnap.forEach(doc => {
+            const w = { wineId: doc.id, ...doc.data() };
+            if (savedWineIds.has(w.wineId)) return;
+            let score = 0, factors = 0;
+            if (quizPrefs.wineType && w.type)           { score += w.type === quizPrefs.wineType ? 1 : 0; factors++; }
+            if (quizPrefs.acidity && w.acidity)         { score += w.acidity === quizPrefs.acidity ? 1 : 0; factors++; }
+            if (quizPrefs.tannins && w.tannins)         { score += w.tannins === quizPrefs.tannins ? 1 : 0; factors++; }
+            if (quizPrefs.bodyWeight && w.bodyWeight)   { score += w.bodyWeight === quizPrefs.bodyWeight ? 1 : 0; factors++; }
+            const matchPct = factors > 0 ? score / factors : 0;
+            if (matchPct > bestScore) { bestScore = matchPct; bestWine = w; }
+          });
+          if (bestWine && bestScore >= 0.6) {
+            nextWineRecommendation = {
+              wineId: bestWine.wineId,
+              wineName: [bestWine.year, bestWine.producer, bestWine.varietal].filter(Boolean).join(' '),
+              wineType: bestWine.type,
+              region: bestWine.region || '',
+              price: bestWine.price || 0,
+              matchPct: Math.round(bestScore * 100),
+              restaurantId: rId,
+              restaurantName: restNames[rId] || '',
+            };
+            break;
+          }
+        }
+      } catch (_) { /* non-critical */ }
+    }
+
     res.json({
       totalPairings,
       avgMatchScore,
@@ -609,6 +722,14 @@ router.get('/user/:userId', async (req, res) => {
       totalSessions,
       restaurantsExplored,
       preferenceProfile: userData.savedPreferences || null,
+      wineTypeBreakdown,
+      dominantType,
+      comfortZone: { adventurousPct, label: comfortZoneLabel },
+      favoriteRestaurant,
+      priceTendency,
+      regionsExplored: regionsExploredList,
+      palateRealityCheck,
+      nextWineRecommendation,
     });
   } catch (err) {
     console.error('[Analytics] user analytics error:', err);

@@ -245,7 +245,7 @@ router.get('/restaurant/:restaurantId/wine/:wineId', async (req, res) => {
 router.post('/save-pairing', async (req, res) => {
   try {
     const { userId, restaurantId, wineId, foodItemId, matchScore, wineName, restaurantName,
-            wineType, acidity, tannins, bodyWeight, sweetnessLevel } = req.body;
+            wineType, acidity, tannins, bodyWeight, sweetnessLevel, price, region } = req.body;
 
     if (!userId || !restaurantId || !wineId) {
       return res.status(400).json({ error: 'userId, restaurantId, and wineId are required' });
@@ -269,6 +269,8 @@ router.post('/save-pairing', async (req, res) => {
         tannins: tannins || '',
         bodyWeight: bodyWeight || '',
         sweetnessLevel: sweetnessLevel || '',
+        price: price || 0,
+        region: region || '',
         saved_at: new Date(),
         notes: ''
       });

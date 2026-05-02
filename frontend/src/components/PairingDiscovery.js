@@ -634,7 +634,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           acidity: wine.acidity || '',
           tannins: wine.tannins || '',
           bodyWeight: wine.bodyWeight || '',
-          sweetnessLevel: wine.sweetnessLevel || ''
+          sweetnessLevel: wine.sweetnessLevel || '',
+          price: wine.price || 0,
+          region: wine.region || ''
         }),
       });
 

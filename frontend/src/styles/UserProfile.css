@@ -417,3 +417,250 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ── Insight Row (Sipping Style / Favorite Spot / Price) ── */
+.ua-insight-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ua-insight-card {
+  background: #fdf6ee;
+  border: 1px solid #e8d8b8;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.ua-insight-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.ua-insight-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #8b0000;
+  line-height: 1.2;
+}
+
+.ua-insight-sub {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  .ua-insight-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Wine Type Breakdown ── */
+.ua-dominant-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+}
+
+.ua-type-bar-track {
+  display: flex;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #eee;
+}
+
+.ua-type-bar-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.ua-type-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.ua-type-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ua-type-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ua-type-name {
+  font-size: 12px;
+  color: #444;
+}
+
+.ua-type-pct {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ── Palate Reality Check ── */
+.ua-palate-check {
+  background: #fff8f0;
+  border: 1px solid #f0d8b0;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.ua-palate-check-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #8b0000;
+  margin-bottom: 6px;
+}
+
+.ua-palate-check-sub {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.ua-palate-drifts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.ua-palate-drift-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.ua-drift-dim {
+  font-weight: 600;
+  color: #555;
+  min-width: 80px;
+}
+
+.ua-drift-quiz {
+  color: #888;
+  background: #f0e8e8;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ua-drift-arrow {
+  color: #c9a96e;
+  font-size: 16px;
+}
+
+.ua-drift-actual {
+  color: #8b0000;
+  font-weight: 600;
+  background: #fce8e8;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ua-palate-retake {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+}
+
+.ua-retake-link {
+  background: none;
+  border: none;
+  color: #8b0000;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.ua-retake-link:hover {
+  color: #a00000;
+}
+
+/* ── Regions Explored ── */
+.ua-region-count {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+.ua-region-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ua-region-tag {
+  background: #f0e8e8;
+  color: #8b0000;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #e0c0c0;
+}
+
+/* ── Next Wine Recommendation ── */
+.ua-next-wine {
+  background: linear-gradient(135deg, #8b0000 0%, #a30000 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.ua-next-wine-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+
+.ua-next-wine-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+
+.ua-next-wine-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.ua-next-type,
+.ua-next-region,
+.ua-next-price {
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.ua-next-wine-rest {
+  font-size: 12px;
+  opacity: 0.75;
+}
