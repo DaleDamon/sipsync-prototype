@@ -332,11 +332,9 @@ function UserProfile({ user, onRetakeQuiz }) {
           // then overlay richer data from the analytics endpoint if it loaded
           const totalPairings = userAnalytics?.totalPairings ?? pairingHistory.length;
           const restaurantsExplored = userAnalytics?.restaurantsExplored ?? visitedRestaurants.length;
-          const avgMatchScore = userAnalytics?.avgMatchScore ?? (
-            pairingHistory.length > 0
-              ? Math.round(pairingHistory.reduce((s, p) => s + (p.matchScore || 0), 0) / pairingHistory.length * 100)
-              : null
-          );
+          const avgMatchScore = pairingHistory.length > 0
+            ? Math.round(pairingHistory.reduce((s, p) => s + (p.matchScore || 0), 0) / pairingHistory.length * 100)
+            : null;
           const totalSessions = userAnalytics?.totalSessions ?? null;
 
           // Top varietals from pairing history if analytics endpoint hasn't loaded
