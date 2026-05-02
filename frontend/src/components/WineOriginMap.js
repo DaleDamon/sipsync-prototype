@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/WineOriginMap.css';
 import { API_URL } from '../config';
@@ -276,14 +276,6 @@ function WineOriginMap({ userId }) {
                 weight: 1.5,
               }}
             >
-              <Tooltip
-                permanent
-                direction="top"
-                offset={[0, -bubbleRadius(m.count) - 2]}
-                className="wom-region-label"
-              >
-                {m.label}
-              </Tooltip>
               <Popup className="wom-popup-wrap">
                 <div className="wom-popup">
                   <div className="wom-popup-region">{m.label}</div>
