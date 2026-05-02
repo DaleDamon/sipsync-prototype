@@ -17,7 +17,7 @@ const REGION_LOOKUP = [
   { keywords: ['central coast'], lat: 36.3, lng: -121.0, label: 'Central Coast' },
   { keywords: ['anderson valley', 'mendocino'], lat: 39.3, lng: -123.4, label: 'Mendocino' },
   { keywords: ['lodi'], lat: 38.1, lng: -121.3, label: 'Lodi' },
-  { keywords: ['north coast'], lat: 38.8, lng: -122.9, label: 'North Coast CA' },
+  { keywords: ['north coast'], lat: 38.8, lng: -122.9, label: 'North Coast' },
   { keywords: ['california'], lat: 36.7, lng: -119.4, label: 'California' },
 
   // ── Pacific Northwest ──
@@ -33,8 +33,8 @@ const REGION_LOOKUP = [
   { keywords: ['bordeaux'], lat: 44.84, lng: -0.58, label: 'Bordeaux' },
   { keywords: ['reims', 'epernay', 'épernay', 'hautvillers', 'aÿ', 'ay,'], lat: 49.0, lng: 4.0, label: 'Champagne' },
   { keywords: ['champagne'], lat: 49.0, lng: 4.0, label: 'Champagne' },
-  { keywords: ['châteauneuf', 'chateauneuf', 'gigondas', 'vacqueyras', 'côtes du rhône', 'cotes du rhone', 'hermitage', 'crozes', 'condrieu', 'côte-rôtie', 'cote-rotie', 'saint-joseph', 'cairanne'], lat: 44.0, lng: 4.8, label: 'Rhône Valley' },
-  { keywords: ['rhône', 'rhone'], lat: 44.0, lng: 4.8, label: 'Rhône Valley' },
+  { keywords: ['châteauneuf', 'chateauneuf', 'gigondas', 'vacqueyras', 'côtes du rhône', 'cotes du rhone', 'hermitage', 'crozes', 'condrieu', 'côte-rôtie', 'cote-rotie', 'saint-joseph', 'cairanne'], lat: 44.0, lng: 4.8, label: 'Rhone Valley' },
+  { keywords: ['rhône', 'rhone'], lat: 44.0, lng: 4.8, label: 'Rhone Valley' },
   { keywords: ['sancerre', 'muscadet', 'vouvray', 'chinon', 'anjou', 'touraine', 'pouilly-fumé', 'pouilly-fume', 'bourgueil', 'samur', 'saumur'], lat: 47.7, lng: 1.0, label: 'Loire Valley' },
   { keywords: ['loire'], lat: 47.7, lng: 1.0, label: 'Loire Valley' },
   { keywords: ['alsace'], lat: 48.3, lng: 7.4, label: 'Alsace' },
@@ -42,7 +42,7 @@ const REGION_LOOKUP = [
   { keywords: ['provence'], lat: 43.5, lng: 5.9, label: 'Provence' },
   { keywords: ['languedoc', 'roussillon', 'pic saint-loup', 'fitou', 'corbières', 'corbieres', 'minervois'], lat: 43.6, lng: 3.8, label: 'Languedoc' },
   { keywords: ['beaujolais', 'morgon', 'fleurie', 'moulin-à-vent', 'moulin-a-vent', 'brouilly', 'chiroubles', 'juliénas'], lat: 46.2, lng: 4.6, label: 'Beaujolais' },
-  { keywords: ['jura', 'savoy', 'savoie'], lat: 46.6, lng: 5.8, label: 'Jura / Savoie' },
+  { keywords: ['jura', 'savoy', 'savoie'], lat: 46.6, lng: 5.8, label: 'Jura & Savoie' },
   { keywords: ['france'], lat: 46.6, lng: 2.4, label: 'France' },
 
   // ── Italy: DOCG/DOC zone → region ──
@@ -69,8 +69,8 @@ const REGION_LOOKUP = [
   { keywords: ['marche'], lat: 43.3, lng: 13.0, label: 'Marche' },
   { keywords: ['cannonau', 'vermentino di sardegna', 'carignano del sulcis'], lat: 40.1, lng: 9.0, label: 'Sardinia' },
   { keywords: ['sardinia', 'sardegna'], lat: 40.1, lng: 9.0, label: 'Sardinia' },
-  { keywords: ['alto adige', 'südtirol', 'sudtirol', 'trentino', 'lagrein', 'trentino-alto'], lat: 46.4, lng: 11.2, label: 'Trentino-Alto Adige' },
-  { keywords: ["valle d'aosta", "valle d'aosta"], lat: 45.7, lng: 7.3, label: "Valle d'Aosta" },
+  { keywords: ['alto adige', 'südtirol', 'sudtirol', 'trentino', 'lagrein', 'trentino-alto'], lat: 46.4, lng: 11.2, label: 'Trentino' },
+  { keywords: ["valle d'aosta", "valle d'aosta"], lat: 45.7, lng: 7.3, label: 'Aosta Valley' },
   { keywords: ['lambrusco', 'sangiovese di romagna', 'emilia', 'romagna', 'pignoletto'], lat: 44.5, lng: 11.3, label: 'Emilia-Romagna' },
   { keywords: ['italy', 'italia'], lat: 42.5, lng: 12.5, label: 'Italy' },
 
@@ -78,8 +78,8 @@ const REGION_LOOKUP = [
   { keywords: ['rioja'], lat: 42.3, lng: -2.5, label: 'Rioja' },
   { keywords: ['ribera del duero', 'ribero del duero'], lat: 41.6, lng: -3.7, label: 'Ribera del Duero' },
   { keywords: ['priorat'], lat: 41.2, lng: 0.8, label: 'Priorat' },
-  { keywords: ['rías baixas', 'rias baixas', 'albariño', 'albarino', 'galicia'], lat: 42.5, lng: -8.6, label: 'Rías Baixas' },
-  { keywords: ['penedès', 'penedes', 'cava', 'catalonia', 'cataluña'], lat: 41.4, lng: 1.7, label: 'Penedès' },
+  { keywords: ['rías baixas', 'rias baixas', 'albariño', 'albarino', 'galicia'], lat: 42.5, lng: -8.6, label: 'Rias Baixas' },
+  { keywords: ['penedès', 'penedes', 'cava', 'catalonia', 'cataluña'], lat: 41.4, lng: 1.7, label: 'Penedes' },
   { keywords: ['binissalem', 'mallorca', 'balearic'], lat: 39.6, lng: 2.9, label: 'Mallorca' },
   { keywords: ['bierzo', 'mencía', 'mencia'], lat: 42.6, lng: -6.7, label: 'Bierzo' },
   { keywords: ['jerez', 'sherry', 'manzanilla', 'fino'], lat: 36.7, lng: -6.1, label: 'Jerez' },
@@ -87,7 +87,7 @@ const REGION_LOOKUP = [
 
   // ── Germany ──
   { keywords: ['mosel', 'moselle', 'saar,', 'ruwer'], lat: 50.0, lng: 7.0, label: 'Mosel' },
-  { keywords: ['rheinhessen', 'rheingau', 'pfalz', 'nahe', 'württemberg', 'franken', 'rhein', 'rhine'], lat: 49.9, lng: 8.2, label: 'Rhine Regions' },
+  { keywords: ['rheinhessen', 'rheingau', 'pfalz', 'nahe', 'württemberg', 'franken', 'rhein', 'rhine'], lat: 49.9, lng: 8.2, label: 'Rhine Valley' },
   { keywords: ['germany', 'deutschland'], lat: 51.2, lng: 10.5, label: 'Germany' },
 
   // ── Portugal ──
@@ -117,7 +117,7 @@ const REGION_LOOKUP = [
   { keywords: ['lebanon', 'liban'], lat: 33.8, lng: 35.9, label: 'Lebanon' },
   { keywords: ['stellenbosch', 'constantia', 'swartland', 'franschhoek', 'paarl', 'robertson', 'elgin'], lat: -33.9, lng: 18.7, label: 'South Africa' },
   { keywords: ['south africa'], lat: -33.9, lng: 18.7, label: 'South Africa' },
-  { keywords: ['guadalupe', 'baja california', 'valle de guadalupe', 'baja'], lat: 31.9, lng: -116.6, label: 'Valle de Guadalupe' },
+  { keywords: ['guadalupe', 'baja california', 'valle de guadalupe', 'baja'], lat: 31.9, lng: -116.6, label: 'Guadalupe Valley' },
   { keywords: ['mexico', 'méxico'], lat: 23.6, lng: -102.5, label: 'Mexico' },
   { keywords: ['tokaj', 'tokaji', 'eger', 'villány', 'villany'], lat: 47.5, lng: 19.1, label: 'Hungary' },
   { keywords: ['hungary'], lat: 47.5, lng: 19.1, label: 'Hungary' },
