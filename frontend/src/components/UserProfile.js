@@ -346,10 +346,31 @@ function UserProfile({ user, onRetakeQuiz }) {
             score: Math.round((p.matchScore || 0) * 100),
           }));
 
-          const wineTypeBreakdown = userAnalytics?.wineTypeBreakdown ?? null;
-          const dominantType = userAnalytics?.dominantType ?? null;
-          const comfortZone = userAnalytics?.comfortZone ?? null;
-          const favoriteRestaurant = userAnalytics?.favoriteRestaurant ?? null;
+          // Wine type breakdown — fallback to local pairing history
+          const wineTypeBreakdown = userAnalytics?.wineTypeBreakdown ?? (() => {
+            if (!pairingHistory.length) return null;
+            const counts = {};
+            pairingHistory.forEach(p => { const t = p.wineType || 'unknown'; counts[t] = (counts[t] || 0) + 1; });
+            return Object.entries(counts).sort((a, b) => b[1] - a[1])
+              .map(([type, count]) => ({ type, count, pct: Math.round(count / pairingHistory.length * 100) }));
+          })();
+          const dominantType = userAnalytics?.dominantType ?? (wineTypeBreakdown?.[0]?.type || null);
+
+          // Comfort zone — fallback from local match scores
+          const comfortZone = userAnalytics?.comfortZone ?? (() => {
+            if (!pairingHistory.length) return null;
+            const adventurous = pairingHistory.filter(p => (p.matchScore || 0) < 0.85).length;
+            const pct = Math.round(adventurous / pairingHistory.length * 100);
+            return { adventurousPct: pct, label: pct >= 40 ? 'Adventurous Sipper' : pct >= 20 ? 'Curious Explorer' : 'Profile Loyalist' };
+          })();
+
+          // Favorite restaurant — fallback from visitedRestaurants
+          const favoriteRestaurant = userAnalytics?.favoriteRestaurant ?? (() => {
+            if (!visitedRestaurants.length) return null;
+            const top = [...visitedRestaurants].sort((a, b) => (b.pairingCount || 0) - (a.pairingCount || 0))[0];
+            return top ? { id: top.restaurantId, name: top.restaurantName, count: top.pairingCount || 0 } : null;
+          })();
+
           const priceTendency = userAnalytics?.priceTendency ?? null;
           const regionsExplored = userAnalytics?.regionsExplored ?? [];
           const palateRealityCheck = userAnalytics?.palateRealityCheck ?? null;
