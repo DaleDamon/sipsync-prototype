@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/UserProfile.css';
 import PolarGraph from './PolarGraph';
+import WineOriginMap from './WineOriginMap';
 import { API_URL } from '../config';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -232,6 +233,8 @@ function UserProfile({ user, onRetakeQuiz }) {
       {quizProfile && savedPreferences && (
         <PolarGraph preferences={savedPreferences} profileName={quizProfile} />
       )}
+
+      <WineOriginMap userId={user?.userId} />
 
       {customProfiles.length > 0 && (
         <div className="section">

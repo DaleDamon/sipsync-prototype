@@ -1056,6 +1056,51 @@ router.get('/events/export.csv', adminAuth, async (req, res) => {
   }
 });
 
+// GET /api/analytics/user/:userId/wine-origins
+// Returns enriched list: pairing history + region fetched live from wine docs
+router.get('/user/:userId/wine-origins', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const histSnap = await db
+      .collection('users').doc(userId).collection('pairing_history')
+      .orderBy('saved_at', 'desc').limit(200).get();
+
+    const pairings = histSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const results = [];
+
+    for (const p of pairings) {
+      let region = p.region || '';
+
+      // If region not on pairing record, fetch live from the wine document
+      if (!region && p.wineId && p.restaurantId) {
+        try {
+          const wineDoc = await db
+            .collection('restaurants').doc(p.restaurantId)
+            .collection('wines').doc(p.wineId).get();
+          if (wineDoc.exists) region = wineDoc.data().region || '';
+        } catch (_) {}
+      }
+
+      if (region) {
+        results.push({
+          wineId: p.wineId || '',
+          wineName: p.wineName || '',
+          wineType: p.wineType || '',
+          region,
+          restaurantName: p.restaurantName || '',
+          matchScore: p.matchScore || 0,
+        });
+      }
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.error('[Analytics] wine-origins error:', err);
+    res.status(500).json({ error: 'Failed to fetch wine origins' });
+  }
+});
+
 // POST /api/analytics/feedback
 router.post('/feedback', async (req, res) => {
   try {
