@@ -153,6 +153,24 @@
   margin-top: 2px;
 }
 
+/* Permanent region labels on bubbles */
+.wom-region-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  pointer-events: none;
+  padding: 0 !important;
+  text-shadow: 0 1px 3px #fff, 0 -1px 3px #fff, 1px 0 3px #fff, -1px 0 3px #fff;
+}
+
+.wom-region-label::before {
+  display: none !important;
+}
+
 /* Loading / empty states */
 .wom-loading,
 .wom-empty {
