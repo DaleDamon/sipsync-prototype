@@ -363,6 +363,10 @@
 }
 
 /* ── User Analytics ── */
+.user-analytics-section {
+  grid-column: 1 / -1;
+}
+
 .user-analytics-section h3 {
   font-size: 20px;
   color: #333;
