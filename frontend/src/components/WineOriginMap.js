@@ -258,7 +258,15 @@ function WineOriginMap({ userId }) {
           zoomControl={true}
           attributionControl={false}
         >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+            attribution="Esri"
+          />
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+            attribution=""
+            opacity={0.6}
+          />
           <MapBoundsUpdater markers={markers} />
 
           {markers.map(m => (
