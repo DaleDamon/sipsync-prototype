@@ -201,6 +201,7 @@ function WineQuiz({ user, onComplete }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sipsyncToken')}`,
         },
         body: JSON.stringify({
           userId: user.userId,

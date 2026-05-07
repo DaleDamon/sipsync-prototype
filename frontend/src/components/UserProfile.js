@@ -61,7 +61,10 @@ function UserProfile({ user, onRetakeQuiz, onUnratedCount, focusUnrated, onFocus
     try {
       await fetch(`${API_URL}/pairings/rating`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sipsyncToken')}`,
+        },
         body: JSON.stringify({ userId: user.userId, pairingHistoryId: historyId, rating }),
       });
       setPairingHistory(prev => {

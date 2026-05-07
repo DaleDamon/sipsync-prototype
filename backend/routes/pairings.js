@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
 const { getWineDisplayName, calculateMatchScore } = require('../utils/wineScoring');
+const { userAuth } = require('../middleware/userAuth');
 
 // POST /api/pairings/find
 // Find wine matches based on user preferences
@@ -146,7 +147,7 @@ router.get('/restaurant/:restaurantId/wine/:wineId', async (req, res) => {
 
 // POST /api/pairings/save-pairing
 // Save a pairing to user's history
-router.post('/save-pairing', async (req, res) => {
+router.post('/save-pairing', userAuth, async (req, res) => {
   try {
     const { userId, restaurantId, wineId, foodItemId, matchScore, wineName, restaurantName,
             wineType, acidity, tannins, bodyWeight, sweetnessLevel, price, region } = req.body;
@@ -193,7 +194,7 @@ router.post('/save-pairing', async (req, res) => {
 
 // PATCH /api/pairings/rating
 // Update the Pass/Pour/Cellar rating on a saved pairing
-router.patch('/rating', async (req, res) => {
+router.patch('/rating', userAuth, async (req, res) => {
   try {
     const { userId, pairingHistoryId, rating } = req.body;
     if (!userId || !pairingHistoryId || !rating) {

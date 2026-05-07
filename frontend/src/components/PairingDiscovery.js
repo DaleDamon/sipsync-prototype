@@ -630,7 +630,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     try {
       const response = await fetch(`${API_URL}/pairings/save-pairing`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sipsyncToken')}`,
+        },
         body: JSON.stringify({
           userId: user.userId,
           restaurantId: selectedRestaurant,

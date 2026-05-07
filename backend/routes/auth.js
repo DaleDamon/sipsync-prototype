@@ -3,6 +3,7 @@ const router = express.Router();
 const { db, auth } = require('../firebase');
 const jwt = require('jsonwebtoken');
 const twilio = require('twilio');
+const { userAuth } = require('../middleware/userAuth');
 
 // Initialize Twilio client only if credentials are provided
 let twilioClient = null;
@@ -336,7 +337,7 @@ router.get('/user/:userId/visited-restaurants', async (req, res) => {
 
 // POST /api/auth/quiz/submit
 // Submit quiz answers and calculate wine preference profile
-router.post('/quiz/submit', async (req, res) => {
+router.post('/quiz/submit', userAuth, async (req, res) => {
   try {
     const { userId, answers } = req.body;
 
