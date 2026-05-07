@@ -1095,19 +1095,78 @@ router.get('/events/export.csv', adminAuth, async (req, res) => {
     const toDate = to ? new Date(to) : new Date();
     toDate.setHours(23, 59, 59, 999);
 
-    const snap = await db.collection('events')
-      .where('timestamp', '>=', fromDate)
-      .where('timestamp', '<=', toDate)
-      .orderBy('timestamp', 'desc')
-      .get();
+    // Fetch events + lookup data in parallel
+    const [snap, wineCache, usersSnap] = await Promise.all([
+      db.collection('events')
+        .where('timestamp', '>=', fromDate)
+        .where('timestamp', '<=', toDate)
+        .orderBy('timestamp', 'desc')
+        .get(),
+      getWineCache(db),
+      db.collection('users').select('name', 'phoneNumber').get(),
+    ]);
 
-    let csv = 'Timestamp,EventType,UserId,RestaurantId,WineId,SessionId\n';
-    snap.docs.forEach(d => {
-      const e = d.data();
-      const ts = e.timestamp?.toDate ? e.timestamp.toDate().toISOString() : '';
-      csv += `${ts},${e.eventType || ''},${e.userId || ''},${e.restaurantId || ''},${e.wineId || ''},${e.sessionId || ''}\n`;
+    // Build lookup maps
+    const userMap = {};
+    usersSnap.forEach(doc => {
+      userMap[doc.id] = doc.data().name || '';
     });
 
+    const restaurantMap = {};
+    const wineMap = {};
+    wineCache.wines.forEach(w => {
+      restaurantMap[w.restaurantId] = w.restaurantName;
+      wineMap[w.wineId] = [w.year, w.producer, w.varietal].filter(Boolean).join(' ') || w.name || '';
+    });
+
+    // CSV helper — quotes any value containing a comma, quote, or newline
+    const cell = (v) => {
+      const s = v == null ? '' : String(v);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+
+    const EVENT_LABELS = {
+      restaurant_view: 'Restaurant View',
+      filter_applied: 'Filter Applied',
+      pairing_result_viewed: 'Pairing Result Viewed',
+      wine_card_open: 'Wine Card Opened',
+    };
+
+    const headers = [
+      'Date', 'Time (UTC)', 'Event', 'User Name', 'User Phone',
+      'Restaurant', 'Wine', 'Session ID', 'Filters Applied',
+    ];
+
+    const rows = snap.docs.map(d => {
+      const e = d.data();
+      const ts = e.timestamp?.toDate ? e.timestamp.toDate() : null;
+      const date = ts ? ts.toISOString().slice(0, 10) : '';
+      const time = ts ? ts.toISOString().slice(11, 19) : '';
+      const eventLabel = EVENT_LABELS[e.eventType] || e.eventType || '';
+      const userName = userMap[e.userId] || '';
+      const restaurantName = restaurantMap[e.restaurantId] || e.restaurantId || '';
+      const wineName = wineMap[e.wineId] || (e.wineId ? e.wineId : '');
+
+      let filters = '';
+      if (e.filterState) {
+        const f = e.filterState;
+        const parts = [];
+        if (f.wineType && f.wineType !== 'any') parts.push(`type:${f.wineType}`);
+        if (f.acidity && f.acidity !== 'any') parts.push(`acidity:${f.acidity}`);
+        if (f.tannins && f.tannins !== 'any') parts.push(`tannins:${f.tannins}`);
+        if (f.bodyWeight && f.bodyWeight !== 'any') parts.push(`body:${f.bodyWeight}`);
+        if (f.sweetnessLevel && f.sweetnessLevel !== 'any') parts.push(`sweetness:${f.sweetnessLevel}`);
+        if (f.btgOnly) parts.push('btg:yes');
+        if (f.flavorProfile?.length) parts.push(`flavors:${f.flavorProfile.join('+')}`);
+        filters = parts.join(' | ');
+      }
+
+      return [date, time, eventLabel, userName, e.userId || '', restaurantName, wineName, e.sessionId || '', filters]
+        .map(cell).join(',');
+    });
+
+    const csv = [headers.join(','), ...rows].join('\n');
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="events-${from || 'all'}-to-${to || 'now'}.csv"`);
     res.send(csv);
