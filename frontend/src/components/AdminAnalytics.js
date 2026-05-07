@@ -40,6 +40,21 @@ export default function AdminAnalytics({ restaurantId, token }) {
   const [from, setFrom] = useState(getDefaultFrom());
   const [to, setTo] = useState(getDefaultTo());
 
+  const downloadCsv = async (url, filename) => {
+    try {
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch {
+      alert('Export failed. Please try again.');
+    }
+  };
+
   // Wine list metrics state
   const [metrics, setMetrics] = useState(null);
   const [benchmarks, setBenchmarks] = useState(null);
@@ -157,13 +172,13 @@ export default function AdminAnalytics({ restaurantId, token }) {
           onChange={e => setTo(e.target.value)} />
         {activeTab === 'winelist' && (
           <button className="analytics-export-btn"
-            onClick={() => window.open(`${API_URL}/analytics/restaurant/${restaurantId}/export.csv`, '_blank')}>
+            onClick={() => downloadCsv(`${API_URL}/analytics/restaurant/${restaurantId}/export.csv`, 'wine-list.csv')}>
             ↓ Export Wine CSV
           </button>
         )}
         {activeTab === 'engagement' && (
           <button className="analytics-export-btn"
-            onClick={() => window.open(`${API_URL}/analytics/events/export.csv?from=${from}&to=${to}`, '_blank')}>
+            onClick={() => downloadCsv(`${API_URL}/analytics/events/export.csv?from=${from}&to=${to}`, 'events.csv')}>
             ↓ Export Events CSV
           </button>
         )}
