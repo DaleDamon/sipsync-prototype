@@ -1,6 +1,107 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
+const { calculateMatchScore, getWineDisplayName } = require('../utils/wineScoring');
+const { getWineCache } = require('../utils/wineCache');
+
+// ─── Trending page cache ───────────────────────────────────
+const TRENDING_TTL_MS = 5 * 60 * 1000;
+let trendingCache = { data: null, fetchedAt: null };
+
+// GET /api/analytics/trending
+// Combined endpoint for the Trending tab — reuses wine cache, single pairing_history scan, 5-min TTL
+router.get('/trending', async (req, res) => {
+  try {
+    if (trendingCache.data && (Date.now() - trendingCache.fetchedAt) < TRENDING_TTL_MS) {
+      return res.json(trendingCache.data);
+    }
+
+    // Two parallel Firestore reads: pairing_history scan + foodItems count
+    // Wines come from the in-memory cache (no extra Firestore hit after first load)
+    const [{ wines }, pairingSnap, foodSnap] = await Promise.all([
+      getWineCache(db),
+      db.collectionGroup('pairing_history').select(
+        'wineName', 'restaurantName', 'acidity', 'tannins',
+        'bodyWeight', 'sweetnessLevel', 'wineType'
+      ).get(),
+      db.collectionGroup('foodItems').select('name').get(),
+    ]);
+
+    // Stats — derived from wine cache
+    const winesByType = { red: 0, white: 0, rosé: 0, sparkling: 0, other: 0 };
+    const restaurantIds = new Set();
+    const cities = new Set();
+    wines.forEach(w => {
+      restaurantIds.add(w.restaurantId);
+      if (w.restaurantCity) cities.add(w.restaurantCity);
+      const t = (w.type || 'other').toLowerCase();
+      if (t in winesByType) winesByType[t]++;
+      else winesByType.other++;
+    });
+
+    const stats = {
+      totalRestaurants: restaurantIds.size,
+      totalWines: wines.length,
+      totalFoodItems: foodSnap.size,
+      totalCities: cities.size,
+      winesByType,
+    };
+
+    // Popular-wines + preference-trends from one shared pairing_history scan
+    const wineSelectionCount = {};
+    const trends = {
+      acidity:       { low: 0, medium: 0, high: 0 },
+      tannins:       { low: 0, medium: 0, high: 0 },
+      bodyWeight:    { light: 0, medium: 0, full: 0 },
+      sweetnessLevel:{ dry: 0, medium: 0, sweet: 0 },
+      wineTypes:     {},
+    };
+    let totalSelections = 0;
+
+    pairingSnap.forEach(doc => {
+      const p = doc.data();
+      totalSelections++;
+
+      const displayName = p.wineName || 'Unnamed Wine';
+      if (!wineSelectionCount[displayName]) {
+        wineSelectionCount[displayName] = { count: 0, displayName, restaurantName: p.restaurantName || '' };
+      }
+      wineSelectionCount[displayName].count++;
+
+      if (p.acidity        && trends.acidity[p.acidity]               !== undefined) trends.acidity[p.acidity]++;
+      if (p.tannins        && trends.tannins[p.tannins]               !== undefined) trends.tannins[p.tannins]++;
+      if (p.bodyWeight     && trends.bodyWeight[p.bodyWeight]         !== undefined) trends.bodyWeight[p.bodyWeight]++;
+      if (p.sweetnessLevel && trends.sweetnessLevel[p.sweetnessLevel] !== undefined) trends.sweetnessLevel[p.sweetnessLevel]++;
+      if (p.wineType) trends.wineTypes[p.wineType] = (trends.wineTypes[p.wineType] || 0) + 1;
+    });
+
+    const popularWines = Object.values(wineSelectionCount)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+      .map(w => ({ wineName: w.displayName, selectionCount: w.count, restaurantName: w.restaurantName }));
+
+    const trendingData = {
+      stats,
+      popularWines,
+      preferencesTrends: {
+        trends,
+        totalSelections,
+        mostPopularAcidity:    Object.entries(trends.acidity).sort((a, b) => b[1] - a[1])[0],
+        mostPopularTannins:    Object.entries(trends.tannins).sort((a, b) => b[1] - a[1])[0],
+        mostPopularBodyWeight: Object.entries(trends.bodyWeight).sort((a, b) => b[1] - a[1])[0],
+        mostPopularSweetness:  Object.entries(trends.sweetnessLevel).sort((a, b) => b[1] - a[1])[0],
+        mostPopularWineType:   Object.entries(trends.wineTypes).sort((a, b) => b[1] - a[1])[0],
+      },
+    };
+
+    trendingCache = { data: trendingData, fetchedAt: Date.now() };
+    console.log('[Analytics] trending cache refreshed');
+    res.json(trendingData);
+  } catch (err) {
+    console.error('[Analytics] trending error:', err);
+    res.status(500).json({ error: 'Failed to fetch trending data' });
+  }
+});
 
 // GET /api/analytics/popular-wines
 // Get the most selected wines based on user pairing history
@@ -675,45 +776,6 @@ router.get('/user/:userId', async (req, res) => {
       palateRealityCheck = { drifts, hasDrift: drifts.length > 0 };
     }
 
-    // ── Next wine recommendation ──
-    let nextWineRecommendation = null;
-    if (quizPrefs && totalPairings > 0 && favRestId) {
-      try {
-        const savedWineIds = new Set(allPairings.map(p => p.wineId));
-        const candidateRestIds = Object.entries(restCounts)
-          .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => id);
-
-        for (const rId of candidateRestIds) {
-          const winesSnap = await db.collection('restaurants').doc(rId).collection('wines').get();
-          let bestWine = null, bestScore = 0;
-          winesSnap.forEach(doc => {
-            const w = { wineId: doc.id, ...doc.data() };
-            if (savedWineIds.has(w.wineId)) return;
-            let score = 0, factors = 0;
-            if (quizPrefs.wineType && w.type)           { score += w.type === quizPrefs.wineType ? 1 : 0; factors++; }
-            if (quizPrefs.acidity && w.acidity)         { score += w.acidity === quizPrefs.acidity ? 1 : 0; factors++; }
-            if (quizPrefs.tannins && w.tannins)         { score += w.tannins === quizPrefs.tannins ? 1 : 0; factors++; }
-            if (quizPrefs.bodyWeight && w.bodyWeight)   { score += w.bodyWeight === quizPrefs.bodyWeight ? 1 : 0; factors++; }
-            const matchPct = factors > 0 ? score / factors : 0;
-            if (matchPct > bestScore) { bestScore = matchPct; bestWine = w; }
-          });
-          if (bestWine && bestScore >= 0.6) {
-            nextWineRecommendation = {
-              wineId: bestWine.wineId,
-              wineName: [bestWine.year, bestWine.producer, bestWine.varietal].filter(Boolean).join(' '),
-              wineType: bestWine.type,
-              region: bestWine.region || '',
-              price: bestWine.price || 0,
-              matchPct: Math.round(bestScore * 100),
-              restaurantId: rId,
-              restaurantName: restNames[rId] || '',
-            };
-            break;
-          }
-        }
-      } catch (_) { /* non-critical */ }
-    }
-
     res.json({
       totalPairings,
       avgMatchScore,
@@ -729,7 +791,6 @@ router.get('/user/:userId', async (req, res) => {
       priceTendency,
       regionsExplored: regionsExploredList,
       palateRealityCheck,
-      nextWineRecommendation,
     });
   } catch (err) {
     console.error('[Analytics] user analytics error:', err);
@@ -1053,6 +1114,124 @@ router.get('/events/export.csv', adminAuth, async (req, res) => {
   } catch (err) {
     console.error('[Analytics] events export error:', err);
     res.status(500).json({ error: 'Failed to export events' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// GET /api/analytics/user/:userId/recommendations
+// Returns 3 randomized wines scored against quiz profile + saved-wine pattern
+// ─────────────────────────────────────────────────────────
+
+function deriveProfileFromSavedWines(pairings) {
+  if (!pairings.length) return null;
+  const vote = (arr) => {
+    const counts = {};
+    arr.forEach(v => { if (v) counts[v] = (counts[v] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  };
+  const prices = pairings.map(p => p.price).filter(Boolean);
+  const minPrice = prices.length ? Math.min(...prices) * 0.8 : 0;
+  const maxPrice = prices.length ? Math.max(...prices) * 1.2 : 999;
+  const flavorCounts = {};
+  pairings.forEach(p => (p.flavorNotes || []).forEach(f => { flavorCounts[f] = (flavorCounts[f] || 0) + 1; }));
+  const topFlavors = Object.entries(flavorCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([f]) => f);
+  return {
+    wineType:   vote(pairings.map(p => p.wineType || p.type)),
+    acidity:    vote(pairings.map(p => p.acidity)),
+    tannins:    vote(pairings.map(p => p.tannins)),
+    bodyWeight: vote(pairings.map(p => p.bodyWeight)),
+    sweetness:  vote(pairings.map(p => p.sweetnessLevel || p.sweetness)),
+    flavorNotes: topFlavors,
+    priceRange: { min: minPrice, max: maxPrice },
+  };
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+router.get('/user/:userId/recommendations', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) return res.json([]);
+    const userData = userDoc.data();
+    const quizPrefs = userData.savedPreferences?.[0] || null;
+
+    const histSnap = await db.collection('users').doc(userId)
+      .collection('pairing_history').orderBy('saved_at', 'desc').limit(300).get();
+    const allPairings = histSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const savedWineIds = new Set(allPairings.map(p => p.wineId).filter(Boolean));
+
+    const savedProfile = deriveProfileFromSavedWines(allPairings);
+
+    const allWinesSnap = await db.collectionGroup('wines').get();
+
+    const overlapPool = [];
+    const quizOnlyPool = [];
+
+    allWinesSnap.forEach(doc => {
+      const wine = { wineId: doc.id, ...doc.data() };
+      const restaurantId = doc.ref.parent.parent.id;
+      if (savedWineIds.has(wine.wineId)) return;
+
+      const quizScore  = quizPrefs    ? calculateMatchScore(quizPrefs,    wine) : 0;
+      const savedScore = savedProfile ? calculateMatchScore(savedProfile,  wine) : 0;
+
+      const entry = {
+        wineId:       wine.wineId,
+        wineName:     getWineDisplayName(wine),
+        wineType:     wine.type || '',
+        region:       wine.region || '',
+        price:        wine.price || 0,
+        restaurantId,
+        quizMatchPct:  Math.round(quizScore  * 100),
+        savedMatchPct: Math.round(savedScore * 100),
+      };
+
+      if (quizScore >= 0.93 && savedScore >= 0.93) overlapPool.push(entry);
+      else if (quizScore >= 0.93)                   quizOnlyPool.push(entry);
+    });
+
+    shuffle(overlapPool);
+    shuffle(quizOnlyPool);
+    const combined = [...overlapPool, ...quizOnlyPool];
+
+    // Pick up to 3 wines preferring one per restaurant
+    const usedRestaurants = new Set();
+    const recs = [];
+    const leftovers = [];
+    for (const entry of combined) {
+      if (recs.length >= 3) break;
+      if (!usedRestaurants.has(entry.restaurantId)) {
+        recs.push(entry);
+        usedRestaurants.add(entry.restaurantId);
+      } else {
+        leftovers.push(entry);
+      }
+    }
+    for (const entry of leftovers) {
+      if (recs.length >= 3) break;
+      recs.push(entry);
+    }
+
+    const restIds = [...new Set(recs.map(r => r.restaurantId))];
+    if (restIds.length > 0) {
+      const restDocs = await Promise.all(restIds.map(id => db.collection('restaurants').doc(id).get()));
+      const restNames = {};
+      restDocs.forEach(d => { if (d.exists) restNames[d.id] = d.data().name || ''; });
+      recs.forEach(r => { r.restaurantName = restNames[r.restaurantId] || ''; });
+    }
+
+    res.json(recs);
+  } catch (err) {
+    console.error('[Analytics] recommendations error:', err);
+    res.status(500).json({ error: 'Failed to fetch recommendations' });
   }
 });
 

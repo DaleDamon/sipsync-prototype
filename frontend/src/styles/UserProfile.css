@@ -138,6 +138,33 @@
   padding-bottom: 10px;
 }
 
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #ffe0e0;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.section-header-row h3 {
+  margin: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.see-all-btn {
+  background: none;
+  border: none;
+  color: #8b0000;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .pairings-list,
 .restaurants-list {
   display: flex;
@@ -188,6 +215,117 @@
   font-size: 13px;
 }
 
+/* Unrated card highlight */
+.pairing-card--unrated {
+  border-left: 3px solid #c9a96e;
+}
+
+.rate-it-btn {
+  background: none;
+  border: 1px solid #c9a96e;
+  color: #8a6d00;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background 0.15s ease;
+}
+
+.rate-it-btn:hover {
+  background: #f5f0e0;
+}
+
+/* Bottom-sheet rating modal */
+.rating-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.rating-sheet {
+  background: white;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 18px 18px 0 0;
+  padding: 24px 20px 32px;
+  text-align: center;
+}
+
+.rating-sheet-wine {
+  font-size: 16px;
+  font-weight: 700;
+  color: #8b0000;
+  margin: 0 0 3px;
+}
+
+.rating-sheet-prompt {
+  font-size: 12px;
+  color: #aaa;
+  margin: 0 0 18px;
+}
+
+.rating-sheet-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 14px;
+  justify-content: center;
+}
+
+.rating-sheet-buttons .rating-btn {
+  flex: 1;
+  max-width: 130px;
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.rating-btn-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rating-btn-desc {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.72;
+  line-height: 1.3;
+}
+
+.pairing-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.pairing-rating {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pairing-rating--pass   { background: #f0f0f0; color: #888; }
+.pairing-rating--pour   { background: #f5f0e0; color: #8a6d00; }
+.pairing-rating--cellar { background: #8b0000; color: #fff; }
+
 .match-score,
 .pairing-count {
   background-color: #d4af37;
@@ -197,7 +335,6 @@
   font-size: 12px;
   font-weight: bold;
   white-space: nowrap;
-  margin-left: 10px;
 }
 
 .saved-date,
@@ -667,4 +804,57 @@
 .ua-next-wine-rest {
   font-size: 12px;
   opacity: 0.75;
+}
+
+/* ── 3-Card Recommendation Row ── */
+.ua-recs-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ua-rec-card {
+  background: linear-gradient(135deg, #8b0000 0%, #a30000 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ua-rec-rank {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.ua-rec-name {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ua-rec-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.ua-rec-scores {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: auto;
+  padding-top: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .ua-recs-row {
+    grid-template-columns: 1fr;
+  }
 }

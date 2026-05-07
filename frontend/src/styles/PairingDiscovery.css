@@ -1118,6 +1118,61 @@
   transform: scale(1.05);
 }
 
+/* ── Rating prompt inside confirmation modal ── */
+.rating-prompt {
+  font-size: 13px;
+  color: #888;
+  margin: 4px 0 12px;
+  letter-spacing: 0.03em;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.rating-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.rating-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.rating-pass   { background: #f0f0f0; color: #666; }
+.rating-pour   { background: #f5f0e0; color: #8a6d00; }
+.rating-cellar { background: #8b0000; color: #fff; }
+
+.rating-skip {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  text-decoration: underline;
+}
+
+.rating-skip:hover { color: #999; }
+
+.rating-confirmed {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 12px 0 4px;
+}
+
 /* ==================== SEARCH MODE STYLES ==================== */
 
 /* Search Mode Toggle */

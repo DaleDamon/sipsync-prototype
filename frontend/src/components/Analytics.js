@@ -16,23 +16,14 @@ function Analytics({ user }) {
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
-      const [statsRes, winesRes, trendsRes] = await Promise.all([
-        fetch(`${API_URL}/analytics/restaurant-stats`),
-        fetch(`${API_URL}/analytics/popular-wines`),
-        fetch(`${API_URL}/analytics/preference-trends`),
-      ]);
-
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData);
-      }
-      if (winesRes.ok) {
-        const winesData = await winesRes.json();
-        setPopularWines(winesData.popularWines || []);
-      }
-      if (trendsRes.ok) {
-        const trendsData = await trendsRes.json();
-        setPreferencesTrends(trendsData);
+      const res = await fetch(`${API_URL}/analytics/trending`);
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data.stats);
+        setPopularWines(data.popularWines || []);
+        setPreferencesTrends(data.preferencesTrends);
+      } else {
+        setError('Failed to fetch analytics');
       }
     } catch (err) {
       setError('Failed to fetch analytics: ' + err.message);
@@ -92,35 +83,40 @@ function Analytics({ user }) {
       )}
 
       {/* Popular Wines Section */}
-      {popularWines.length > 0 && (
-        <section className="analytics-section">
-          <h3>⭐ Most Popular Wines</h3>
-          <p className="section-subtitle">Most frequently selected wines by users</p>
-          <div className="wines-grid">
-            {popularWines.map((wine, idx) => {
-              // Handle both old and new response formats
-              const displayName = wine.wineName || (wine.producer && wine.varietal
-                ? `${wine.year ? wine.year + ' ' : ''}${wine.producer} ${wine.varietal}`
-                : wine.name || 'Unnamed Wine');
-              const count = wine.selectionCount || wine.matchCount || 0;
-
-              return (
-                <div key={idx} className="wine-card-analytics">
-                  <div className="wine-header-analytics">
-                    <h4>{displayName}</h4>
-                  </div>
-                  {wine.restaurantName && (
-                    <p className="wine-restaurant">📍 {wine.restaurantName}</p>
-                  )}
-                  <p className="match-count">
-                    ❤️ {count} selection{count !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      {popularWines.length > 0 && (() => {
+        const maxCount = popularWines[0]?.selectionCount || 1;
+        return (
+          <section className="analytics-section">
+            <h3>⭐ Most Saved Wines</h3>
+            <ol className="popular-wines-list">
+              {popularWines.slice(0, 10).map((wine, idx) => {
+                const displayName = wine.wineName || (wine.producer && wine.varietal
+                  ? `${wine.year ? wine.year + ' ' : ''}${wine.producer} ${wine.varietal}`
+                  : wine.name || 'Unnamed Wine');
+                const count = wine.selectionCount || wine.matchCount || 0;
+                const barWidth = Math.round((count / maxCount) * 100);
+                return (
+                  <li key={idx} className="popular-wine-row">
+                    <span className="popular-wine-rank">#{idx + 1}</span>
+                    <div className="popular-wine-info">
+                      <span className="popular-wine-name">{displayName}</span>
+                      <div className="popular-wine-meta">
+                        {wine.restaurantName && (
+                          <span className="popular-wine-restaurant">{wine.restaurantName}</span>
+                        )}
+                        <div className="popular-wine-bar-track">
+                          <div className="popular-wine-bar-fill" style={{ width: `${barWidth}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                    <span className="popular-wine-count">{count} {count === 1 ? 'save' : 'saves'}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        );
+      })()}
 
       {/* User Preferences Trends Section */}
       {preferencesTrends && (

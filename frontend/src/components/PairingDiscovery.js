@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../styles/PairingDiscovery.css';
 import { API_URL } from '../config';
 import SearchableSelect from './SearchableSelect';
@@ -142,6 +142,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
   const debounceTimer = useRef(null);
   const searchDebounceTimer = useRef(null);
+  const searchAbortController = useRef(null);
   const { trackEvent } = useEventTracker(user?.userId);
 
   // Helper function to get display name for wines
@@ -220,7 +221,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   useEffect(() => {
     fetchRestaurants();
     loadUserPreferences();
-  }, [user]);
+  }, [user?.userId]);
 
   // Update selected restaurant when pre-selected restaurant prop changes
   useEffect(() => {
@@ -515,23 +516,30 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   };
 
   const performCrossRestaurantSearch = async (keyword) => {
+    // Cancel any in-flight request before starting a new one
+    if (searchAbortController.current) {
+      searchAbortController.current.abort();
+    }
+    searchAbortController.current = new AbortController();
+
     setSearchLoading(true);
     setError('');
 
     try {
       const response = await fetch(
-        `${API_URL}/wines/search?keyword=${encodeURIComponent(keyword)}`
+        `${API_URL}/wines/search?keyword=${encodeURIComponent(keyword)}`,
+        { signal: searchAbortController.current.signal }
       );
       const data = await response.json();
 
       if (response.ok) {
-        console.log(`[SEARCH] Found ${data.totalWines} wines across ${data.results?.length} restaurants`);
         setSearchResults(data.results || []);
       } else {
         setError(data.error || 'Search failed');
         setSearchResults([]);
       }
     } catch (err) {
+      if (err.name === 'AbortError') return; // superseded by newer search — ignore
       setError('Network error: ' + err.message);
       setSearchResults([]);
     } finally {
@@ -642,15 +650,8 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
       if (response.ok) {
         trackEvent('wine_saved', { wineId: wine.wineId, restaurantId: selectedRestaurant, wineName: getWineDisplayName(wine) });
-        // Show confirmation modal with wine name
-        setConfirmationModal({
-          wineName: getWineDisplayName(wine),
-          show: true
-        });
-        // Auto-close modal after 4 seconds
-        setTimeout(() => {
-          setConfirmationModal(null);
-        }, 4000);
+        setConfirmationModal({ wineName: getWineDisplayName(wine) });
+        setTimeout(() => setConfirmationModal(null), 4000);
       } else {
         setError('Failed to save pairing');
       }
@@ -662,6 +663,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const wineTypes = ['red', 'white', 'rosé', 'sparkling', 'dessert'];
   const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral', 'chocolate', 'earthy', 'tropical', 'herbal', 'honey', 'pear', 'biscuit'];
 
+  // Memoized at component level so it only recomputes when search results change
+  const { wineKeyMap, duplicates } = useMemo(() => detectDuplicateWines(searchResults), [searchResults]);
+
   // Render search results grouped by restaurant
   const renderSearchResults = () => {
     if (searchKeyword.trim().length < 2) {
@@ -671,8 +675,6 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     if (searchResults.length === 0 && !searchLoading) {
       return <p className="empty-state">No wines found matching "{searchKeyword}"</p>;
     }
-
-    const { wineKeyMap, duplicates } = detectDuplicateWines(searchResults);
 
     return (
       <div className="restaurant-groups">
@@ -768,15 +770,12 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
           <div className="confirmation-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content">
               <div className="modal-icon">🍷</div>
-              <h3>Wine Selected!</h3>
+              <h3>Wine Saved!</h3>
               <p className="selected-wine">{confirmationModal.wineName}</p>
               <p className="modal-message">
-                Enjoy your wine! We hope you love this pairing as much as we do. Cheers! 🍾
+                Once you've tried it, head to your Profile to give it a rating.
               </p>
-              <button
-                className="modal-close-btn"
-                onClick={() => setConfirmationModal(null)}
-              >
+              <button className="modal-close-btn" onClick={() => setConfirmationModal(null)}>
                 Got it!
               </button>
             </div>

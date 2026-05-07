@@ -20,6 +20,8 @@ function App() {
   const [showQuizPrompt, setShowQuizPrompt] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [userHasPreferences, setUserHasPreferences] = useState(true);
+  const [unratedCount, setUnratedCount] = useState(0);
+  const [focusUnrated, setFocusUnrated] = useState(false);
 
   // Check if user is logged in on mount and handle URL routing
   useEffect(() => {
@@ -161,6 +163,15 @@ function App() {
       </nav>
 
       <main className="main-content">
+        {user && unratedCount > 0 && (
+          <div
+            className="pending-ratings-banner"
+            onClick={() => { setCurrentScreen('profile'); setFocusUnrated(true); }}
+          >
+            {unratedCount} wine{unratedCount !== 1 ? 's' : ''} waiting to be rated — tap to rate
+            <span className="pending-ratings-arrow">→</span>
+          </div>
+        )}
         {!user ? (
           <AuthScreen onLogin={handleLogin} />
         ) : showQuiz ? (
@@ -172,7 +183,13 @@ function App() {
         ) : currentScreen === 'analytics' ? (
           <Analytics user={user} />
         ) : currentScreen === 'profile' ? (
-          <UserProfile user={user} onRetakeQuiz={() => setShowQuiz(true)} />
+          <UserProfile
+            user={user}
+            onRetakeQuiz={() => setShowQuiz(true)}
+            onUnratedCount={setUnratedCount}
+            focusUnrated={focusUnrated}
+            onFocusHandled={() => setFocusUnrated(false)}
+          />
         ) : currentScreen === 'admin' ? (
           <AdminPortal />
         ) : null}

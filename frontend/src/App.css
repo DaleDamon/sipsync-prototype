@@ -96,6 +96,30 @@ body {
   padding-bottom: 40px;
 }
 
+.pending-ratings-banner {
+  background: #8b0000;
+  color: #fff;
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.pending-ratings-banner:hover {
+  background: #a10000;
+}
+
+.pending-ratings-arrow {
+  font-size: 15px;
+}
+
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;

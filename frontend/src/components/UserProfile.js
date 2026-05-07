@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/UserProfile.css';
 import PolarGraph from './PolarGraph';
 import WineOriginMap from './WineOriginMap';
 import { API_URL } from '../config';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line,
 } from 'recharts';
 
@@ -21,7 +21,7 @@ const QUIZ_PROFILES = [
   { id: 'dessert-wine-aficionado',         name: 'Dessert Wine Aficionado',         preferences: { wineType: 'dessert',  acidity: 'low',    tannins: 'low',    bodyWeight: 'medium', flavorNotes: ['berry', 'vanilla'],        sweetness: 'sweet',  priceRange: { min: 0, max: 1000 } } },
 ];
 
-function UserProfile({ user, onRetakeQuiz }) {
+function UserProfile({ user, onRetakeQuiz, onUnratedCount, focusUnrated, onFocusHandled }) {
   const [pairingHistory, setPairingHistory] = useState([]);
   const [visitedRestaurants, setVisitedRestaurants] = useState([]);
   const [quizProfile, setQuizProfile] = useState(null);
@@ -31,60 +31,97 @@ function UserProfile({ user, onRetakeQuiz }) {
   const [editingProfileName, setEditingProfileName] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
   const [userAnalytics, setUserAnalytics] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recsLoading, setRecsLoading] = useState(true);
+  const [ratingModal, setRatingModal] = useState(null);
+  const [showAllPairings, setShowAllPairings] = useState(false);
+  const [showAllRestaurants, setShowAllRestaurants] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const firstUnratedRef = useRef(null);
 
   useEffect(() => {
     if (user && user.userId) {
       fetchUserData();
+      fetchRecommendations();
     }
-  }, [user]);
+  }, [user?.userId]);
+
+  useEffect(() => {
+    if (focusUnrated && !loading && firstUnratedRef.current) {
+      firstUnratedRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (onFocusHandled) onFocusHandled();
+    }
+  }, [focusUnrated, loading]);
+
+  const submitRating = async (rating) => {
+    if (!ratingModal) return;
+    const { historyId } = ratingModal;
+    setRatingModal(null);
+    try {
+      await fetch(`${API_URL}/pairings/rating`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.userId, pairingHistoryId: historyId, rating }),
+      });
+      setPairingHistory(prev => {
+        const updated = prev.map(p => p.historyId === historyId ? { ...p, rating } : p);
+        if (onUnratedCount) onUnratedCount(updated.filter(p => !p.rating).length);
+        return updated;
+      });
+    } catch (_) {}
+  };
+
+  const fetchRecommendations = async () => {
+    try {
+      const res = await fetch(`${API_URL}/analytics/user/${user.userId}/recommendations`);
+      setRecommendations(res.ok ? await res.json() : []);
+    } catch (_) {
+      setRecommendations([]);
+    } finally {
+      setRecsLoading(false);
+    }
+  };
 
   const fetchUserData = async () => {
     try {
       setLoading(true);
       setError('');
 
-      // Fetch user data to get quiz profile and preferences
-      const userResponse = await fetch(
-        `${API_URL}/auth/user/${user.userId}`
-      );
-      const userData = await userResponse.json();
+      const [userResponse, historyResponse, restaurantsResponse] = await Promise.all([
+        fetch(`${API_URL}/auth/user/${user.userId}`),
+        fetch(`${API_URL}/auth/user/${user.userId}/pairing-history?limit=50`),
+        fetch(`${API_URL}/auth/user/${user.userId}/visited-restaurants`),
+      ]);
+
+      const [userData, historyData, restaurantsData] = await Promise.all([
+        userResponse.json(),
+        historyResponse.json(),
+        restaurantsResponse.json(),
+      ]);
+
       if (userResponse.ok) {
-        if (userData.quizProfile) {
-          setQuizProfile(userData.quizProfile);
-        }
-        if (userData.savedPreferences && userData.savedPreferences.length > 0) {
-          setSavedPreferences(userData.savedPreferences[0]);
-        }
+        if (userData.quizProfile) setQuizProfile(userData.quizProfile);
+        if (userData.savedPreferences?.length > 0) setSavedPreferences(userData.savedPreferences[0]);
         if (userData.customProfiles) setCustomProfiles(userData.customProfiles);
       }
 
-      // Fetch pairing history
-      const historyResponse = await fetch(
-        `${API_URL}/auth/user/${user.userId}/pairing-history?limit=50`
-      );
-      const historyData = await historyResponse.json();
       if (historyResponse.ok) {
-        setPairingHistory(historyData.pairingHistory || []);
+        const history = historyData.pairingHistory || [];
+        setPairingHistory(history);
+        if (onUnratedCount) onUnratedCount(history.filter(p => !p.rating).length);
       }
 
-      // Fetch visited restaurants
-      const restaurantsResponse = await fetch(
-        `${API_URL}/auth/user/${user.userId}/visited-restaurants`
-      );
-      const restaurantsData = await restaurantsResponse.json();
       if (restaurantsResponse.ok) {
         setVisitedRestaurants(restaurantsData.visitedRestaurants || []);
       }
 
-      // Fetch analytics (non-blocking — don't fail if this endpoint errors)
-      try {
-        const analyticsRes = await fetch(`${API_URL}/analytics/user/${user.userId}`);
-        if (analyticsRes.ok) {
-          setUserAnalytics(await analyticsRes.json());
-        }
-      } catch (_) { /* analytics is non-critical */ }
+      // Analytics is non-critical — fire and forget after main data loads
+      fetch(`${API_URL}/analytics/user/${user.userId}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data) setUserAnalytics(data); })
+        .catch(() => {});
+
     } catch (err) {
       setError('Failed to load profile data: ' + err.message);
     } finally {
@@ -278,24 +315,52 @@ function UserProfile({ user, onRetakeQuiz }) {
       <div className="profile-content">
         {/* Recent Pairings Section */}
         <div className="section">
-          <h3>Recent Pairings</h3>
+          <div className="section-header-row">
+            <h3>Recent Pairings</h3>
+            {pairingHistory.length > 5 && (
+              <button className="see-all-btn" onClick={() => setShowAllPairings(v => !v)}>
+                {showAllPairings ? 'Show less' : `See all (${pairingHistory.length})`}
+              </button>
+            )}
+          </div>
           {pairingHistory.length > 0 ? (
             <div className="pairings-list">
-              {pairingHistory.map((pairing) => (
-                <div key={pairing.historyId} className="pairing-card">
-                  <div className="pairing-header">
-                    <div className="pairing-info">
-                      <h4>{pairing.wineName}</h4>
-                      <p className="restaurant-name">{pairing.restaurantName}</p>
+              {(showAllPairings ? pairingHistory : pairingHistory.slice(0, 5)).map((pairing, idx) => {
+                const isFirstUnrated = !pairing.rating && idx === pairingHistory.findIndex(p => !p.rating);
+                return (
+                  <div
+                    key={pairing.historyId}
+                    ref={isFirstUnrated ? firstUnratedRef : null}
+                    className={`pairing-card${!pairing.rating ? ' pairing-card--unrated' : ''}`}
+                  >
+                    <div className="pairing-header">
+                      <div className="pairing-info">
+                        <h4>{pairing.wineName}</h4>
+                        <p className="restaurant-name">{pairing.restaurantName}</p>
+                      </div>
+                      <div className="pairing-header-right">
+                        {pairing.rating ? (
+                          <span className={`pairing-rating pairing-rating--${pairing.rating}`}>
+                            {pairing.rating === 'pass' ? 'Pass' : pairing.rating === 'pour' ? 'Pour' : 'Cellar'}
+                          </span>
+                        ) : (
+                          <button
+                            className="rate-it-btn"
+                            onClick={() => setRatingModal({ historyId: pairing.historyId, wineName: pairing.wineName })}
+                          >
+                            Rate it
+                          </button>
+                        )}
+                        <span className="match-score">
+                          {(pairing.matchScore * 100).toFixed(0)}% match
+                        </span>
+                      </div>
                     </div>
-                    <span className="match-score">
-                      {(pairing.matchScore * 100).toFixed(0)}% match
-                    </span>
+                    <p className="saved-date">Saved {formatDate(pairing.saved_at)}</p>
+                    {pairing.notes && <p className="pairing-notes">{pairing.notes}</p>}
                   </div>
-                  <p className="saved-date">Saved {formatDate(pairing.saved_at)}</p>
-                  {pairing.notes && <p className="pairing-notes">{pairing.notes}</p>}
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="empty-state">
@@ -306,10 +371,17 @@ function UserProfile({ user, onRetakeQuiz }) {
 
         {/* Visited Restaurants Section */}
         <div className="section">
-          <h3>Visited Restaurants</h3>
+          <div className="section-header-row">
+            <h3>Visited Restaurants</h3>
+            {visitedRestaurants.length > 5 && (
+              <button className="see-all-btn" onClick={() => setShowAllRestaurants(v => !v)}>
+                {showAllRestaurants ? 'Show less' : `See all (${visitedRestaurants.length})`}
+              </button>
+            )}
+          </div>
           {visitedRestaurants.length > 0 ? (
             <div className="restaurants-list">
-              {visitedRestaurants.map((restaurant) => (
+              {(showAllRestaurants ? visitedRestaurants : visitedRestaurants.slice(0, 5)).map((restaurant) => (
                 <div key={restaurant.restaurantId} className="restaurant-card">
                   <div className="restaurant-header">
                     <div className="restaurant-info">
@@ -338,11 +410,7 @@ function UserProfile({ user, onRetakeQuiz }) {
             : null;
           const totalSessions = userAnalytics?.totalSessions ?? null;
 
-          const topVarietals = userAnalytics?.topVarietals ?? (() => {
-            const counts = {};
-            pairingHistory.forEach(p => { const v = p.wineType || 'Unknown'; counts[v] = (counts[v] || 0) + 1; });
-            return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
-          })();
+
 
           const matchScoreOverTime = userAnalytics?.matchScoreOverTime ?? pairingHistory.slice(0, 20).reverse().map(p => ({
             date: new Date(p.saved_at).toLocaleDateString(),
@@ -375,10 +443,7 @@ function UserProfile({ user, onRetakeQuiz }) {
           })();
 
           const priceTendency = userAnalytics?.priceTendency ?? null;
-          const regionsExplored = userAnalytics?.regionsExplored ?? [];
           const palateRealityCheck = userAnalytics?.palateRealityCheck ?? null;
-          const nextWine = userAnalytics?.nextWineRecommendation ?? null;
-
           const typeColors = { red: '#8b0000', white: '#c9a96e', rosé: '#d4829a', sparkling: '#6baed6', dessert: '#9e6b3c' };
 
           return (
@@ -482,47 +547,38 @@ function UserProfile({ user, onRetakeQuiz }) {
                 </div>
               )}
 
-              {/* Regions explored */}
-              {regionsExplored.length > 0 && (
-                <div className="user-analytics-chart">
-                  <h4>Regions Explored <span className="ua-region-count">({regionsExplored.length})</span></h4>
-                  <div className="ua-region-tags">
-                    {regionsExplored.map(r => (
-                      <span key={r} className="ua-region-tag">{r}</span>
+
+              {/* Next wine recommendations — 3 cards */}
+              <div className="user-analytics-chart">
+                <h4>Your Next Wines</h4>
+                {recsLoading ? (
+                  <p className="ua-palate-check-sub">Finding wines for you…</p>
+                ) : recommendations.length === 0 ? (
+                  <p className="ua-palate-check-sub">Save more wines to unlock personalized recommendations.</p>
+                ) : (
+                  <div className="ua-recs-row">
+                    {recommendations.map((rec, i) => (
+                      <div key={rec.wineId || i} className="ua-rec-card">
+                        <div className="ua-rec-rank">#{i + 1}</div>
+                        <div className="ua-rec-name">{rec.wineName}</div>
+                        <div className="ua-rec-meta">
+                          {rec.wineType && <span className="ua-next-type">{rec.wineType.charAt(0).toUpperCase() + rec.wineType.slice(1)}</span>}
+                          {rec.region   && <span className="ua-next-region">{rec.region}</span>}
+                          {rec.price > 0 && <span className="ua-next-price">${rec.price}</span>}
+                        </div>
+                        <div className="ua-rec-scores">
+                          <span>Quiz: {rec.quizMatchPct}%</span>
+                          <span>Taste: {rec.savedMatchPct}%</span>
+                        </div>
+                        {rec.restaurantName && (
+                          <div className="ua-next-wine-rest">At {rec.restaurantName}</div>
+                        )}
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Next wine recommendation */}
-              {nextWine && (
-                <div className="ua-next-wine">
-                  <div className="ua-next-wine-label">Your Next Wine</div>
-                  <div className="ua-next-wine-name">{nextWine.wineName}</div>
-                  <div className="ua-next-wine-meta">
-                    {nextWine.wineType && <span className="ua-next-type">{nextWine.wineType.charAt(0).toUpperCase() + nextWine.wineType.slice(1)}</span>}
-                    {nextWine.region && <span className="ua-next-region">{nextWine.region}</span>}
-                    {nextWine.price > 0 && <span className="ua-next-price">${nextWine.price}</span>}
-                  </div>
-                  <div className="ua-next-wine-rest">Available at {nextWine.restaurantName} · {nextWine.matchPct}% match</div>
-                </div>
-              )}
-
-              {/* Top Varietals */}
-              {topVarietals.length > 0 && (
-                <div className="user-analytics-chart">
-                  <h4>Top Wine Types</h4>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={topVarietals} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                      <XAxis type="number" tick={{ fontSize: 11 }} />
-                      <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} />
-                      <Tooltip formatter={(v) => [`${v} selections`, 'Count']} />
-                      <Bar dataKey="count" fill="#722F37" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
 
               {/* Match Score over time */}
               {matchScoreOverTime.length > 1 && (
@@ -543,6 +599,30 @@ function UserProfile({ user, onRetakeQuiz }) {
           );
         })()}
       </div>
+
+      {ratingModal && (
+        <div className="rating-sheet-overlay" onClick={() => setRatingModal(null)}>
+          <div className="rating-sheet" onClick={e => e.stopPropagation()}>
+            <p className="rating-sheet-wine">{ratingModal.wineName}</p>
+            <p className="rating-sheet-prompt">How was it?</p>
+            <div className="rating-sheet-buttons">
+              <button className="rating-btn rating-pass" onClick={() => submitRating('pass')}>
+                <span className="rating-btn-label">Pass</span>
+                <span className="rating-btn-desc">Not for me</span>
+              </button>
+              <button className="rating-btn rating-pour" onClick={() => submitRating('pour')}>
+                <span className="rating-btn-label">Pour</span>
+                <span className="rating-btn-desc">Would order again</span>
+              </button>
+              <button className="rating-btn rating-cellar" onClick={() => submitRating('cellar')}>
+                <span className="rating-btn-label">Cellar</span>
+                <span className="rating-btn-desc">Absolutely loved it</span>
+              </button>
+            </div>
+            <button className="rating-skip" onClick={() => setRatingModal(null)}>cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

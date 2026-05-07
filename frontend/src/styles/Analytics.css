@@ -247,6 +247,93 @@
   gap: 20px;
 }
 
+.popular-wines-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.popular-wine-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 2px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.popular-wine-row:last-child {
+  border-bottom: none;
+}
+
+.popular-wine-rank {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ccc;
+  width: 26px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.popular-wine-row:nth-child(1) .popular-wine-rank { color: #8b0000; }
+.popular-wine-row:nth-child(2) .popular-wine-rank { color: #b22222; }
+.popular-wine-row:nth-child(3) .popular-wine-rank { color: #c9a96e; }
+
+.popular-wine-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.popular-wine-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popular-wine-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.popular-wine-restaurant {
+  font-size: 11px;
+  color: #aaa;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.popular-wine-bar-track {
+  flex: 1;
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 40px;
+}
+
+.popular-wine-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c9a96e, #8b0000);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.popular-wine-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8b0000;
+  background: #fff5f5;
+  padding: 3px 9px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .wine-card-analytics {
   background: white;
   border: 1px solid #e0e0e0;

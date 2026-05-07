@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
 const { adminAuth } = require('../middleware/adminAuth');
+const { getWineCache, invalidateWineCache } = require('../utils/wineCache');
 
 // POST /api/wines/restaurant/:restaurantId/add
 // Add a wine to a restaurant's wine list
@@ -131,6 +132,8 @@ router.post('/restaurant/:restaurantId/add', async (req, res) => {
       .collection('wines')
       .add(wine);
 
+    invalidateWineCache();
+
     res.json({
       message: 'Wine added successfully',
       wineId: wineRef.id,
@@ -179,7 +182,6 @@ router.get('/search', async (req, res) => {
   try {
     const { keyword } = req.query;
 
-    // Validate keyword parameter
     if (!keyword || keyword.trim().length < 2) {
       return res.status(400).json({
         error: 'Keyword is required and must be at least 2 characters'
@@ -187,82 +189,48 @@ router.get('/search', async (req, res) => {
     }
 
     const searchTerm = keyword.trim().toLowerCase();
-    const results = [];
-    let totalWines = 0;
+    const { wines } = await getWineCache(db);
 
-    // Get all restaurants
-    const restaurantsSnapshot = await db.collection('restaurants').get();
+    const matched = wines.filter(wine => {
+      const producer = (wine.producer || '').toLowerCase();
+      const varietal = (wine.varietal || '').toLowerCase();
+      const region = (wine.region || '').toLowerCase();
+      return producer.includes(searchTerm) || varietal.includes(searchTerm) || region.includes(searchTerm);
+    });
 
-    // Iterate through each restaurant and search their wines
-    for (const restaurantDoc of restaurantsSnapshot.docs) {
-      const restaurantData = restaurantDoc.data();
-      const restaurantId = restaurantDoc.id;
-
-      // Get wines for this restaurant
-      const winesSnapshot = await db
-        .collection('restaurants')
-        .doc(restaurantId)
-        .collection('wines')
-        .get();
-
-      const matchedWines = [];
-
-      // Filter wines by keyword (producer, varietal, region)
-      winesSnapshot.forEach((wineDoc) => {
-        const wine = wineDoc.data();
-
-        // Search in producer, varietal, and region fields
-        const producer = (wine.producer || '').toLowerCase();
-        const varietal = (wine.varietal || '').toLowerCase();
-        const region = (wine.region || '').toLowerCase();
-
-        if (
-          producer.includes(searchTerm) ||
-          varietal.includes(searchTerm) ||
-          region.includes(searchTerm)
-        ) {
-          // Generate matchKey for duplicate detection (normalize wine identifier)
-          const year = wine.year || '';
-          const matchKey = `${producer}-${varietal}-${year}`.trim();
-
-          matchedWines.push({
-            wineId: wineDoc.id,
-            year: wine.year || '',
-            producer: wine.producer || '',
-            varietal: wine.varietal || '',
-            region: wine.region || '',
-            type: wine.type || '',
-            price: wine.price || 0,
-            acidity: wine.acidity || '',
-            tannins: wine.tannins || '',
-            bodyWeight: wine.bodyWeight || '',
-            sweetnessLevel: wine.sweetnessLevel || '',
-            flavorProfile: wine.flavorProfile || [],
-            matchKey
-          });
-        }
-      });
-
-      // Only include restaurants that have matching wines
-      if (matchedWines.length > 0) {
-        results.push({
-          restaurantId,
-          restaurantName: restaurantData.name || 'Unnamed Restaurant',
-          restaurantCity: restaurantData.city || '',
-          wines: matchedWines
-        });
-        totalWines += matchedWines.length;
+    // Group by restaurant
+    const byRestaurant = {};
+    for (const wine of matched) {
+      if (!byRestaurant[wine.restaurantId]) {
+        byRestaurant[wine.restaurantId] = {
+          restaurantId: wine.restaurantId,
+          restaurantName: wine.restaurantName,
+          restaurantCity: wine.restaurantCity,
+          wines: [],
+        };
       }
+      const matchKey = `${(wine.producer || '').toLowerCase()}-${(wine.varietal || '').toLowerCase()}-${wine.year || ''}`.trim();
+      byRestaurant[wine.restaurantId].wines.push({
+        wineId: wine.wineId,
+        year: wine.year || '',
+        producer: wine.producer || '',
+        varietal: wine.varietal || '',
+        region: wine.region || '',
+        type: wine.type || '',
+        price: wine.price || 0,
+        acidity: wine.acidity || '',
+        tannins: wine.tannins || '',
+        bodyWeight: wine.bodyWeight || '',
+        sweetnessLevel: wine.sweetnessLevel || '',
+        flavorProfile: wine.flavorProfile || [],
+        matchKey,
+      });
     }
 
-    // Sort results by restaurant name
-    results.sort((a, b) => a.restaurantName.localeCompare(b.restaurantName));
+    const results = Object.values(byRestaurant)
+      .sort((a, b) => a.restaurantName.localeCompare(b.restaurantName));
 
-    res.json({
-      results,
-      totalWines,
-      searchTerm: keyword
-    });
+    res.json({ results, totalWines: matched.length, searchTerm: keyword });
 
   } catch (error) {
     console.error('Error searching wines:', error);
@@ -329,6 +297,7 @@ router.post('/restaurant/:restaurantId/batch', adminAuth, async (req, res) => {
     }
 
     await batch.commit();
+    invalidateWineCache();
 
     // Keep wineCount on the restaurant document current so GET /restaurants skips subcollection queries
     const currentWines = await db.collection('restaurants').doc(restaurantId).collection('wines').get();

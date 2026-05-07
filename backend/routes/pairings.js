@@ -1,103 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../firebase');
-
-// Helper function to get display name for wine (supports both old and new format)
-function getWineDisplayName(wine) {
-  const parts = [];
-  if (wine.year && wine.year.trim()) parts.push(wine.year);
-  if (wine.producer && wine.producer.trim()) parts.push(wine.producer);
-  if (wine.varietal && wine.varietal.trim()) parts.push(wine.varietal);
-  return parts.join(' ') || wine.name || 'Unnamed Wine';
-}
-
-// Helper function to calculate match score between user preferences and wine
-function calculateMatchScore(userPreferences, wine) {
-  console.log('\n=== MATCH SCORE CALCULATION ===');
-  console.log('Wine:', getWineDisplayName(wine));
-  console.log('User Preferences:', JSON.stringify(userPreferences, null, 2));
-  console.log('Wine Data:', JSON.stringify({
-    type: wine.type,
-    acidity: wine.acidity,
-    tannins: wine.tannins,
-    bodyWeight: wine.bodyWeight,
-    flavorProfile: wine.flavorProfile,
-    sweetnessLevel: wine.sweetnessLevel,
-    price: wine.price
-  }, null, 2));
-
-  let totalScore = 0;
-  let categoryCount = 0;
-
-  // Acidity match
-  if (userPreferences.acidity) {
-    const acidityMatch = userPreferences.acidity === wine.acidity ? 1 : 0.5;
-    totalScore += acidityMatch;
-    categoryCount++;
-    console.log(`Acidity: ${userPreferences.acidity} vs ${wine.acidity} = ${acidityMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Tannins match
-  if (userPreferences.tannins) {
-    const tanninsMatch = userPreferences.tannins === wine.tannins ? 1 : 0.5;
-    totalScore += tanninsMatch;
-    categoryCount++;
-    console.log(`Tannins: ${userPreferences.tannins} vs ${wine.tannins} = ${tanninsMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Body weight match
-  if (userPreferences.bodyWeight) {
-    const bodyMatch = userPreferences.bodyWeight === wine.bodyWeight ? 1 : 0.5;
-    totalScore += bodyMatch;
-    categoryCount++;
-    console.log(`Body: ${userPreferences.bodyWeight} vs ${wine.bodyWeight} = ${bodyMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Flavor profile match
-  // Available flavor notes: oak, cherry, citrus, berry, vanilla, spice, floral, chocolate, earthy, tropical, herbal, honey
-  if (userPreferences.flavorNotes && userPreferences.flavorNotes.length > 0) {
-    const matchedFlavors = userPreferences.flavorNotes.filter((flavor) =>
-      wine.flavorProfile.includes(flavor)
-    );
-    const flavorMatch = matchedFlavors.length / userPreferences.flavorNotes.length;
-    totalScore += flavorMatch;
-    categoryCount++;
-    console.log(`Flavors: [${userPreferences.flavorNotes.join(', ')}] vs [${wine.flavorProfile.join(', ')}]`);
-    console.log(`  Matched: [${matchedFlavors.join(', ')}] = ${flavorMatch} (${matchedFlavors.length}/${userPreferences.flavorNotes.length}) (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Sweetness match
-  if (userPreferences.sweetness) {
-    const sweetnessMatch = userPreferences.sweetness === wine.sweetnessLevel ? 1 : 0.5;
-    totalScore += sweetnessMatch;
-    categoryCount++;
-    console.log(`Sweetness: ${userPreferences.sweetness} vs ${wine.sweetnessLevel} = ${sweetnessMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Price match (uses glassPrice when BTG mode is on)
-  if (userPreferences.priceRange) {
-    const { min, max } = userPreferences.priceRange;
-    const priceToCheck = userPreferences.btgOnly && wine.glassPrice ? wine.glassPrice : wine.price;
-    const priceMatch = priceToCheck >= min && priceToCheck <= max ? 1 : 0.5;
-    totalScore += priceMatch;
-    categoryCount++;
-    console.log(`Price (${userPreferences.btgOnly ? 'glass' : 'bottle'}): $${priceToCheck} in [$${min}-$${max}] = ${priceMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  // Wine type match
-  if (userPreferences.wineType && userPreferences.wineType !== 'any') {
-    const typeMatch = userPreferences.wineType === wine.type ? 1 : 0;
-    totalScore += typeMatch;
-    categoryCount++;
-    console.log(`Type: ${userPreferences.wineType} vs ${wine.type} = ${typeMatch} (total: ${totalScore}/${categoryCount})`);
-  }
-
-  const finalScore = categoryCount > 0 ? totalScore / categoryCount : 0;
-  console.log(`\nFINAL SCORE: ${totalScore} / ${categoryCount} = ${finalScore} (${Math.round(finalScore * 100)}%)`);
-  console.log('=== END CALCULATION ===\n');
-
-  return finalScore;
-}
+const { getWineDisplayName, calculateMatchScore } = require('../utils/wineScoring');
 
 // POST /api/pairings/find
 // Find wine matches based on user preferences
@@ -272,7 +176,8 @@ router.post('/save-pairing', async (req, res) => {
         price: price || 0,
         region: region || '',
         saved_at: new Date(),
-        notes: ''
+        notes: '',
+        rating: ''
       });
 
     res.json({
@@ -283,6 +188,27 @@ router.post('/save-pairing', async (req, res) => {
   } catch (error) {
     console.error('Error saving pairing:', error);
     res.status(500).json({ error: 'Failed to save pairing' });
+  }
+});
+
+// PATCH /api/pairings/rating
+// Update the Pass/Pour/Cellar rating on a saved pairing
+router.patch('/rating', async (req, res) => {
+  try {
+    const { userId, pairingHistoryId, rating } = req.body;
+    if (!userId || !pairingHistoryId || !rating) {
+      return res.status(400).json({ error: 'userId, pairingHistoryId, and rating are required' });
+    }
+    if (!['pass', 'pour', 'cellar'].includes(rating)) {
+      return res.status(400).json({ error: 'rating must be pass, pour, or cellar' });
+    }
+    await db.collection('users').doc(userId)
+      .collection('pairing_history').doc(pairingHistoryId)
+      .update({ rating });
+    res.json({ message: 'Rating saved' });
+  } catch (err) {
+    console.error('Error saving rating:', err);
+    res.status(500).json({ error: 'Failed to save rating' });
   }
 });
 
