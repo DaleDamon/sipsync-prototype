@@ -132,13 +132,14 @@ For each wine, extract:
 - varietal: string (the grape variety or wine name, e.g., "Cabernet Sauvignon", "Chianti (Sangiovese)")
 - region: string (format as "Area, Country", e.g., "Tuscany, Italy", "Napa Valley, California")
 - type: string (one of: red, white, rose, sparkling, dessert)
-- price: number (the bottle price as a number, no dollar sign)
+- price: number (the bottle price as a number, no dollar sign) — set to null if no bottle price exists
 - glassPrice: number or null — read the pricing guidance below carefully before filling this field
 
 PRICING GUIDANCE — how to detect glass prices:
 Some menus use a column table with headers like "6oz", "Glass", "BTL", or "Bottle" at the top of a wine section. When you see these column headers, the left/first column is the glass price and the right/second column is the bottle price. Apply this column mapping consistently to ALL wines within that section — do not abandon it partway through. Within the same section, some wines may only appear in the bottle column (no glass price) — give those glassPrice: null based on visual alignment, not just by counting numbers.
 Some menus use inline format instead: "13 • 52", "Glass $14 / Bottle $52", or "Btg $16". Extract glassPrice from that inline text.
-If a wine has only one price and no glass indicator anywhere, set glassPrice: null.
+CRITICAL — BTG-only sections: If the section is clearly labeled "By the Glass", "Wine by the Glass", "BTG", or similar, and each wine shows only ONE price with no bottle column present, that single price is the GLASS price. Set glassPrice to that price and set price to null. Do NOT put the glass price in the price field.
+If a wine has only one price and no glass indicator anywhere on the page, set glassPrice: null.
 
 Also estimate the sensory profile:
 - acidity: "low", "medium", or "high"
@@ -322,14 +323,19 @@ function sanitizeWines(wines) {
   if (priced.length < wines.length) {
     console.log(`[AI] Filtered out ${wines.length - priced.length} priceless entries (likely from non-menu pages)`);
   }
-  return priced.map(wine => ({
+  return priced.map(wine => {
+    const bottlePrice = parseFloat(wine.price) || 0;
+    const glassPrice = wine.glassPrice ? (parseFloat(wine.glassPrice) || null) : null;
+    // If bottle price equals glass price, the glass price leaked into the bottle field — clear it
+    const resolvedBottlePrice = (glassPrice && bottlePrice === glassPrice) ? 0 : bottlePrice;
+    return {
     year: wine.year || '',
     producer: wine.producer || '',
     varietal: wine.varietal || '',
     region: wine.region || '',
     type: ['red', 'white', 'rosé', 'rose', 'sparkling', 'dessert'].includes(wine.type) ? (wine.type === 'rose' ? 'rosé' : wine.type) : 'red',
-    price: parseFloat(wine.price) || 0,
-    glassPrice: wine.glassPrice ? (parseFloat(wine.glassPrice) || null) : null,
+    price: resolvedBottlePrice,
+    glassPrice,
     acidity: ['low', 'medium', 'high'].includes(wine.acidity) ? wine.acidity : 'medium',
     tannins: ['low', 'medium', 'high'].includes(wine.tannins) ? wine.tannins : 'low',
     bodyWeight: ['light', 'medium', 'full'].includes(wine.bodyWeight) ? wine.bodyWeight : 'medium',
@@ -340,7 +346,8 @@ function sanitizeWines(wines) {
     lowConfidence: Array.isArray(wine.lowConfidence)
       ? wine.lowConfidence.filter(f => CONFIDENCE_FIELDS.includes(f))
       : []
-  }));
+    };
+  });
 }
 
 // Merge duplicate wine entries that appear in both BTG and bottle sections
