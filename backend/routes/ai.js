@@ -107,11 +107,16 @@ Return a JSON array where each wine object has these fields:
 Important guidelines for accuracy:
 - Consider the specific producer and region, not just the varietal
 - California Chardonnay and Italian house whites often have perceived sweetness ("medium" not "dry")
-- Primitivo/Zinfandel from warm regions tend to have low acidity
 - Use menu section hints if provided (e.g., "Light Whites" means bodyWeight should be "light")
 - Sparkling wines typically have "medium" body weight, not "light"
 - Select 2-5 flavor notes that best characterize each wine
 - When in doubt about sweetness, lean toward "medium" for fruit-forward whites and value reds
+
+Acidity calibration — use these as probabilistic defaults, adjusted by producer and region signals:
+- Default LOW: Malbec, Grenache/Garnacha, Zinfandel, Primitivo, Viognier, Marsanne, Roussanne, Gewürztraminer, Muscat, Mourvèdre/Monastrell. Override to medium if the wine is from a demonstrably cool-climate site (e.g., high-altitude Mendoza, coastal California).
+- Default HIGH: Sangiovese, Nebbiolo, Barbera, Sauvignon Blanc, Riesling, Albariño, Grüner Veltliner, Pinot Grigio from northern Italy, most sparkling wines. Override to medium only if context clearly signals a riper, warmer style.
+- Default MEDIUM: Cabernet Sauvignon, Merlot, Syrah/Shiraz, Pinot Noir, Chardonnay, Tempranillo — these genuinely vary and medium is correct absent strong signals.
+- When genuinely uncertain about a specific producer's acidity level, assign the varietal default above and add "acidity" to lowConfidence rather than defaulting to medium.
 
 Return ONLY the JSON array, no other text.`;
 
@@ -148,6 +153,12 @@ Also estimate the sensory profile:
 - sweetnessLevel: "dry", "medium", or "sweet"
 - flavorProfile: array of 2-5 strings from ONLY: oak, cherry, citrus, berry, vanilla, spice, floral, chocolate, earthy, tropical, herbal, honey, pear, biscuit
 - lowConfidence: array of field names (from: acidity, tannins, bodyWeight, sweetnessLevel, flavorProfile) where your confidence is LOW. Flag a field if you don't recognize the producer, the varietal is unusual/a blend that could vary widely, or the region doesn't narrow things down. If confident in all, return an empty array [].
+
+Acidity calibration — use these as probabilistic defaults, adjusted by producer and region signals:
+- Default LOW: Malbec, Grenache/Garnacha, Zinfandel, Primitivo, Viognier, Marsanne, Roussanne, Gewürztraminer, Muscat, Mourvèdre/Monastrell. Override to medium if from a demonstrably cool-climate site (e.g., high-altitude Mendoza, coastal California).
+- Default HIGH: Sangiovese, Nebbiolo, Barbera, Sauvignon Blanc, Riesling, Albariño, Grüner Veltliner, Pinot Grigio from northern Italy, most sparkling wines. Override to medium only if context clearly signals a riper, warmer style.
+- Default MEDIUM: Cabernet Sauvignon, Merlot, Syrah/Shiraz, Pinot Noir, Chardonnay, Tempranillo — these genuinely vary and medium is correct absent strong signals.
+- When genuinely uncertain about a specific producer's acidity level, assign the varietal default above and add "acidity" to lowConfidence rather than defaulting to medium.
 
 DEDUPLICATION — this is critical: Many menus list wines in separate "By the Glass" and "By the Bottle" sections. When you see the same wine appearing in both sections, create ONE entry with both prices — glassPrice from the glass section and price from the bottle section. Match wines across sections by producer + varietal + region similarity. Do NOT create two separate objects for the same wine.
 
