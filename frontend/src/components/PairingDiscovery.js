@@ -169,6 +169,11 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     });
   };
 
+  // Helper to render a small dot indicating if a wine attribute matches the user's preference
+  const getMatchDot = (wineVal, prefVal) => (
+    <span className={`attr-dot ${wineVal === prefVal ? 'attr-dot--match' : 'attr-dot--no-match'}`} />
+  );
+
   // Helper function to get color based on match percentage
   const getMatchColor = (matchScore) => {
     const percentage = matchScore * 100;
@@ -344,14 +349,17 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
       const data = await response.json();
 
       // Check if user has taken the quiz and store quiz profile
+      const profileKey = data.quizProfile || 'no-quiz';
+      const dismissedKey = `sipsync_banner_dismissed_${user.userId}`;
+      const wasDismissed = localStorage.getItem(dismissedKey) === profileKey;
+
       if (data.quizProfile) {
         setQuizProfile(data.quizProfile);
         setHasQuiz(true);
-        // Show banner prompting to apply profile
-        setShowQuizBanner(true);
+        setShowQuizBanner(!wasDismissed);
       } else {
         setHasQuiz(false);
-        setShowQuizBanner(true); // Show banner prompting to take quiz
+        setShowQuizBanner(!wasDismissed);
       }
 
       // Load custom profiles
@@ -412,6 +420,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     if (!quizProfile) return;
     const profileId = quizProfile.toLowerCase().replace(/\s+/g, '-');
     applyProfileById(profileId);
+    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, quizProfile);
   };
 
   const toggleInfoModal = (modalName) => {
@@ -621,11 +630,14 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     }
   }, [selectedRestaurant, preferences, trackEvent]);
 
-  const savePairing = async (wine) => {
+  const savePairing = async (wine, restaurantIdOverride = null, restaurantNameOverride = null) => {
     if (!user || !user.userId) {
       setError('Must be logged in to save pairings');
       return;
     }
+
+    const effectiveRestaurantId = restaurantIdOverride || selectedRestaurant;
+    const effectiveRestaurantName = restaurantNameOverride || restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || '';
 
     try {
       const response = await fetch(`${API_URL}/pairings/save-pairing`, {
@@ -636,11 +648,11 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
         },
         body: JSON.stringify({
           userId: user.userId,
-          restaurantId: selectedRestaurant,
+          restaurantId: effectiveRestaurantId,
           wineId: wine.wineId,
-          matchScore: wine.matchScore,
+          matchScore: wine.matchScore || 0,
           wineName: getWineDisplayName(wine),
-          restaurantName: restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || '',
+          restaurantName: effectiveRestaurantName,
           wineType: wine.type || '',
           acidity: wine.acidity || '',
           tannins: wine.tannins || '',
@@ -733,10 +745,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   )}
 
                   <div className="wine-details">
-                    <span className="detail"><strong>Acidity:</strong> {wine.acidity}</span>
-                    <span className="detail"><strong>Tannins:</strong> {wine.tannins}</span>
-                    <span className="detail"><strong>Body:</strong> {wine.bodyWeight}</span>
-                    <span className="detail"><strong>Sweetness:</strong> {wine.sweetnessLevel}</span>
+                    <span className="detail">{getMatchDot(wine.acidity, preferences.acidity)}<strong>Acidity:</strong> {wine.acidity}</span>
+                    <span className="detail">{getMatchDot(wine.tannins, preferences.tannins)}<strong>Tannins:</strong> {wine.tannins}</span>
+                    <span className="detail">{getMatchDot(wine.bodyWeight, preferences.bodyWeight)}<strong>Body:</strong> {wine.bodyWeight}</span>
+                    <span className="detail">{getMatchDot(wine.sweetnessLevel, preferences.sweetness)}<strong>Sweetness:</strong> {wine.sweetnessLevel}</span>
                   </div>
 
                   {wine.flavorProfile && wine.flavorProfile.length > 0 && (
@@ -746,6 +758,12 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                       ))}
                     </div>
                   )}
+                  <button
+                    className="save-pairing-btn"
+                    onClick={() => savePairing(wine, restaurant.restaurantId, restaurant.restaurantName)}
+                  >
+                    ♥ Save this Wine
+                  </button>
                 </div>
               ))}
             </div>
@@ -801,7 +819,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 </button>
                 <button
                   className="banner-close-btn"
-                  onClick={() => setShowQuizBanner(false)}
+                  onClick={() => {
+                    setShowQuizBanner(false);
+                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, quizProfile || 'no-quiz');
+                  }}
                   aria-label="Close banner"
                 >
                   ✕
@@ -820,7 +841,10 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 </button>
                 <button
                   className="banner-close-btn"
-                  onClick={() => setShowQuizBanner(false)}
+                  onClick={() => {
+                    setShowQuizBanner(false);
+                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, 'no-quiz');
+                  }}
                   aria-label="Close banner"
                 >
                   ✕
@@ -1248,16 +1272,16 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 )}
                 <div className="wine-details">
                   <span className="detail">
-                    <strong>Acidity:</strong> {wine.acidity}
+                    {getMatchDot(wine.acidity, preferences.acidity)}<strong>Acidity:</strong> {wine.acidity}
                   </span>
                   <span className="detail">
-                    <strong>Tannins:</strong> {wine.tannins}
+                    {getMatchDot(wine.tannins, preferences.tannins)}<strong>Tannins:</strong> {wine.tannins}
                   </span>
                   <span className="detail">
-                    <strong>Body:</strong> {wine.bodyWeight}
+                    {getMatchDot(wine.bodyWeight, preferences.bodyWeight)}<strong>Body:</strong> {wine.bodyWeight}
                   </span>
                   <span className="detail">
-                    <strong>Sweetness:</strong> {wine.sweetnessLevel}
+                    {getMatchDot(wine.sweetnessLevel, preferences.sweetness)}<strong>Sweetness:</strong> {wine.sweetnessLevel}
                   </span>
                 </div>
                 {wine.flavorProfile && wine.flavorProfile.length > 0 && (
@@ -1273,7 +1297,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   className="save-pairing-btn"
                   onClick={() => savePairing(wine)}
                 >
-                  ♥ Confirm Selection
+                  ♥ Save this Wine
                 </button>
               </div>
             ))}

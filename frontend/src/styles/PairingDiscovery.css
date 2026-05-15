@@ -555,6 +555,18 @@
   color: #666;
 }
 
+.attr-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.attr-dot--match { background: #4CAF50; }
+.attr-dot--no-match { background: #ddd; }
+
 .flavor-list {
   display: flex;
   flex-wrap: wrap;

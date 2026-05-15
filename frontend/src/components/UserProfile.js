@@ -224,7 +224,7 @@ function UserProfile({ user, onRetakeQuiz, onUnratedCount, focusUnrated, onFocus
       <div className="profile-header">
         <h2>Your Profile</h2>
         <div className="user-info">
-          <p className="user-name">{user?.userId || 'User'}</p>
+          <p className="user-name">{user?.name || 'You'}</p>
           <div className="user-profile-selector">
             <label className="user-profile-selector-label">🍷 Wine Profile</label>
             <select

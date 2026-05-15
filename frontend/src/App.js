@@ -28,7 +28,7 @@ function App() {
     const token = localStorage.getItem('sipsyncToken');
     const userId = localStorage.getItem('sipsyncUserId');
     if (token && userId) {
-      const userData = { userId, token };
+      const userData = { userId, token, name: localStorage.getItem('sipsyncUserName') || '' };
       setUser(userData);
 
       // Log session start
@@ -72,6 +72,7 @@ function App() {
     setUser(userData);
     localStorage.setItem('sipsyncToken', userData.token);
     localStorage.setItem('sipsyncUserId', userData.userId);
+    if (userData.name) localStorage.setItem('sipsyncUserName', userData.name);
     checkUserPreferences(userData.userId);
     setCurrentScreen('discovery');
   };
@@ -89,12 +90,14 @@ function App() {
     setShowQuiz(false);
     setUserHasPreferences(true);
     setCurrentScreen('discovery');
+    if (user?.userId) localStorage.removeItem(`sipsync_banner_dismissed_${user.userId}`);
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('sipsyncToken');
     localStorage.removeItem('sipsyncUserId');
+    localStorage.removeItem('sipsyncUserName');
     setCurrentScreen('auth');
   };
 
@@ -141,7 +144,7 @@ function App() {
               className={`nav-btn ${!showQuiz && currentScreen === 'analytics' ? 'active' : ''}`}
               onClick={() => { setShowQuiz(false); setCurrentScreen('analytics'); }}
             >
-              Trending
+              Community
             </button>
             <button
               className={`nav-btn ${!showQuiz && currentScreen === 'profile' ? 'active' : ''}`}

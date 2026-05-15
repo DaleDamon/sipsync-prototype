@@ -30,6 +30,7 @@ router.post('/login', async (req, res) => {
     const userRef = db.collection('users').doc(phoneNumber);
     const userDoc = await userRef.get();
 
+    let resolvedName = name;
     if (!userDoc.exists) {
       if (!name) {
         return res.status(400).json({ error: 'Name is required for new users' });
@@ -41,6 +42,8 @@ router.post('/login', async (req, res) => {
         wineHistory: [],
         createdAt: new Date(),
       });
+    } else {
+      resolvedName = userDoc.data().name || name || '';
     }
 
     const userId = phoneNumber;
@@ -50,7 +53,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '30d' }
     );
 
-    res.json({ message: 'Logged in', token, userId, phoneNumber });
+    res.json({ message: 'Logged in', token, userId, phoneNumber, name: resolvedName });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Login failed' });
