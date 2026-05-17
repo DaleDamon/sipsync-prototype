@@ -27,6 +27,8 @@ function AdminPortal() {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [showRestaurantForm, setShowRestaurantForm] = useState(false);
+  const [flags, setFlags] = useState([]);
+  const [flagsLoading, setFlagsLoading] = useState(false);
 
   // Restore admin session from localStorage
   useEffect(() => {
@@ -133,6 +135,7 @@ function AdminPortal() {
     if (uploadMode === 'append') {
       const existingKeys = new Set(
         existingWines.map(w =>
+          (w.year || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.producer || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.varietal || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.type || '').toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -140,6 +143,7 @@ function AdminPortal() {
       );
       const newOnly = wines.filter(w => {
         const key =
+          (w.year || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.producer || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.varietal || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' +
           (w.type || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -369,6 +373,37 @@ function AdminPortal() {
     }
   };
 
+  const fetchFlags = async () => {
+    setFlagsLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/wines/flags`, {
+        headers: { 'Authorization': `Bearer ${adminUser.token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFlags(data.flags || []);
+      }
+    } catch (err) {
+      console.error('Error fetching flags:', err);
+    } finally {
+      setFlagsLoading(false);
+    }
+  };
+
+  const resolveFlag = async (flagId) => {
+    try {
+      const response = await fetch(`${API_URL}/wines/flags/${flagId}/resolve`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminUser.token}` }
+      });
+      if (response.ok) {
+        setFlags(prev => prev.filter(f => f.flagId !== flagId));
+      }
+    } catch (err) {
+      console.error('Error resolving flag:', err);
+    }
+  };
+
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');
     setParsedWines(null);
@@ -556,7 +591,7 @@ function AdminPortal() {
         </div>
       )}
 
-      {(currentView === 'dashboard' || currentView === 'analytics') && selectedRestaurant && (
+      {(currentView === 'dashboard' || currentView === 'analytics' || currentView === 'flags') && selectedRestaurant && (
         <div className="admin-nav">
           <button
             className={`admin-nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
@@ -570,11 +605,67 @@ function AdminPortal() {
           >
             Analytics
           </button>
+          <button
+            className={`admin-nav-btn ${currentView === 'flags' ? 'active' : ''}`}
+            onClick={() => { setCurrentView('flags'); fetchFlags(); }}
+          >
+            Flags {flags.length > 0 && <span className="flag-nav-badge">{flags.length}</span>}
+          </button>
         </div>
       )}
 
       {currentView === 'analytics' && selectedRestaurant && (
         <AdminAnalytics restaurantId={selectedRestaurant} token={adminUser.token} />
+      )}
+
+      {currentView === 'flags' && (
+        <div className="flags-view">
+          <h3>Flagged Wines</h3>
+          {flagsLoading ? (
+            <p style={{ color: '#666', padding: 20 }}>Loading flags...</p>
+          ) : flags.length === 0 ? (
+            <div className="history-empty">No unresolved flags. All clear!</div>
+          ) : (
+            <table className="history-table">
+              <thead>
+                <tr>
+                  <th>Wine</th>
+                  <th>Restaurant</th>
+                  <th>Issue</th>
+                  <th>Note</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {flags.map(flag => (
+                  <tr key={flag.flagId}>
+                    <td>{flag.wineName || '—'}</td>
+                    <td>{flag.restaurantName || '—'}</td>
+                    <td>
+                      {flag.flagType === 'unavailable' && 'Not available'}
+                      {flag.flagType === 'wrong_price' && 'Wrong price'}
+                      {flag.flagType === 'wrong_details' && 'Wrong details'}
+                    </td>
+                    <td style={{ color: '#666', fontStyle: flag.note ? 'normal' : 'italic' }}>
+                      {flag.note || 'No note'}
+                    </td>
+                    <td>
+                      {flag.timestamp
+                        ? new Date(flag.timestamp._seconds ? flag.timestamp._seconds * 1000 : flag.timestamp).toLocaleDateString()
+                        : '—'}
+                    </td>
+                    <td>
+                      <button className="reanalyze-btn" onClick={() => resolveFlag(flag.flagId)}>
+                        Resolve
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       )}
 
       {currentView === 'dashboard' && selectedRestaurant && (

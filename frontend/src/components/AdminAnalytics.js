@@ -614,12 +614,12 @@ export default function AdminAnalytics({ restaurantId, token }) {
                 <div className="analytics-section">
                   <div className="analytics-chart-wrap">
                     <h3 style={{ marginTop: 0 }}>Most Viewed Restaurants</h3>
-                    <ResponsiveContainer width="100%" height={220}>
+                    <ResponsiveContainer width="100%" height={Math.max(220, (engagement.topRestaurants?.length || 0) * 45)}>
                       <BarChart data={engagement.topRestaurants} layout="vertical"
                         margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                         <XAxis type="number" tick={{ fontSize: 12 }} />
-                        <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12 }} />
+                        <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 12 }} />
                         <Tooltip formatter={(v) => [`${v} views`, 'Views']} />
                         <Bar dataKey="views" fill="#8b0000" radius={[0, 4, 4, 0]} />
                       </BarChart>

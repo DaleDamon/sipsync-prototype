@@ -142,8 +142,9 @@ For each wine, extract:
 
 PRICING GUIDANCE — how to detect glass prices:
 Some menus use a column table with headers like "6oz", "Glass", "BTL", or "Bottle" at the top of a wine section. When you see these column headers, the left/first column is the glass price and the right/second column is the bottle price. Apply this column mapping consistently to ALL wines within that section — do not abandon it partway through. Within the same section, some wines may only appear in the bottle column (no glass price) — give those glassPrice: null based on visual alignment, not just by counting numbers.
-Some menus use inline format instead: "13 • 52", "Glass $14 / Bottle $52", or "Btg $16". Extract glassPrice from that inline text.
-CRITICAL — BTG-only sections: If the section is clearly labeled "By the Glass", "Wine by the Glass", "BTG", or similar, and each wine shows only ONE price with no bottle column present, that single price is the GLASS price. Set glassPrice to that price and set price to null. Do NOT put the glass price in the price field.
+Some menus use inline format instead: "13 • 52", "Glass $14 / Bottle $52", "12 / 48", "15 | 60", or "Btg $16". When you see TWO numbers separated by "•", "/", "|", or similar — even inside a section labeled "Wine By The Glass" — treat the first as glassPrice and the second as price (bottle). Extract BOTH.
+CRITICAL — BTG-only sections: If the section is clearly labeled "By the Glass", "Wine by the Glass", "BTG", or similar, AND each wine shows only ONE price with no second number anywhere on the line, that single price is the GLASS price. Set glassPrice to that price and set price to null. Do NOT put the glass price in the price field. Apply this rule to EVERY wine in the section — do not revert to treating wines as bottle-only midway through. If you can see the section header and some wines have been assigned glass prices, continue assigning glass prices to the remaining wines in that same section.
+IMPORTANT: A section labeled "Wine By The Glass" that shows a "glass / bottle" column header or two numbers per wine is NOT a BTG-only section — it is a dual-price section. Extract both the glass price (first number) and the bottle price (second number) for every wine that shows two numbers.
 If a wine has only one price and no glass indicator anywhere on the page, set glassPrice: null.
 
 Also estimate the sensory profile:
@@ -366,7 +367,7 @@ function deduplicateWines(wines) {
   const map = new Map();
 
   for (const wine of wines) {
-    const key = [wine.producer, wine.varietal, wine.region]
+    const key = [wine.year || '', wine.producer, wine.varietal, wine.region]
       .map(s => (s || '').toLowerCase().trim().replace(/[^a-z0-9]/g, ''))
       .join('|');
 

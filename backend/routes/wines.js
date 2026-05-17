@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../firebase');
+const { db, admin } = require('../firebase');
 const { adminAuth } = require('../middleware/adminAuth');
+const { userAuth } = require('../middleware/userAuth');
 const { getWineCache, invalidateWineCache } = require('../utils/wineCache');
 
 // POST /api/wines/restaurant/:restaurantId/add
@@ -223,6 +224,7 @@ router.get('/search', async (req, res) => {
         bodyWeight: wine.bodyWeight || '',
         sweetnessLevel: wine.sweetnessLevel || '',
         flavorProfile: wine.flavorProfile || [],
+        flagCount: wine.flagCount || 0,
         matchKey,
       });
     }
@@ -235,6 +237,97 @@ router.get('/search', async (req, res) => {
   } catch (error) {
     console.error('Error searching wines:', error);
     res.status(500).json({ error: 'Wine search failed' });
+  }
+});
+
+// POST /api/wines/flag
+// User flags a wine as having an issue
+router.post('/flag', userAuth, async (req, res) => {
+  try {
+    const { restaurantId, restaurantName, wineId, wineName, flagType, note } = req.body;
+    const userId = req.user.userId;
+
+    if (!restaurantId || !wineId || !flagType) {
+      return res.status(400).json({ error: 'restaurantId, wineId, and flagType are required' });
+    }
+
+    const validFlagTypes = ['unavailable', 'wrong_price', 'wrong_details'];
+    if (!validFlagTypes.includes(flagType)) {
+      return res.status(400).json({ error: 'Invalid flagType' });
+    }
+
+    // Prevent duplicate flags from the same user on the same wine
+    const existing = await db.collection('wine_flags')
+      .where('userId', '==', userId)
+      .where('wineId', '==', wineId)
+      .get();
+
+    if (!existing.empty) {
+      return res.status(409).json({ error: 'You have already reported this wine' });
+    }
+
+    await db.collection('wine_flags').add({
+      restaurantId,
+      restaurantName: restaurantName || '',
+      wineId,
+      wineName: wineName || '',
+      userId,
+      flagType,
+      note: note || '',
+      timestamp: new Date(),
+      resolved: false,
+    });
+
+    // Increment flagCount on the wine document
+    const wineRef = db.collection('restaurants').doc(restaurantId).collection('wines').doc(wineId);
+    await wineRef.update({ flagCount: admin.firestore.FieldValue.increment(1) });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error flagging wine:', error);
+    res.status(500).json({ error: 'Failed to submit report' });
+  }
+});
+
+// GET /api/wines/flags
+// Admin: get all unresolved flags
+router.get('/flags', adminAuth, async (req, res) => {
+  try {
+    const snapshot = await db.collection('wine_flags')
+      .where('resolved', '==', false)
+      .get();
+
+    const flags = [];
+    snapshot.forEach(doc => {
+      flags.push({ flagId: doc.id, ...doc.data() });
+    });
+
+    flags.sort((a, b) => {
+      const ta = a.timestamp?.toDate?.() || new Date(a.timestamp);
+      const tb = b.timestamp?.toDate?.() || new Date(b.timestamp);
+      return tb - ta;
+    });
+
+    res.json({ flags });
+  } catch (error) {
+    console.error('Error fetching flags:', error);
+    res.status(500).json({ error: 'Failed to fetch flags' });
+  }
+});
+
+// POST /api/wines/flags/:flagId/resolve
+// Admin: mark a flag as resolved
+router.post('/flags/:flagId/resolve', adminAuth, async (req, res) => {
+  try {
+    const { flagId } = req.params;
+    await db.collection('wine_flags').doc(flagId).update({
+      resolved: true,
+      resolvedAt: new Date(),
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error resolving flag:', error);
+    res.status(500).json({ error: 'Failed to resolve flag' });
   }
 });
 

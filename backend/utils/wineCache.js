@@ -13,7 +13,7 @@ async function getWineCache(db) {
     db.collectionGroup('wines').select(
       'producer', 'varietal', 'region', 'year', 'name',
       'type', 'price', 'glassPrice', 'acidity', 'tannins',
-      'bodyWeight', 'sweetnessLevel', 'flavorProfile', 'inventoryStatus'
+      'bodyWeight', 'sweetnessLevel', 'flavorProfile', 'inventoryStatus', 'flagCount'
     ).get(),
     db.collection('restaurants').select('name', 'city').get(),
   ]);

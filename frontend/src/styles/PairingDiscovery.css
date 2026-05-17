@@ -1597,6 +1597,146 @@
   outline: none;
 }
 
+/* ==================== FLAG / REPORT ISSUE ==================== */
+
+.flag-btn {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 6px;
+  display: block;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.flag-btn:hover {
+  color: #888;
+}
+
+.flagged-label {
+  display: block;
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 6px;
+  padding: 4px 0;
+}
+
+.flag-indicator {
+  color: #e67e22;
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.flag-form {
+  margin-top: 10px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.flag-form-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin: 0 0 8px 0;
+}
+
+.flag-form-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.flag-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.flag-option input[type="radio"] {
+  accent-color: #8b0000;
+  cursor: pointer;
+}
+
+.flag-note-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  color: #333;
+}
+
+.flag-note-input:focus {
+  outline: none;
+  border-color: #8b0000;
+}
+
+.flag-form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.flag-submit-btn {
+  background: #8b0000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.flag-submit-btn:hover:not(:disabled) {
+  background: #6b0000;
+}
+
+.flag-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.flag-cancel-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.flag-cancel-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Match attribute dots */
+.attr-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.attr-dot--match { background: #4CAF50; }
+.attr-dot--no-match { background: #ddd; }
+
 /* OR divider between profile shortcut and manual characteristic fields */
 .pref-or-divider {
   display: flex;

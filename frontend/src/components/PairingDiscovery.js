@@ -130,6 +130,12 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
   const [activeInfoModal, setActiveInfoModal] = useState(null); // 'acidity', 'tannins', 'body', 'sweetness', or null
   const [confirmationModal, setConfirmationModal] = useState(null); // {wineName, show} for wine selection confirmation
 
+  // Flag / report state
+  const [flaggingWineId, setFlaggingWineId] = useState(null);
+  const [flaggedWineIds, setFlaggedWineIds] = useState(new Set());
+  const [flagType, setFlagType] = useState('');
+  const [flagNote, setFlagNote] = useState('');
+
   // Search mode state
   const [searchMode, setSearchMode] = useState('matching'); // 'matching' or 'search'
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -278,7 +284,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     try {
       const response = await fetch(`${API_URL}/restaurants`);
       const data = await response.json();
-      const restaurantList = data.restaurants || [];
+      const restaurantList = (data.restaurants || []).sort((a, b) => a.name.localeCompare(b.name));
       setRestaurants(restaurantList);
 
       if (restaurantList.length > 0 && !preSelectedRestaurant && !selectedRestaurant) {
@@ -348,10 +354,9 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
 
       const data = await response.json();
 
-      // Check if user has taken the quiz and store quiz profile
-      const profileKey = data.quizProfile || 'no-quiz';
+      // Check if user has dismissed the banner this session/profile cycle
       const dismissedKey = `sipsync_banner_dismissed_${user.userId}`;
-      const wasDismissed = localStorage.getItem(dismissedKey) === profileKey;
+      const wasDismissed = !!localStorage.getItem(dismissedKey);
 
       if (data.quizProfile) {
         setQuizProfile(data.quizProfile);
@@ -420,7 +425,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     if (!quizProfile) return;
     const profileId = quizProfile.toLowerCase().replace(/\s+/g, '-');
     applyProfileById(profileId);
-    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, quizProfile);
+    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, '1');
   };
 
   const toggleInfoModal = (modalName) => {
@@ -675,6 +680,109 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
     }
   };
 
+  const submitFlag = async (wine, restaurantId, restaurantName) => {
+    if (!flagType) return;
+    try {
+      const response = await fetch(`${API_URL}/wines/flag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sipsyncToken')}`,
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          restaurantId,
+          restaurantName: restaurantName || '',
+          wineId: wine.wineId,
+          wineName: getWineDisplayName(wine),
+          flagType,
+          note: flagNote,
+        }),
+      });
+
+      if (response.ok || response.status === 409) {
+        setFlaggedWineIds(prev => new Set([...prev, wine.wineId]));
+        setFlaggingWineId(null);
+        setFlagType('');
+        setFlagNote('');
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to submit report');
+      }
+    } catch (err) {
+      setError('Network error: ' + err.message);
+    }
+  };
+
+  const renderFlagUI = (wine, restaurantId, restaurantName) => {
+    const isOpen = flaggingWineId === wine.wineId;
+    const alreadyFlagged = flaggedWineIds.has(wine.wineId);
+
+    if (alreadyFlagged) {
+      return <span className="flagged-label">✓ Reported</span>;
+    }
+
+    return (
+      <>
+        <button
+          className="flag-btn"
+          onClick={() => {
+            setFlaggingWineId(isOpen ? null : wine.wineId);
+            setFlagType('');
+            setFlagNote('');
+          }}
+        >
+          ⚑ Report issue
+        </button>
+        {isOpen && (
+          <div className="flag-form">
+            <p className="flag-form-title">What's the issue?</p>
+            <div className="flag-form-options">
+              {[
+                { value: 'unavailable', label: 'Wine no longer available' },
+                { value: 'wrong_price', label: 'Price is incorrect' },
+                { value: 'wrong_details', label: 'Other details are wrong' },
+              ].map(opt => (
+                <label key={opt.value} className="flag-option">
+                  <input
+                    type="radio"
+                    name={`flag-${wine.wineId}`}
+                    value={opt.value}
+                    checked={flagType === opt.value}
+                    onChange={() => setFlagType(opt.value)}
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+            <input
+              type="text"
+              className="flag-note-input"
+              placeholder="Optional note..."
+              value={flagNote}
+              onChange={e => setFlagNote(e.target.value)}
+            />
+            <div className="flag-form-actions">
+              <button
+                className="flag-submit-btn"
+                disabled={!flagType}
+                onClick={() => submitFlag(wine, restaurantId, restaurantName)}
+              >
+                Submit
+              </button>
+              <button
+                className="flag-cancel-btn"
+                onClick={() => { setFlaggingWineId(null); setFlagType(''); setFlagNote(''); }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
   const wineTypes = ['red', 'white', 'rosé', 'sparkling', 'dessert'];
   const flavorOptions = ['oak', 'cherry', 'citrus', 'berry', 'vanilla', 'spice', 'floral', 'chocolate', 'earthy', 'tropical', 'herbal', 'honey', 'pear', 'biscuit'];
 
@@ -710,6 +818,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                     <h4>
                       {wine.year && `${wine.year} `}
                       {wine.producer} {wine.varietal}
+                      {wine.flagCount >= 3 && <span className="flag-indicator" title="Multiple users reported an issue with this wine"> ⚑</span>}
                     </h4>
                   </div>
                   {wine.region && (
@@ -764,6 +873,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   >
                     ♥ Save this Wine
                   </button>
+                  {renderFlagUI(wine, restaurant.restaurantId, restaurant.restaurantName)}
                 </div>
               ))}
             </div>
@@ -821,7 +931,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   className="banner-close-btn"
                   onClick={() => {
                     setShowQuizBanner(false);
-                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, quizProfile || 'no-quiz');
+                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, '1');
                   }}
                   aria-label="Close banner"
                 >
@@ -843,7 +953,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   className="banner-close-btn"
                   onClick={() => {
                     setShowQuizBanner(false);
-                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, 'no-quiz');
+                    localStorage.setItem(`sipsync_banner_dismissed_${user.userId}`, '1');
                   }}
                   aria-label="Close banner"
                 >
@@ -1256,6 +1366,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                   <h4>
                     {wine.year && `${wine.year} `}
                     {wine.producer} {wine.varietal}
+                    {wine.flagCount >= 3 && <span className="flag-indicator" title="Multiple users reported an issue with this wine"> ⚑</span>}
                   </h4>
                   <CircularProgress percentage={wine.matchScore * 100} />
                 </div>
@@ -1299,6 +1410,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
                 >
                   ♥ Save this Wine
                 </button>
+                {renderFlagUI(wine, selectedRestaurant, restaurants.find(r => r.restaurantId === selectedRestaurant)?.name || '')}
               </div>
             ))}
           </div>
