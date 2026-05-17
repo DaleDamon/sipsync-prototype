@@ -803,7 +803,7 @@ router.get('/user/:userId', async (req, res) => {
 // POST /api/analytics/event
 router.post('/event', async (req, res) => {
   try {
-    const { userId, eventType, restaurantId, wineId, filterState, sessionId } = req.body;
+    const { userId, eventType, restaurantId, wineId, filterState, sessionId, ...metadata } = req.body;
     if (!userId || !eventType) return res.status(400).json({ error: 'userId and eventType required' });
 
     const eventData = {
@@ -813,6 +813,7 @@ router.post('/event', async (req, res) => {
       wineId: wineId || null,
       filterState: filterState || null,
       sessionId: sessionId || null,
+      ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
       timestamp: FieldValue.serverTimestamp(),
     };
 

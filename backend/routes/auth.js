@@ -610,10 +610,19 @@ router.post('/quiz/submit', userAuth, async (req, res) => {
     };
 
     try {
-      // Use set with merge to handle both new and existing users
+      const completedAt = new Date();
+      // Preserve history before overwriting current result
+      await userRef.collection('quiz_history').add({
+        profileId: winningProfile.id,
+        profile: winningProfile.name,
+        answers,
+        preferences: preferencesData,
+        completedAt,
+      });
+
       await userRef.set({
         quizProfile: winningProfile.name,
-        quizCompletedAt: new Date(),
+        quizCompletedAt: completedAt,
         quizAnswers: answers,
         savedPreferences: [preferencesData]
       }, { merge: true });
