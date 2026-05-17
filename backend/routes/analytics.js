@@ -16,15 +16,13 @@ router.get('/trending', async (req, res) => {
       return res.json(trendingCache.data);
     }
 
-    // Two parallel Firestore reads: pairing_history scan + foodItems count
-    // Wines come from the in-memory cache (no extra Firestore hit after first load)
-    const [{ wines }, pairingSnap, foodSnap] = await Promise.all([
+    // Two parallel Firestore reads: pairing_history scan + wine cache
+    const [{ wines }, pairingSnap] = await Promise.all([
       getWineCache(db),
       db.collectionGroup('pairing_history').select(
         'wineName', 'restaurantName', 'acidity', 'tannins',
         'bodyWeight', 'sweetnessLevel', 'wineType'
       ).get(),
-      db.collectionGroup('foodItems').select('name').get(),
     ]);
 
     // Stats — derived from wine cache
@@ -42,7 +40,7 @@ router.get('/trending', async (req, res) => {
     const stats = {
       totalRestaurants: restaurantIds.size,
       totalWines: wines.length,
-      totalFoodItems: foodSnap.size,
+      totalWinesSaved: pairingSnap.size,
       totalCities: cities.size,
       winesByType,
     };

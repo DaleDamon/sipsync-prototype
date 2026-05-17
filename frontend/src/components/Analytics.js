@@ -57,8 +57,8 @@ function Analytics({ user }) {
               <p className="stat-value">{stats.totalWines}</p>
             </div>
             <div className="stat-card">
-              <p className="stat-label">Food Pairings</p>
-              <p className="stat-value">{stats.totalFoodItems}</p>
+              <p className="stat-label">Wines Saved</p>
+              <p className="stat-value">{stats.totalWinesSaved}</p>
             </div>
             <div className="stat-card">
               <p className="stat-label">Cities</p>
