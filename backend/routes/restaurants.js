@@ -165,43 +165,6 @@ router.post('/', adminAuth, async (req, res) => {
   }
 });
 
-// Second: POST /api/restaurants/create
-router.post('/create', async (req, res) => {
-  try {
-    const { name, location, city } = req.body;
-    if (!name || !city) {
-      return res.status(400).json({ error: 'Restaurant name and city are required' });
-    }
-
-    const restaurant = {
-      name,
-      location: location || {},
-      city,
-      wineList: [],
-      menu: [],
-      createdAt: new Date(),
-    };
-
-    const restaurantRef = await db.collection('restaurants').add(restaurant);
-    const restaurantId = restaurantRef.id;
-
-    const baseUrl = process.env.SIPSYNC_BASE_URL || 'http://localhost:3000';
-    const qrUrl = `${baseUrl}/restaurant/${restaurantId}`;
-    const qrCode = await QRCode.toDataURL(qrUrl);
-
-    await restaurantRef.update({ qrCodeUrl: qrUrl });
-
-    res.json({
-      message: 'Restaurant created successfully',
-      restaurantId,
-      restaurant: { ...restaurant, qrCodeUrl: qrUrl, qrCodeImage: qrCode },
-    });
-  } catch (error) {
-    console.error('Error creating restaurant:', error);
-    res.status(500).json({ error: 'Failed to create restaurant' });
-  }
-});
-
 // Third: GET /api/restaurants/:restaurantId
 router.get('/:restaurantId', async (req, res) => {
   try {
