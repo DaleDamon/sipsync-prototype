@@ -7,13 +7,15 @@ function FeedbackButton({ user, currentScreen }) {
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
     setSubmitting(true);
+    setSubmitError(false);
     try {
       const sessionId = sessionStorage.getItem('sipsync_session') || null;
-      await fetch(`${API_URL}/analytics/feedback`, {
+      const res = await fetch(`${API_URL}/analytics/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -23,14 +25,18 @@ function FeedbackButton({ user, currentScreen }) {
           sessionId,
         }),
       });
-      setSubmitted(true);
-      setTimeout(() => {
-        setOpen(false);
-        setText('');
-        setSubmitted(false);
-      }, 1800);
+      if (res.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setOpen(false);
+          setText('');
+          setSubmitted(false);
+        }, 1800);
+      } else {
+        setSubmitError(true);
+      }
     } catch {
-      // silent fail — don't let feedback errors surface to user
+      setSubmitError(true);
     } finally {
       setSubmitting(false);
     }
@@ -77,6 +83,9 @@ function FeedbackButton({ user, currentScreen }) {
                   maxLength={500}
                 />
 
+                {submitError && (
+                  <p className="feedback-error">Something went wrong. Please try again.</p>
+                )}
                 <button
                   className="feedback-submit"
                   onClick={handleSubmit}

@@ -1509,6 +1509,12 @@
   gap: 6px;
 }
 
+.replace-profile-hint {
+  font-size: 12px;
+  color: #8b0000;
+  margin: 0;
+}
+
 .replace-profile-selector label {
   font-size: 13px;
   color: #666;

@@ -1288,7 +1288,7 @@ function PairingDiscovery({ user, preSelectedRestaurant, onStartQuiz }) {
               />
               {customProfiles.length >= 3 && (
                 <div className="replace-profile-selector">
-                  <label>Replace existing profile:</label>
+                  <p className="replace-profile-hint">You've reached the 3-profile limit. Select a profile to replace it.</p>
                   <select value={replaceTargetId} onChange={e => setReplaceTargetId(e.target.value)}>
                     <option value="">— Choose profile to replace —</option>
                     {customProfiles.map(p => (
