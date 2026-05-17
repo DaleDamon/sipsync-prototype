@@ -73,6 +73,7 @@ function App() {
     localStorage.setItem('sipsyncToken', userData.token);
     localStorage.setItem('sipsyncUserId', userData.userId);
     if (userData.name) localStorage.setItem('sipsyncUserName', userData.name);
+    logSession(userData.userId);
     checkUserPreferences(userData.userId);
     setCurrentScreen('discovery');
   };
